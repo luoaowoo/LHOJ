@@ -1,0 +1,111 @@
+html, body, #root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #0b0f12;
+}
+
+* { scrollbar-width: thin; scrollbar-color: rgb(120 138 153 / 0.45) transparent; }
+::selection { background: rgb(98 217 243 / 0.28); }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.md {
+  color: inherit;
+  font-size: 0.95rem;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+
+.md h1, .md h2, .md h3, .md h4 {
+  line-height: 1.3;
+  margin: 1.4rem 0 0.6rem;
+  letter-spacing: 0;
+}
+
+.md h1 { font-size: 1.55rem; }
+.md h2 {
+  font-size: 1.3rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid rgb(128 128 128 / 0.28);
+}
+.md h3 { font-size: 1.12rem; }
+.md p { margin: 0.55rem 0; }
+.md pre, .md code {
+  font-family: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+}
+.md pre {
+  background: rgb(128 128 128 / 0.1);
+  border: 1px solid rgb(128 128 128 / 0.18);
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  overflow: auto;
+  margin: 0.75rem 0;
+}
+.md code {
+  font-size: 0.88em;
+}
+.md :not(pre) > code {
+  background: rgb(128 128 128 / 0.12);
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+}
+.md blockquote {
+  margin: 0.75rem 0;
+  padding: 0.1rem 0 0.1rem 1rem;
+  border-left: 3px solid currentColor;
+  opacity: 0.78;
+}
+.md table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0.75rem 0;
+  font-size: 0.92rem;
+}
+.md th, .md td {
+  border: 1px solid rgb(128 128 128 / 0.24);
+  padding: 0.45rem 0.65rem;
+  text-align: left;
+  vertical-align: top;
+}
+.md img {
+  max-width: 100%;
+  height: auto;
+}
+.md a {
+  color: inherit;
+}
+
+.md .katex-display {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-block: 0.25rem;
+}
+
+.md .contains-task-list {
+  padding-left: 0;
+  list-style: none;
+}
+
+.md .task-list-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.md .task-list-item > input {
+  flex: 0 0 auto;
+  margin-top: 0.42rem;
+}

@@ -1,0 +1,25 @@
+# Replace /srv/lh-oj with the directory containing this project's dist output.
+# TLS may be added by replacing :8080 with the frontend hostname.
+:8080 {
+	encode zstd gzip
+
+	# All session-bearing Hydro requests stay same-origin in the browser.
+	handle_path /hydro-native/* {
+		reverse_proxy 64.90.0.223:801 {
+			header_up Host {http.reverse_proxy.upstream.hostport}
+			header_up Origin http://64.90.0.223:801
+			header_up Referer http://64.90.0.223:801/
+		}
+	}
+
+	# GraphQL primary path used before fallback is selected.
+	handle /api* {
+		reverse_proxy 64.90.0.223:801
+	}
+
+	handle {
+		root * /srv/lh-oj
+		try_files {path} /index.html
+		file_server
+	}
+}

@@ -1,0 +1,10 @@
+node_modules/
+dist/
+*.local
+.env
+.env.*
+.DS_Store
+npm-debug.log*
+*.tsbuildinfo
+proxy-record.txt
+response.txt
