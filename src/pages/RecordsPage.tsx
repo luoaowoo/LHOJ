@@ -126,6 +126,10 @@ export default function RecordsPage() {
 
   return (
     <Box>
+      <Box sx={{ mb: 2.3 }}>
+        <Typography variant="h4" sx={{ fontWeight: 800 }}>评测记录</Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mt: .45 }}>查看提交状态、运行时间和评测结果</Typography>
+      </Box>
       <Box
         sx={{
           mb: 2,
@@ -133,6 +137,11 @@ export default function RecordsPage() {
           flexWrap: 'wrap',
           alignItems: 'center',
           gap: 1.2,
+          p: { xs: 1.4, md: 1.8 },
+          border: '1px solid',
+          borderColor: 'divider',
+          borderRadius: 2,
+          bgcolor: 'rgba(255,255,255,.025)',
         }}
       >
         <TextField

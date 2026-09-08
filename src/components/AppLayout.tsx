@@ -187,7 +187,7 @@ export default function AppLayout() {
           transition: theme.transitions.create(['width', 'margin-left']),
         }}
       >
-        <Toolbar sx={{ gap: 1, minHeight: { xs: 58, md: 64 } }}>
+        <Toolbar sx={{ gap: 1.2, minHeight: { xs: 58, md: 72 }, px: { xs: 1.5, md: 2.5 } }}>
           {wide && (
             <Tooltip title={sidebarCollapsed ? '展开侧边栏' : '收起侧边栏'}>
               <IconButton
@@ -199,12 +199,30 @@ export default function AppLayout() {
               </IconButton>
             </Tooltip>
           )}
-          <Typography
-            noWrap
-            sx={{ fontWeight: 650, flex: 1, fontSize: { xs: 16, md: 18 } }}
-          >
-            {pageTitle}
-          </Typography>
+          <Box sx={{ display: { xs: 'none', lg: 'flex' }, alignItems: 'center', gap: .35, flex: 1, minWidth: 0 }}>
+            {visibleNavItems.slice(0, 7).map((item) => (
+              <Box
+                key={item.to}
+                component={RouterLink}
+                to={item.to}
+                sx={{
+                  color: active(item.to) ? 'text.primary' : 'text.secondary',
+                  bgcolor: active(item.to) ? 'action.selected' : 'transparent',
+                  borderRadius: 99,
+                  px: 1.55,
+                  py: .85,
+                  textDecoration: 'none',
+                  fontSize: '.88rem',
+                  fontWeight: active(item.to) ? 700 : 600,
+                  whiteSpace: 'nowrap',
+                  '&:hover': { bgcolor: 'action.hover', color: 'text.primary' },
+                }}
+              >
+                {item.label}
+              </Box>
+            ))}
+          </Box>
+          <Typography noWrap sx={{ display: { xs: 'block', lg: 'none' }, fontWeight: 700, flex: 1, fontSize: { xs: 16, md: 18 } }}>{pageTitle}</Typography>
           <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: .7, px: 1.2, py: .55, border: '1px solid', borderColor: 'divider', borderRadius: 1, color: 'text.secondary' }}>
             <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: 'success.light', boxShadow: '0 0 9px rgba(102,187,106,.7)' }} />
             <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>Hydro online</Typography>
@@ -313,7 +331,7 @@ export default function AppLayout() {
           transition: theme.transitions.create('width'),
         }}
       >
-        <Toolbar sx={{ minHeight: { xs: 58, md: 64 } }} />
+        <Toolbar sx={{ minHeight: { xs: 58, md: 72 } }} />
         <Box
           sx={{
             px: { xs: 1.4, sm: 2.2, xl: 3 },

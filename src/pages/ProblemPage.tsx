@@ -122,6 +122,9 @@ export default function ProblemPage() {
         }}
       >
         <Paper component="article" variant="outlined" sx={{ p: { xs: 2, sm: 3 }, minWidth: 0 }}>
+          <Typography variant="overline" sx={{ color: 'primary.main', fontFamily: 'monospace' }}>
+            PROBLEM / {pid}
+          </Typography>
           <Typography variant="h5" sx={{ fontWeight: 700, lineHeight: 1.3 }}>
             {problem.title}
           </Typography>

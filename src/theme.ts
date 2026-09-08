@@ -193,10 +193,10 @@ export function buildTheme(mode: ThemeMode, accent: string) {
         styleOverrides: {
           root: {
             fontSize: '0.9rem',
-            '& .MuiInputLabel-root': { color: dark ? '#c5ced6' : '#4b5563' },
+            '& .MuiInputLabel-root': { color: dark ? '#d2dae1' : '#4b5563' },
             '& .MuiOutlinedInput-root': {
-              backgroundColor: dark ? '#11171c' : '#ffffff',
-              '& fieldset': { borderColor: dark ? 'rgba(226,232,240,.28)' : 'rgba(15,23,42,.22)' },
+              backgroundColor: dark ? '#11161b' : '#ffffff',
+              '& fieldset': { borderColor: dark ? 'rgba(226,232,240,.36)' : 'rgba(15,23,42,.22)' },
               '&:hover fieldset': { borderColor: dark ? 'rgba(226,232,240,.48)' : 'rgba(15,23,42,.38)' },
               '&.Mui-focused fieldset': { borderWidth: 2 },
             },
