@@ -47,12 +47,12 @@ export function buildTheme(mode: ThemeMode, accent: string) {
         contrastText: '#ffffff',
       },
       background: dark
-        ? { default: '#0b0f12', paper: '#151a1f' }
+        ? { default: '#0d1115', paper: '#181e24' }
         : { default: '#f4f6fa', paper: '#ffffff' },
       text: dark
-        ? { primary: '#eef3f7', secondary: '#929da8' }
+        ? { primary: '#f4f7fa', secondary: '#b5c0ca' }
         : { primary: '#172033', secondary: '#4b5563' },
-      divider: dark ? 'rgba(226, 232, 240, 0.10)' : 'rgba(15, 23, 42, 0.12)',
+      divider: dark ? 'rgba(226, 232, 240, 0.18)' : 'rgba(15, 23, 42, 0.14)',
       action: {
         hover: dark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(25, 55, 120, 0.06)',
         selected: dark ? 'rgba(59, 130, 246, 0.18)' : 'rgba(37, 99, 235, 0.10)',
@@ -66,14 +66,14 @@ export function buildTheme(mode: ThemeMode, accent: string) {
       h1: { fontSize: '1.75rem', fontWeight: 650, lineHeight: 1.2 },
       h2: { fontSize: '1.45rem', fontWeight: 650, lineHeight: 1.25 },
       h3: { fontSize: '1.2rem', fontWeight: 650, lineHeight: 1.3 },
-      h4: { fontSize: '1.05rem', fontWeight: 650, lineHeight: 1.35 },
-      h5: { fontSize: '0.98rem', fontWeight: 650, lineHeight: 1.4 },
-      h6: { fontSize: '0.9rem', fontWeight: 650, lineHeight: 1.4 },
-      subtitle1: { fontSize: '0.95rem', fontWeight: 500, lineHeight: 1.5 },
-      subtitle2: { fontSize: '0.85rem', fontWeight: 550, lineHeight: 1.45 },
-      body1: { fontSize: '0.94rem', lineHeight: 1.6 },
-      body2: { fontSize: '0.84rem', lineHeight: 1.55 },
-      caption: { fontSize: '0.76rem', lineHeight: 1.4 },
+      h4: { fontSize: '1.35rem', fontWeight: 700, lineHeight: 1.35 },
+      h5: { fontSize: '1.18rem', fontWeight: 700, lineHeight: 1.4 },
+      h6: { fontSize: '1rem', fontWeight: 700, lineHeight: 1.4 },
+      subtitle1: { fontSize: '1rem', fontWeight: 550, lineHeight: 1.5 },
+      subtitle2: { fontSize: '0.9rem', fontWeight: 600, lineHeight: 1.5 },
+      body1: { fontSize: '0.98rem', lineHeight: 1.65 },
+      body2: { fontSize: '0.9rem', lineHeight: 1.6 },
+      caption: { fontSize: '0.8rem', lineHeight: 1.5 },
       overline: { fontSize: '0.72rem', fontWeight: 600, letterSpacing: 0 },
       button: {
         fontSize: '0.86rem',
@@ -109,7 +109,7 @@ export function buildTheme(mode: ThemeMode, accent: string) {
         styleOverrides: {
           root: {
             backgroundImage: 'none',
-            ...(dark && { borderColor: 'rgba(255,255,255,0.075)' }),
+            ...(dark && { borderColor: 'rgba(226,232,240,0.16)' }),
           },
         },
       },
@@ -193,6 +193,14 @@ export function buildTheme(mode: ThemeMode, accent: string) {
         styleOverrides: {
           root: {
             fontSize: '0.9rem',
+            '& .MuiInputLabel-root': { color: dark ? '#c5ced6' : '#4b5563' },
+            '& .MuiOutlinedInput-root': {
+              backgroundColor: dark ? '#11171c' : '#ffffff',
+              '& fieldset': { borderColor: dark ? 'rgba(226,232,240,.28)' : 'rgba(15,23,42,.22)' },
+              '&:hover fieldset': { borderColor: dark ? 'rgba(226,232,240,.48)' : 'rgba(15,23,42,.38)' },
+              '&.Mui-focused fieldset': { borderWidth: 2 },
+            },
+            '& .MuiFormHelperText-root': { color: dark ? '#aeb9c3' : '#596579' },
           },
         },
       },
