@@ -15,7 +15,7 @@ import { useAuth } from '../auth';
 import { usePreferences } from '../prefs';
 import { hydroAvatarUrl, hydroPublicUrl } from '../lib/endpoint';
 import { parseRp, ratingColor } from '../lib/rating';
-import { sidebarSurface } from '../theme';
+import { resolveChromeBg } from '../theme';
 
 const drawerWidth = 260;
 const railWidth = 72;
@@ -30,7 +30,6 @@ const navItems = [
   { to: '/discuss', label: '讨论', icon: MessageSquare },
   { to: '/records', label: '评测记录', icon: ListChecks },
   { to: '/ranking', label: '排名', icon: BarChart3 },
-  { to: '/about', label: '风格简介', icon: Palette },
 ];
 const mobileNavItems = [navItems[0], navItems[1], navItems[3], navItems[6]];
 
@@ -87,9 +86,9 @@ export default function AppLayout() {
   });
   const compactRail = !phone && (!wide || sidebarCollapsed);
   const navigationWidth = compactRail ? railWidth : drawerWidth;
-  const sidebarBg = theme.palette.mode === 'dark' ? sidebarSurface.dark : sidebarSurface.light;
   const { user, logout } = useAuth();
-  const { usernameColoring, customBgEnabled, customBgUrl } = usePreferences();
+  const { usernameColoring, customBgColor } = usePreferences();
+  const sidebarBg = resolveChromeBg(theme.palette.mode, customBgColor);
   const location = useLocation();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [userAnchor, setUserAnchor] = useState<HTMLElement | null>(null);
@@ -172,17 +171,7 @@ export default function AppLayout() {
   );
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        ...(customBgEnabled && customBgUrl ? {
-          backgroundImage: `url("${customBgUrl.replace(/"/g, '%22')}")`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundAttachment: 'fixed',
-        } : {}),
-      }}
-    >
+    <Box sx={{ display: 'flex' }}>
       <Box
         component="a"
         href="#main-content"
@@ -350,7 +339,7 @@ export default function AppLayout() {
           borderRadius: 4,
           border: '1px solid',
           borderColor: 'divider',
-          bgcolor: 'background.paper',
+          bgcolor: sidebarBg,
           boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
           overflow: 'hidden',
         }}
