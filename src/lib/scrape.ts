@@ -881,19 +881,99 @@ export async function scrapeDiscussionDetail(id: string, pageNumber = 1): Promis
   };
 }
 
-export async function postHydroForm(
+export type HydroFormValue = string | Blob | null | undefined;
+export type HydroFormFields = Record<string, HydroFormValue | HydroFormValue[]>;
+export type HydroFormInput = HydroFormFields | FormData | URLSearchParams | HTMLFormElement;
+
+export interface HydroSubmitResult {
+  status: number;
+  ok: boolean;
+  redirected: boolean;
+  redirectUrl?: string;
+  refresh: boolean;
+  payload: Record<string, unknown> | null;
+}
+
+function formValueToString(value: HydroFormValue): string {
+  if (value instanceof Blob) {
+    const name = 'name' in value && typeof value.name === 'string' ? value.name : '';
+    return name || '[blob]';
+  }
+  return value == null ? '' : String(value);
+}
+
+function formEntries(input: HydroFormInput): Array<[string, HydroFormValue]> {
+  if (input instanceof FormData || input instanceof URLSearchParams) {
+    return Array.from(input.entries()).map(([name, value]) => [name, value]);
+  }
+  if (typeof HTMLFormElement !== 'undefined' && input instanceof HTMLFormElement) {
+    return Array.from(new FormData(input).entries()).map(([name, value]) => [name, value]);
+  }
+  return Object.entries(input).flatMap(([name, value]) => (
+    (Array.isArray(value) ? value : [value]).map((item) => [name, item] as [string, HydroFormValue])
+  ));
+}
+
+function toHydroFormData(input: HydroFormInput): FormData {
+  const data = new FormData();
+  for (const [name, value] of formEntries(input)) {
+    if (value instanceof Blob) data.append(name, value);
+    else data.append(name, formValueToString(value));
+  }
+  return data;
+}
+
+function toHydroSearchParams(input: HydroFormInput): URLSearchParams {
+  const params = new URLSearchParams();
+  for (const [name, value] of formEntries(input)) params.append(name, formValueToString(value));
+  return params;
+}
+
+function hasBinaryEntries(input: HydroFormInput): boolean {
+  return formEntries(input).some(([, value]) => value instanceof Blob);
+}
+
+function parseResponsePayload(text: string, contentType: string): Record<string, unknown> | null {
+  if (!contentType.includes('json') && !/^\s*[{[]/.test(text)) return null;
+  try {
+    const value: unknown = JSON.parse(text);
+    return isRecord(value) ? value : null;
+  } catch {
+    return null;
+  }
+}
+
+function responseRefreshes(response: Response, text: string, payload: Record<string, unknown> | null): boolean {
+  return response.redirected
+    || response.status >= 300 && response.status < 400
+    || typeof payload?.url === 'string'
+    || /<meta[^>]+http-equiv=["']?refresh|window\.location(?:\.href)?\s*=|location\.replace\s*\(/i.test(text);
+}
+
+export async function submitHydro(
   path: string,
-  fields: FormData | Record<string, string | Blob | File | string[] | Blob[]>,
-): Promise<void> {
+  fields: HydroFormInput = {},
+  options: { method?: string; enctype?: string } = {},
+): Promise<HydroSubmitResult> {
   await ensureEndpoint();
+  const method = (options.method || 'POST').toUpperCase() === 'GET' ? 'GET' : 'POST';
+  const enctype = (options.enctype || '').toLowerCase();
+  const params = toHydroSearchParams(fields);
+  const query = params.toString();
+  const url = method === 'GET' && query
+    ? `${hydroNativeUrl(path)}${path.includes('?') ? '&' : '?'}${query}`
+    : hydroNativeUrl(path);
+  const multipart = method === 'POST' && (enctype.includes('multipart/form-data') || hasBinaryEntries(fields));
+  const body = method === 'GET' ? undefined : multipart ? toHydroFormData(fields) : params;
   let response: Response;
   try {
-    response = await fetch(hydroNativeUrl(path), {
-      method: 'POST',
+    response = await fetch(url, {
+      method,
       headers: {
         Accept: 'text/html, application/json',
+        ...(method === 'POST' && !multipart ? { 'Content-Type': 'application/x-www-form-urlencoded' } : {}),
       },
-      body: fields instanceof FormData ? fields : toHydroFormData(fields),
+      body,
       credentials: 'include',
       redirect: 'manual',
       signal: requestSignal(),
@@ -902,25 +982,41 @@ export async function postHydroForm(
     throw new ApiError('操作失败：无法连接 Hydro 服务。');
   }
   const text = await response.text().catch(() => '');
+  const payload = parseResponsePayload(text, response.headers.get('content-type') || '');
+  const location = response.headers.get('location') || (typeof payload?.url === 'string' ? payload.url : '');
+  if (/\/login(?:[/?#]|$)/i.test(location) || /href=["']?\/login(?:[/?#]|["'])/i.test(text)) {
+    throw sessionExpiredError();
+  }
   if (response.status >= 300 && response.status < 400) {
-    const location = response.headers.get('location') ?? '';
-    if (/\/login(?:[/?#]|$)/i.test(location)) throw sessionExpiredError();
-    return;
+    return {
+      status: response.status,
+      ok: true,
+      redirected: true,
+      redirectUrl: location || undefined,
+      refresh: true,
+      payload,
+    };
   }
   if (response.ok) {
-    try {
-      const payload = JSON.parse(text) as Record<string, unknown>;
-      if (typeof payload.url === 'string' && /^\/login(?:[/?#]|$)/.test(payload.url)) {
-        throw sessionExpiredError();
-      }
-    } catch (cause) {
-      if (cause instanceof ApiError) throw cause;
-    }
-    if (/href=["']?\/login(?:[/?#]|["'])/i.test(text)) throw sessionExpiredError();
-    return;
+    return {
+      status: response.status,
+      ok: true,
+      redirected: response.redirected,
+      redirectUrl: location || undefined,
+      refresh: responseRefreshes(response, text, payload),
+      payload,
+    };
   }
   const message = text.match(/<p[^>]*>([^<]+)<\/p>/i)?.[1]?.trim();
   throw new ApiError(message || `操作失败（HTTP ${response.status}）。`);
+}
+
+export async function postHydroForm(
+  path: string,
+  fields: HydroFormInput,
+  options: { enctype?: string } = {},
+): Promise<HydroSubmitResult> {
+  return submitHydro(path, fields, { ...options, method: 'POST' });
 }
 
 export interface HydroAdminField {
@@ -940,10 +1036,19 @@ export interface HydroAdminField {
 }
 
 export interface HydroAdminSubmit {
+  id?: string;
   name?: string;
   value?: string;
   label: string;
   action?: string;
+  method?: string;
+  enctype?: string;
+}
+
+export interface HydroAdminLink {
+  id: string;
+  label: string;
+  href: string;
 }
 
 export interface HydroAdminTableCell {
@@ -952,111 +1057,192 @@ export interface HydroAdminTableCell {
 }
 
 export interface HydroAdminTableRow {
+  id: string;
   cells: HydroAdminTableCell[];
   attributes: Record<string, string>;
 }
 
 export interface HydroAdminTable {
+  id: string;
   title: string;
   headers: string[];
   rows: HydroAdminTableRow[];
 }
 
 export interface HydroAdminAction {
+  id: string;
   label: string;
   action: string;
   fields: Array<{ name: string; value: string }>;
+  method?: string;
+  href?: string;
 }
 
 export interface HydroAdminForm {
+  id: string;
   action: string;
   method?: string;
   enctype?: string;
   title: string;
   fields: HydroAdminField[];
   submits?: HydroAdminSubmit[];
+  links?: HydroAdminLink[];
 }
 
 export interface HydroAdminPage {
+  id: string;
   title: string;
   forms: HydroAdminForm[];
   tables: HydroAdminTable[];
   actions: HydroAdminAction[];
+  links: HydroAdminLink[];
   path: string;
 }
 
-function toHydroFormData(fields: Record<string, string | Blob | File | string[] | Blob[]>): FormData {
-  const data = new FormData();
-  for (const [name, value] of Object.entries(fields)) {
-    for (const item of Array.isArray(value) ? value : [value]) data.append(name, item);
+function uniqueAdminId(used: Set<string>, preferred: string, fallback: string): string {
+  const base = preferred || fallback;
+  let value = base;
+  let index = 2;
+  while (used.has(value)) value = `${base}-${index++}`;
+  used.add(value);
+  return value;
+}
+
+function routePath(path: string): string {
+  try {
+    return new URL(path, 'http://hydro.local').pathname;
+  } catch {
+    return path.split('?')[0];
   }
-  return data;
 }
 
 function internalPath(value: string | null | undefined, fallback: string): string {
   if (!value) return fallback;
   try {
-    const url = new URL(value, window.location.origin);
-    return url.origin === window.location.origin ? `${url.pathname}${url.search}${url.hash}` : value;
-  } catch { return value; }
+    const url = new URL(value, 'http://hydro.local');
+    return url.origin === 'http://hydro.local' ? `${url.pathname}${url.search}${url.hash}` : value;
+  } catch {
+    return value;
+  }
+}
+
+function elementLabel(element: Element, doc: Document): string {
+  const id = element.getAttribute('id');
+  const label = id ? doc.querySelector<HTMLLabelElement>(`label[for="${CSS.escape(id)}"]`) : element.closest('label');
+  return clean(label?.textContent)
+    || clean(element.getAttribute('aria-label'))
+    || clean(element.getAttribute('placeholder'))
+    || element.getAttribute('name')
+    || '';
 }
 
 function headingFor(element: Element, fallback: string): string {
   return clean(element.querySelector('h1, h2, h3, h4, legend, [data-heading], .section__title')?.textContent) || fallback;
 }
 
-function fieldLabel(element: Element, doc: Document): string {
-  const input = element as HTMLInputElement;
-  const label = input.id ? doc.querySelector<HTMLLabelElement>(`label[for="${CSS.escape(input.id)}"]`) : element.closest('label');
-  return clean(label?.textContent) || element.getAttribute('aria-label') || element.getAttribute('placeholder') || input.name;
+function formControls(form: HTMLFormElement): Array<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement> {
+  return Array.from(form.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(
+    'input[name], select[name], textarea[name]',
+  )).filter((element) => !(element instanceof HTMLInputElement && ['submit', 'button', 'reset', 'image'].includes(element.type)));
 }
 
-function scrapeForm(form: HTMLFormElement, doc: Document, index: number): HydroAdminForm {
-  const fields = Array.from(form.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('input[name], select[name], textarea[name]')).map((element, fieldIndex) => {
+function formActionFields(form: HTMLFormElement): Array<{ name: string; value: string }> {
+  const fields: Array<{ name: string; value: string }> = [];
+  for (const control of formControls(form)) {
+    if (control.disabled) continue;
+    if (control instanceof HTMLInputElement && ['checkbox', 'radio'].includes(control.type) && !control.checked) continue;
+    if (control instanceof HTMLSelectElement && control.multiple) {
+      for (const option of Array.from(control.selectedOptions)) fields.push({ name: control.name, value: option.value });
+    } else if (control.type !== 'file') {
+      fields.push({ name: control.name, value: control.value });
+    }
+  }
+  return fields;
+}
+
+function actionFromElement(
+  element: HTMLButtonElement | HTMLInputElement | HTMLAnchorElement,
+  used: Set<string>,
+  index: number,
+  form?: HTMLFormElement,
+): HydroAdminAction {
+  const name = element.getAttribute('name');
+  const value = element instanceof HTMLInputElement ? element.value : element.getAttribute('value') || '';
+  const href = element instanceof HTMLAnchorElement ? element.getAttribute('href') || undefined : undefined;
+  const formAction = internalPath(element.getAttribute('formaction'), form?.getAttribute('action') || '');
+  const action = href && !href.startsWith('javascript:') ? href : formAction || '';
+  const fields = form ? formActionFields(form) : [];
+  if (name) fields.push({ name, value });
+  return {
+    id: uniqueAdminId(used, element.id, `action-${index + 1}`),
+    label: clean(element.textContent) || clean(element.getAttribute('aria-label')) || value || name || '操作',
+    action,
+    fields,
+    method: (element.getAttribute('formmethod') || form?.getAttribute('method') || 'POST').toUpperCase(),
+    href,
+  };
+}
+
+function scrapeForm(form: HTMLFormElement, doc: Document, index: number, used: Set<string>, fallbackAction: string): HydroAdminForm {
+  const fields = formControls(form).map((element, fieldIndex) => {
     const type = element instanceof HTMLSelectElement ? 'select' : element instanceof HTMLTextAreaElement ? 'textarea' : element.type || 'text';
-    const options = element instanceof HTMLSelectElement
-      ? Array.from(element.options).map((option) => ({ value: option.value, label: clean(option.textContent), selected: option.selected }))
-      : undefined;
     return {
-      id: `${index}:${fieldIndex}`,
+      id: uniqueAdminId(used, element.id, `field-${index + 1}-${fieldIndex + 1}`),
       name: element.name,
       type,
-      label: fieldLabel(element, doc),
-      value: element instanceof HTMLSelectElement || element instanceof HTMLTextAreaElement ? element.value : element.value,
+      label: elementLabel(element, doc),
+      value: element instanceof HTMLInputElement && element.type === 'file' ? '' : element.value,
       checked: element instanceof HTMLInputElement ? element.checked : false,
       disabled: element.disabled,
       required: element.required,
       placeholder: element.getAttribute('placeholder') || undefined,
       helpText: clean(element.closest('.form__item')?.querySelector('.help-text')?.textContent) || undefined,
-      accept: element instanceof HTMLInputElement ? element.getAttribute('accept') || undefined : undefined,
-      multiple: element instanceof HTMLInputElement ? element.multiple : undefined,
-      ...(options ? { options } : {}),
+      accept: element instanceof HTMLInputElement ? element.accept || undefined : undefined,
+      multiple: element instanceof HTMLSelectElement || element instanceof HTMLInputElement ? element.multiple : undefined,
+      options: element instanceof HTMLSelectElement
+        ? Array.from(element.options).map((option) => ({ value: option.value, label: clean(option.textContent), selected: option.selected }))
+        : undefined,
     } satisfies HydroAdminField;
   });
-  const submits = Array.from(form.querySelectorAll<HTMLButtonElement | HTMLInputElement>('button, input')).filter((element) => {
-    const type = element instanceof HTMLInputElement ? element.type : element.type;
-    return type === 'submit' || type === 'button';
-  }).map((element) => ({
+  const submits = Array.from(form.querySelectorAll<HTMLButtonElement | HTMLInputElement>(
+    'button, input[type="submit"], input[type="button"]',
+  )).map((element, submitIndex) => ({
+    id: uniqueAdminId(used, element.id, `submit-${index + 1}-${submitIndex + 1}`),
     name: element.name || undefined,
-    value: element.value || undefined,
-    label: clean(element.textContent) || element.getAttribute('aria-label') || element.value || '提交',
+    value: element instanceof HTMLInputElement ? element.value || undefined : element.getAttribute('value') || undefined,
+    label: clean(element.textContent) || clean(element.getAttribute('aria-label')) || (element instanceof HTMLInputElement ? element.value : '') || '提交',
     action: internalPath(element.getAttribute('formaction'), form.getAttribute('action') || ''),
+    method: element.getAttribute('formmethod') || form.getAttribute('method') || 'GET',
+    enctype: element.getAttribute('formenctype') || form.getAttribute('enctype') || 'application/x-www-form-urlencoded',
+  }));
+  const links = Array.from(form.querySelectorAll<HTMLAnchorElement>('a[href]')).map((link, linkIndex) => ({
+    id: uniqueAdminId(used, link.id, `form-${index + 1}-link-${linkIndex + 1}`),
+    label: clean(link.textContent) || link.getAttribute('aria-label') || link.getAttribute('href') || '',
+    href: link.getAttribute('href') || '',
   }));
   return {
-    action: internalPath(form.getAttribute('action'), ''),
+    id: uniqueAdminId(used, form.id, `form-${index + 1}`),
+    action: internalPath(form.getAttribute('action'), fallbackAction),
     method: (form.getAttribute('method') || 'GET').toUpperCase(),
     enctype: form.getAttribute('enctype') || 'application/x-www-form-urlencoded',
     title: headingFor(form, '设置表单'),
     fields,
     submits,
+    links,
   };
 }
 
-function scrapeTables(root: Element): HydroAdminTable[] {
-  return Array.from(root.querySelectorAll<HTMLTableElement>('table')).map((table) => ({
+function scrapeTables(root: Element, used: Set<string>): HydroAdminTable[] {
+  return Array.from(root.querySelectorAll<HTMLTableElement>('table')).map((table, tableIndex) => ({
+    id: uniqueAdminId(used, table.id, `table-${tableIndex + 1}`),
     title: headingFor(table.closest('.section') || table, '数据列表'),
     headers: Array.from(table.querySelectorAll('thead th, thead td')).map((cell) => clean(cell.textContent)),
-    rows: Array.from(table.querySelectorAll<HTMLTableRowElement>('tbody tr')).map((row) => ({
+    rows: Array.from(table.querySelectorAll<HTMLTableRowElement>('tbody tr')).map((row, rowIndex) => ({
+      id: uniqueAdminId(
+        used,
+        row.id,
+        row.dataset.uid || row.dataset.gid || row.dataset.role || `row-${tableIndex + 1}-${rowIndex + 1}`,
+      ),
       cells: Array.from(row.cells).map((cell) => ({
         text: clean(cell.textContent),
         href: cell.querySelector<HTMLAnchorElement>('a[href]')?.getAttribute('href') || undefined,
@@ -1066,62 +1252,199 @@ function scrapeTables(root: Element): HydroAdminTable[] {
   }));
 }
 
-function virtualForm(path: string, title: string, fields: HydroAdminField[], submits: HydroAdminSubmit[] = []): HydroAdminForm {
-  return { action: path, method: 'POST', enctype: 'application/x-www-form-urlencoded', title, fields, submits };
+function linkList(root: Element, used: Set<string>, prefix: string): HydroAdminLink[] {
+  return Array.from(root.querySelectorAll<HTMLAnchorElement>('a[href]')).map((link, index) => ({
+    id: uniqueAdminId(used, link.id, `${prefix}-link-${index + 1}`),
+    label: clean(link.textContent) || link.getAttribute('aria-label') || link.getAttribute('href') || '',
+    href: link.getAttribute('href') || '',
+  }));
 }
 
-function specialAdminForms(path: string, root: Element, forms: HydroAdminForm[]): HydroAdminForm[] {
-  const field = (name: string, value = '', type = 'text', label = name): HydroAdminField => ({ id: `virtual:${name}:${forms.length}`, name, type, label, value, checked: false, disabled: false });
-  if (path === '/manage/config') {
+function virtualField(
+  used: Set<string>,
+  name: string,
+  value = '',
+  type = 'text',
+  label = name,
+  options?: HydroAdminField['options'],
+): HydroAdminField {
+  return {
+    id: uniqueAdminId(used, '', `virtual-field-${name}`),
+    name,
+    type,
+    label,
+    value,
+    checked: false,
+    disabled: false,
+    options,
+  };
+}
+
+function virtualForm(
+  used: Set<string>,
+  path: string,
+  title: string,
+  fields: HydroAdminField[],
+  submits: HydroAdminSubmit[] = [],
+): HydroAdminForm {
+  return {
+    id: uniqueAdminId(used, '', `virtual-form-${used.size + 1}`),
+    action: path,
+    method: 'POST',
+    enctype: 'application/x-www-form-urlencoded',
+    title,
+    fields,
+    submits,
+  };
+}
+
+function specialAdminForms(
+  path: string,
+  root: Element,
+  forms: HydroAdminForm[],
+  used: Set<string>,
+): HydroAdminForm[] {
+  const route = routePath(path);
+  if (route === '/manage/config') {
     const textarea = root.querySelector<HTMLTextAreaElement>('[data-model="hydro://system/setting.yaml"], #config');
-    return [virtualForm(path, '系统配置', [field('value', textarea?.value || '', 'textarea', 'config')], [{ name: 'submit', label: '保存' }])];
+    return [virtualForm(used, path, '系统配置', [
+      virtualField(used, 'value', textarea?.value || '', 'textarea', 'config'),
+    ], [{ label: '保存' }])];
   }
-  if (path === '/manage/script') {
-    const result = Array.from(root.querySelectorAll<HTMLTableRowElement>('tbody tr')).flatMap((row) => {
-      const link = row.querySelector<HTMLAnchorElement>('a[href^="javascript:"]');
-      const match = link?.getAttribute('href')?.match(/runScript\(['"]([^'"]+)/);
-      return match ? [virtualForm(path, clean(row.cells[1]?.textContent) || '运行脚本', [field('id', match[1], 'hidden', 'ID'), field('args', '', 'text', '参数')], [{ name: 'submit', label: '运行' }])] : [];
+  if (route === '/manage/script') {
+    return Array.from(root.querySelectorAll<HTMLTableRowElement>('tbody tr')).flatMap((row, rowIndex) => {
+      const href = row.querySelector<HTMLAnchorElement>('a[href^="javascript:"]')?.getAttribute('href') || '';
+      const id = href.match(/runScript\(\s*['"]([^'"]+)['"]\s*\)/)?.[1];
+      if (!id) return [];
+      return [virtualForm(used, path, clean(row.cells[1]?.textContent) || '运行脚本', [
+        virtualField(used, 'id', id, 'hidden', 'ID'),
+        virtualField(used, 'args', '{}', 'text', '参数'),
+      ], [{ id: `script-submit-${rowIndex + 1}`, label: '运行' }])];
     });
-    return result;
   }
-  if (path === '/manage/userimport') {
+  if (route === '/manage/userimport') {
     const textarea = root.querySelector<HTMLTextAreaElement>('[name="users"]');
-    return [virtualForm(path, '导入用户', [field('users', textarea?.value || '', 'textarea', '用户'), field('draft', 'true', 'hidden')], [{ name: 'preview', value: 'true', label: '预览' }, { name: 'submit', value: 'false', label: '导入' }])];
+    return [virtualForm(used, path, '导入用户', [
+      virtualField(used, 'users', textarea?.value || '', 'textarea', '用户'),
+    ], [
+      { id: 'user-import-preview', name: 'draft', value: 'true', label: '预览' },
+      { id: 'user-import-submit', name: 'draft', value: 'false', label: '导入' },
+    ])];
   }
-  if (path === '/manage/userpriv') {
-    const result = Array.from(root.querySelectorAll<HTMLElement>('[data-uid][data-priv]')).map((item) => virtualForm(path, `用户权限 ${item.dataset.uid}`, [field('uid', item.dataset.uid === 'default' ? '0' : item.dataset.uid, 'hidden', '用户 ID'), field('priv', item.dataset.priv || '0', 'number', '权限值'), field('system', item.dataset.uid === 'default' ? 'true' : 'false', 'hidden')], [{ name: 'submit', label: '保存' }]));
-    return result;
-  }
-  if (path === '/domain/user') {
-    return Array.from(root.querySelectorAll<HTMLTableRowElement>('tbody tr[data-uid]')).flatMap((row) => {
-      const role = row.querySelector<HTMLSelectElement>('[name="role"]');
-      return role ? [virtualForm(path, `用户 ${row.dataset.uid}`, [field('operation', 'set_user', 'hidden'), field('uid', row.dataset.uid || '', 'hidden'), { ...field('role', role.value, 'select', '角色'), options: Array.from(role.options).map((o) => ({ value: o.value, label: clean(o.textContent), selected: o.selected })) }], [{ name: 'submit', label: '保存' }])] : [];
+  if (route === '/manage/userpriv') {
+    return Array.from(root.querySelectorAll<HTMLElement>('[data-uid][data-priv]')).map((item, index) => {
+      const isDefault = item.dataset.uid === 'default';
+      return virtualForm(used, path, isDefault ? '默认用户权限' : `用户权限 ${item.dataset.uid}`, [
+        virtualField(used, 'uid', isDefault ? '0' : item.dataset.uid || '', 'hidden', '用户 ID'),
+        virtualField(used, 'priv', item.dataset.priv || '0', 'number', '权限值'),
+        virtualField(used, 'system', String(isDefault), 'hidden', 'system'),
+      ], [{ id: `user-priv-submit-${index + 1}`, label: '保存' }]);
     });
   }
-  if (path === '/domain/role') {
-    const create = virtualForm(path, '创建角色', [field('operation', 'add', 'hidden'), field('role', '', 'text', '角色名')], [{ name: 'submit', label: '创建' }]);
-    const rows = Array.from(root.querySelectorAll<HTMLTableRowElement>('tbody tr[data-role]')).map((row) => virtualForm(path, `删除角色 ${row.dataset.role}`, [field('operation', 'delete', 'hidden'), field('roles', row.dataset.role || '', 'hidden', '角色')], [{ name: 'submit', label: '删除' }]));
-    return [create, ...rows];
+  if (route === '/domain/user') {
+    const roleOptions = Array.from(root.querySelector<HTMLSelectElement>('tbody select[name="role"]')?.options || [])
+      .map((option) => ({ value: option.value, label: clean(option.textContent), selected: option.selected }));
+    const addRoleOptions = roleOptions.filter((option) => option.value !== 'default');
+    const result = Array.from(root.querySelectorAll<HTMLTableRowElement>('tbody tr[data-uid]')).flatMap((row) => {
+      const uid = row.dataset.uid || '';
+      const role = row.querySelector<HTMLSelectElement>('select[name="role"]');
+      if (!uid || !role || role.disabled) return [];
+      const options = Array.from(role.options).map((option) => ({
+        value: option.value,
+        label: clean(option.textContent),
+        selected: option.selected,
+      }));
+      return [
+        virtualForm(used, path, `用户 ${uid}`, [
+          virtualField(used, 'operation', 'set_user', 'hidden', 'operation'),
+          virtualField(used, 'uid', uid, 'hidden', '用户 ID'),
+          virtualField(used, 'role', role.value, 'select', '角色', options),
+        ], [{ label: '保存' }]),
+        virtualForm(used, path, `移除用户 ${uid}`, [
+          virtualField(used, 'operation', 'set_user', 'hidden', 'operation'),
+          virtualField(used, 'uid', uid, 'hidden', '用户 ID'),
+          virtualField(used, 'role', 'default', 'hidden', '角色'),
+        ], [{ label: '移除' }]),
+      ];
+    });
+    result.unshift(virtualForm(used, path, '添加用户', [
+      virtualField(used, 'operation', 'set_user', 'hidden', 'operation'),
+      virtualField(used, 'uid', '', 'text', '用户 ID'),
+      virtualField(used, 'role', addRoleOptions[0]?.value || '', 'select', '角色', addRoleOptions),
+    ], [{ label: '添加' }]));
+    return result;
   }
-  if (path === '/domain/group') {
-    const create = virtualForm(path, '创建用户组', [field('operation', 'update', 'hidden'), field('name', '', 'text', '组名'), field('uids', '', 'text', '用户 ID')], [{ name: 'submit', label: '创建' }]);
-    const rows = Array.from(root.querySelectorAll<HTMLTableRowElement>('tbody tr[data-gid]')).map((row) => virtualForm(path, `用户组 ${row.dataset.gid}`, [field('operation', 'update', 'hidden'), field('name', row.dataset.gid || '', 'hidden', '组名'), field('uids', row.querySelector<HTMLInputElement>('[data-gid]')?.value || '', 'text', '用户 ID')], [{ name: 'submit', label: '保存' }]));
-    return [create, ...rows];
+  if (route === '/domain/role') {
+    const result = Array.from(root.querySelectorAll<HTMLTableRowElement>('tbody tr[data-role]')).map((row) => virtualForm(used, path, `删除角色 ${row.dataset.role}`, [
+      virtualField(used, 'operation', 'delete', 'hidden', 'operation'),
+      virtualField(used, 'roles', row.dataset.role || '', 'hidden', '角色'),
+    ], [{ label: '删除' }]));
+    result.unshift(virtualForm(used, path, '创建角色', [
+      virtualField(used, 'operation', 'add', 'hidden', 'operation'),
+      virtualField(used, 'role', '', 'text', '角色名'),
+    ], [{ label: '创建' }]));
+    return result;
+  }
+  if (route === '/domain/group') {
+    const result = Array.from(root.querySelectorAll<HTMLTableRowElement>('tbody tr[data-gid]')).flatMap((row) => {
+      const name = row.dataset.gid || '';
+      return [
+        virtualForm(used, path, `用户组 ${name}`, [
+          virtualField(used, 'operation', 'update', 'hidden', 'operation'),
+          virtualField(used, 'name', name, 'hidden', '组名'),
+          virtualField(used, 'uids', row.querySelector<HTMLInputElement>('input[data-gid]')?.value || '', 'text', '用户 ID'),
+        ], [{ label: '保存' }]),
+        virtualForm(used, path, `删除用户组 ${name}`, [
+          virtualField(used, 'operation', 'del', 'hidden', 'operation'),
+          virtualField(used, 'name', name, 'hidden', '组名'),
+        ], [{ label: '删除' }]),
+      ];
+    });
+    result.unshift(virtualForm(used, path, '创建用户组', [
+      virtualField(used, 'operation', 'update', 'hidden', 'operation'),
+      virtualField(used, 'name', '', 'text', '组名'),
+      virtualField(used, 'uids', '', 'text', '用户 ID'),
+    ], [{ label: '创建' }]));
+    return result;
   }
   return forms;
 }
 
+function pageActions(root: Element, path: string, used: Set<string>): HydroAdminAction[] {
+  if ([
+    '/manage/config',
+    '/manage/script',
+    '/manage/userimport',
+    '/manage/userpriv',
+    '/domain/user',
+    '/domain/role',
+    '/domain/group',
+  ].includes(routePath(path))) return [];
+  return Array.from(root.querySelectorAll<HTMLButtonElement | HTMLInputElement | HTMLAnchorElement>(
+    'button, input[type="submit"], input[type="button"], a[data-operation], a[data-action]',
+  )).filter((element) => !element.closest('form')).map((element, index) => actionFromElement(element, used, index));
+}
+
 export async function scrapeAdminPage(path: string): Promise<HydroAdminPage> {
   const doc = await readHydroPageResponse(path, false).then((result) => result.doc);
-  const root = doc.querySelector('main, .main, #content') ?? doc.body;
-  const forms = Array.from(root.querySelectorAll<HTMLFormElement>('form')).map((form, index) => scrapeForm(form, doc, index));
-  const pageForms = specialAdminForms(path, root, forms);
-  return { path, title: headingFor(root, path), forms: pageForms, tables: scrapeTables(root), actions: [], };
+  const root = doc.querySelector('main, .main, #content') || doc.body;
+  const used = new Set<string>();
+  const forms = Array.from(root.querySelectorAll<HTMLFormElement>('form')).map((form, index) => scrapeForm(form, doc, index, used, path));
+  const actions = pageActions(root, path, used);
+  const pageForms = specialAdminForms(path, root, forms, used);
+  return {
+    id: uniqueAdminId(used, '', `page-${routePath(path).replace(/[^a-z0-9]+/gi, '-') || 'admin'}`),
+    path,
+    title: headingFor(root, path),
+    forms: pageForms,
+    tables: scrapeTables(root, used),
+    actions,
+    links: linkList(root, used, 'page'),
+  };
 }
 
 export async function scrapeAdminForms(path: string): Promise<HydroAdminForm[]> {
-  const page = await scrapeAdminPage(path);
-  return page.forms.map(({ method: _method, enctype: _enctype, submits: _submits, ...form }) => ({
+  return (await scrapeAdminPage(path)).forms.map((form) => ({
     ...form,
     fields: form.fields.filter((field) => !field.disabled && field.type !== 'submit' && field.type !== 'button' && field.type !== 'file'),
   }));
@@ -1130,14 +1453,10 @@ export async function scrapeAdminForms(path: string): Promise<HydroAdminForm[]> 
 export async function submitHydroAdminForm(
   path: string,
   method: string,
-  fields: FormData | Record<string, string | Blob | File | string[] | Blob[]>,
-): Promise<void> {
-  if (method.toUpperCase() === 'GET') {
-    const params = fields instanceof FormData ? new URLSearchParams(Array.from(fields.entries()).map(([key, value]) => [key, typeof value === 'string' ? value : value.name])) : new URLSearchParams(Object.entries(fields).flatMap(([key, value]) => (Array.isArray(value) ? value : [value]).map((item) => [key, typeof item === 'string' ? item : item instanceof File ? item.name : ''])));
-    await readHydroPage(`${path}${path.includes('?') ? '&' : '?'}${params.toString()}`);
-    return;
-  }
-  await postHydroForm(path, fields);
+  fields: HydroFormInput,
+  enctype?: string,
+): Promise<HydroSubmitResult> {
+  return submitHydro(path, fields, { method, enctype });
 }
 
 export async function scrapeProblemSolutions(pid: string, pageNumber = 1): Promise<ProblemSolutionsResult> {
