@@ -7,13 +7,13 @@ import {
   Tooltip, Typography, useMediaQuery, useTheme,
 } from '@mui/material';
 import {
-  Activity, BarChart3, BookOpen, ChevronDown, CircleUserRound, ClipboardList, ExternalLink, GraduationCap,
+  Activity, BarChart3, BookOpen, ChevronDown, CircleUserRound, ClipboardList, GraduationCap,
   Home, ListChecks, LogOut, MessageSquare, MoreHorizontal, Palette, PanelLeftClose,
   PanelLeftOpen, Settings2, ShieldCheck, Trophy, Wrench,
 } from 'lucide-react';
 import { useAuth } from '../auth';
 import { usePreferences } from '../prefs';
-import { hydroAvatarUrl, hydroPublicUrl } from '../lib/endpoint';
+import { hydroAvatarUrl } from '../lib/endpoint';
 import { parseRp, ratingColor } from '../lib/rating';
 import { resolveChromeBg } from '../theme';
 
@@ -151,21 +151,6 @@ export default function AppLayout() {
       <List dense sx={{ px: 1.5, py: 1 }}>
         <NavRow to="/status" label="系统状态" icon={Activity} activeItem={active('/status')} compact={compactRail} onClick={() => setDrawerOpen(false)} />
         <NavRow to="/user" label="个人中心" icon={CircleUserRound} activeItem={active('/user')} compact={compactRail} onClick={() => setDrawerOpen(false)} />
-        <ListItem disablePadding>
-          <ListItemButton
-            component="a"
-            href={hydroPublicUrl('/domain/dashboard')}
-            target="_blank"
-            rel="noreferrer"
-            onClick={() => setDrawerOpen(false)}
-            aria-label="Hydro 管理"
-            title={compactRail ? 'Hydro 管理' : undefined}
-            sx={{ minHeight: 38, px: 1.5, justifyContent: compactRail ? 'center' : 'flex-start', color: 'text.secondary' }}
-          >
-            <ListItemIcon sx={{ minWidth: compactRail ? 0 : 34, justifyContent: 'center', color: 'inherit' }}><ExternalLink size={18} strokeWidth={1.75} /></ListItemIcon>
-            {!compactRail && <ListItemText primaryTypographyProps={{ fontSize: 14 }}>Hydro 管理</ListItemText>}
-          </ListItemButton>
-        </ListItem>
       </List>
     </Box>
   );
