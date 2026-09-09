@@ -140,6 +140,20 @@ export function hydroContentUrl(value?: string): string | undefined {
   return value;
 }
 
+export function hydroAssetUrl(value?: string): string | undefined {
+  if (!value) return undefined;
+  if (value.startsWith('/')) return hydroNativeUrl(value);
+  try {
+    const url = new URL(value);
+    if (url.hostname === new URL(PUBLIC_HYDRO_BASE).hostname || url.host === new URL(FALLBACK_BASE).host) {
+      return hydroNativeUrl(`${url.pathname}${url.search}${url.hash}`);
+    }
+  } catch {
+    return hydroNativeUrl(value);
+  }
+  return value;
+}
+
 function fallbackUrl(path: string): string {
   const normalized = path.startsWith('/') ? path : `/${path}`;
   return `/hydro-native${normalized}`;

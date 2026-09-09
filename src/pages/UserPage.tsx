@@ -1,18 +1,16 @@
 import { useEffect, useState } from 'react';
 import { Link as RouterLink, useParams } from 'react-router-dom';
 import { Avatar, Box, Button, Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Typography } from '@mui/material';
-import { Bell, ExternalLink, Globe2, Image, Settings2, ShieldCheck, Wrench } from 'lucide-react';
+import { Bell, CircleUserRound, ExternalLink, Globe2, Image, Settings2, ShieldCheck, Wrench } from 'lucide-react';
 import { useAuth } from '../auth';
+import PageHeader from '../components/PageHeader';
 import { ErrorBox, FullPageLoader } from '../components/StateBox';
 import { fetchUserByUname } from '../lib/api';
-import { hydroPublicUrl } from '../lib/endpoint';
+import { hydroAssetUrl, hydroPublicUrl } from '../lib/endpoint';
+import { parseRp, ratingColor } from '../lib/rating';
+import { formatDate } from '../lib/scrape';
+import { usePreferences } from '../prefs';
 import type { HydroUser } from '../types';
-
-function formatProfileDate(value?: string): string {
-  if (!value) return '—';
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString('zh-CN');
-}
 
 function profileMetric(info: Record<string, unknown> | undefined, keys: string[]): string | null {
   for (const key of keys) {
@@ -26,6 +24,7 @@ function profileMetric(info: Record<string, unknown> | undefined, keys: string[]
 export default function UserPage() {
   const { uname } = useParams();
   const { user: sessionUser } = useAuth();
+  const { usernameColoring } = usePreferences();
   const [profile, setProfile] = useState<HydroUser | null>(uname ? null : sessionUser);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(Boolean(uname));
@@ -73,6 +72,7 @@ export default function UserPage() {
   const encodedUname = encodeURIComponent(profile.uname);
   const canOpenOriginal = typeof profile._id === 'number';
   const ownProfile = !uname || profile._id === sessionUser?._id;
+  const nameColor = usernameColoring === 'rp' ? ratingColor(parseRp(profile.rpInfo)) : undefined;
   const metrics = [
     { label: 'RP', value: profileMetric(profile.rpInfo, ['rp', 'rating', 'score']) },
     { label: '排名', value: profileMetric(profile.rpInfo, ['rank', 'ranking']) },
@@ -88,9 +88,7 @@ export default function UserPage() {
 
   return (
     <Box>
-      <Typography variant="h5" sx={{ fontWeight: 700, mb: 2.4 }}>
-        个人中心
-      </Typography>
+      <PageHeader icon={<CircleUserRound size={20} />} title="个人中心" />
       <Paper
         variant="outlined"
         sx={{
@@ -102,14 +100,14 @@ export default function UserPage() {
         }}
       >
         <Avatar
-          src={profile.avatarUrl}
+          src={hydroAssetUrl(profile.avatarUrl)}
           alt=""
           sx={{ width: 72, height: 72, bgcolor: 'primary.main', fontSize: 26 }}
         >
           {initials}
         </Avatar>
         <Box sx={{ flex: 1, minWidth: 220 }}>
-          <Typography variant="h6" sx={{ fontWeight: 700 }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, color: nameColor ?? 'text.primary' }}>
             {profile.displayName || profile.uname}
           </Typography>
           {profile.displayName ? <Typography variant="body2" color="text.secondary">@{profile.uname}</Typography> : null}
@@ -150,8 +148,8 @@ export default function UserPage() {
         <Typography variant="h6" sx={{ mb: 1.5 }}>账户概览</Typography>
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))', lg: 'repeat(4, minmax(0, 1fr))' }, gap: 1.5 }}>
           {[
-            { label: '注册日期', value: formatProfileDate(profile.regat) },
-            { label: '最近登录', value: formatProfileDate(profile.loginat) },
+            { label: '注册日期', value: formatDate(profile.regat) },
+            { label: '最近登录', value: formatDate(profile.loginat) },
             ...metrics,
           ].map((item) => (
             <Box key={item.label}>
