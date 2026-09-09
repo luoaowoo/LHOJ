@@ -143,25 +143,25 @@ const languageNames: Record<string, string> = {
   'rs.rust': 'Rust',
 };
 
-function formatStatus(value: unknown): string {
+export function formatStatus(value: unknown): string {
   const status = numberValue(value);
   if (status !== null && recordStatuses[status]) return recordStatuses[status];
   return textValue(value) || 'Unknown';
 }
 
-function formatLanguage(value: unknown): string {
+export function formatLanguage(value: unknown): string {
   const raw = textValue(value);
   return languageNames[raw] ?? (raw.replace(/^\w+\./, '') || 'Unknown');
 }
 
-function formatTime(value: unknown): string {
+export function formatTime(value: unknown): string {
   const raw = textValue(value);
   if (raw && numberValue(value) === null) return raw;
   const milliseconds = numberValue(value);
   return milliseconds === null ? '-' : `${Math.round(milliseconds)}ms`;
 }
 
-function formatMemory(value: unknown): string {
+export function formatMemory(value: unknown): string {
   const raw = textValue(value);
   if (raw && numberValue(value) === null) return raw;
   const kib = numberValue(value);
@@ -171,7 +171,7 @@ function formatMemory(value: unknown): string {
   return `${mib.toFixed(mib >= 10 ? 0 : 1).replace(/\.0$/, '')} MiB`;
 }
 
-function formatDate(value: unknown): string {
+export function formatDate(value: unknown): string {
   const raw = textValue(value);
   if (!raw) return '-';
   const date = new Date(raw);
@@ -187,7 +187,7 @@ function formatDate(value: unknown): string {
   });
 }
 
-function formatDuration(beginAt: unknown, endAt: unknown, duration: unknown): string | undefined {
+export function formatDuration(beginAt: unknown, endAt: unknown, duration: unknown): string | undefined {
   const explicit = numberValue(duration);
   if (explicit !== null && explicit > 0) {
     const minutes = Math.round(explicit / 60000);
@@ -856,6 +856,40 @@ export async function postHydroForm(
   }
   const message = text.match(/<p[^>]*>([^<]+)<\/p>/i)?.[1]?.trim();
   throw new ApiError(message || `操作失败（HTTP ${response.status}）。`);
+}
+
+export interface HydroAdminField {
+  name: string;
+  type: string;
+  label: string;
+  value: string;
+  checked: boolean;
+  disabled: boolean;
+  options?: Array<{ value: string; label: string; selected: boolean }>;
+}
+
+export interface HydroAdminForm {
+  action: string;
+  title: string;
+  fields: HydroAdminField[];
+}
+
+export async function scrapeAdminForms(path: string): Promise<HydroAdminForm[]> {
+  const doc = await readHydroPageResponse(path, false).then((result) => result.doc);
+  return Array.from(doc.querySelectorAll<HTMLFormElement>('form')).flatMap((form) => {
+    const fields = Array.from(form.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('input[name], select[name], textarea[name]')).flatMap((element) => {
+      if (element.disabled || element.type === 'submit' || element.type === 'button' || element.type === 'file') return [];
+      const label = element.id ? doc.querySelector<HTMLLabelElement>(`label[for="${CSS.escape(element.id)}"]`)?.textContent : element.closest('label')?.textContent;
+      const common = { name: element.name, label: clean(label) || element.getAttribute('placeholder') || element.name, disabled: element.disabled };
+      if (element instanceof HTMLSelectElement) return [{ ...common, type: 'select', value: element.value, checked: false, options: Array.from(element.options).map((option) => ({ value: option.value, label: clean(option.textContent), selected: option.selected })) }];
+      if (element instanceof HTMLTextAreaElement) return [{ ...common, type: 'textarea', value: element.value, checked: false }];
+      if (element.type === 'checkbox' || element.type === 'radio') return [{ ...common, type: element.type, value: element.value || 'on', checked: element.checked }];
+      return [{ ...common, type: element.type || 'text', value: element.value, checked: false }];
+    });
+    if (!fields.length) return [];
+    const heading = form.querySelector<HTMLElement>('h1, h2, h3, h4, legend, .section__title')?.textContent;
+    return [{ action: form.getAttribute('action') || path, title: clean(heading) || '设置表单', fields }];
+  });
 }
 
 export async function scrapeProblemSolutions(pid: string, pageNumber = 1): Promise<ProblemSolutionsResult> {

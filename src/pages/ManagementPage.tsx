@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Box, Button, Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Stack, Typography } from '@mui/material';
+import { Box, Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Stack, Typography } from '@mui/material';
 import {
   BookOpen, Check, ChevronRight, ClipboardList, FileCode2, Gauge, Globe2, GraduationCap,
   Settings2, ShieldCheck, TerminalSquare, Trophy, UserCog, Users, Wrench,
@@ -7,7 +7,7 @@ import {
 import { useAuth } from '../auth';
 import PageHeader from '../components/PageHeader';
 import { ErrorBox } from '../components/StateBox';
-import { useNavigate } from 'react-router-dom';
+import HydroAdminWorkspace from '../components/HydroAdminWorkspace';
 
 const groups = [
   {
@@ -50,20 +50,10 @@ const groups = [
 
 export default function ManagementPage() {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [selected, setSelected] = useState(groups[0].items[0].label);
   if (user?.role !== 'root') return <ErrorBox message="当前账号没有系统管理权限。" />;
 
   const selectedItem = groups.flatMap((group) => group.items).find((item) => item.label === selected);
-  const internalPaths: Record<string, string> = {
-    '管理首页': '/management',
-    '比赛管理': '/contests',
-    '作业管理': '/homework',
-    '训练管理': '/training',
-    '题目管理': '/problems',
-    '系统设置': '/settings',
-  };
-
   return (
     <Box>
       <PageHeader icon={<Wrench size={20} />} title="管理中心" subtitle="所有管理入口均在 LH-oj 内打开。" />
@@ -72,14 +62,10 @@ export default function ManagementPage() {
           <Box>
             <Typography sx={{ fontWeight: 700 }}>{selectedItem?.label ?? '管理工作区'}</Typography>
             <Typography variant="body2" color="text.secondary">
-              {internalPaths[selected] ? '已接入 LH-oj 站内功能，可以直接使用。' : '该管理模块已保留在站内，具体操作正在接入中。'}
+              选择下方管理项目后，设置表单会直接显示在本页。
             </Typography>
           </Box>
-          {internalPaths[selected] && internalPaths[selected] !== '/management' ? (
-            <Button variant="contained" size="small" startIcon={<ChevronRight size={16} />} onClick={() => navigate(internalPaths[selected])}>
-              打开站内工作区
-            </Button>
-          ) : <Check size={20} aria-label="当前页面" />}
+          <Check size={20} aria-label="当前页面" />
         </Stack>
       </Paper>
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: 'repeat(3, minmax(0, 1fr))' }, gap: 2 }}>
@@ -101,6 +87,7 @@ export default function ManagementPage() {
           </Paper>
         ))}
       </Box>
+      {selectedItem && selectedItem.path !== '/manage' ? <Paper variant="outlined" sx={{ mt: 2, p: { xs: 2, sm: 3 } }}><HydroAdminWorkspace path={selectedItem.path} title={selectedItem.label} /></Paper> : null}
     </Box>
   );
 }
