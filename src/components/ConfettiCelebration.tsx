@@ -7,9 +7,11 @@ export default function ConfettiCelebration({ emojis, onDone }: { emojis: string
   const pieces = useMemo(() => {
     const choices = Array.from(emojis.trim()).slice(0, 3);
     const symbols = choices.length ? choices : defaults;
-    return Array.from({ length: 42 }, (_, index) => ({
+    return Array.from({ length: 84 }, (_, index) => ({
       symbol: symbols[index % symbols.length],
-      left: `${3 + ((index * 37) % 94)}%`,
+      side: index % 2 === 0 ? 'left' : 'right',
+      x: `${18 + ((index * 29) % 48)}vw`,
+      y: `${20 + ((index * 17) % 28)}vh`,
       delay: `${(index % 9) * 45}ms`,
       duration: `${1100 + (index % 6) * 130}ms`,
       rotate: `${(index * 47) % 360}deg`,
@@ -27,15 +29,22 @@ export default function ConfettiCelebration({ emojis, onDone }: { emojis: string
       role="status"
       sx={{
         position: 'fixed', inset: 0, zIndex: 1500, pointerEvents: 'none', overflow: 'hidden',
-        '@keyframes lhConfettiFall': {
-          '0%': { transform: 'translate3d(0, -12vh, 0) rotate(0deg)', opacity: 0 },
+        '@keyframes lhConfettiBurstLeft': {
+          '0%': { transform: 'translate3d(0, 0, 0) scale(.65) rotate(0deg)', opacity: 0 },
           '12%': { opacity: 1 },
-          '100%': { transform: 'translate3d(0, 108vh, 0) rotate(540deg)', opacity: 0.1 },
+          '38%': { transform: 'translate3d(var(--x), calc(var(--y) * -1), 0) scale(1) rotate(180deg)', opacity: 1 },
+          '100%': { transform: 'translate3d(calc(var(--x) + 5vw), 92vh, 0) rotate(720deg)', opacity: 0 },
+        },
+        '@keyframes lhConfettiBurstRight': {
+          '0%': { transform: 'translate3d(0, 0, 0) scale(.65) rotate(0deg)', opacity: 0 },
+          '12%': { opacity: 1 },
+          '38%': { transform: 'translate3d(calc(var(--x) * -1), calc(var(--y) * -1), 0) scale(1) rotate(-180deg)', opacity: 1 },
+          '100%': { transform: 'translate3d(calc((var(--x) * -1) - 5vw), 92vh, 0) rotate(-720deg)', opacity: 0 },
         },
       }}
     >
       {pieces.map((piece, index) => (
-        <Box key={index} component="span" sx={{ position: 'absolute', left: piece.left, top: 0, fontSize: { xs: 20, sm: 25 }, transform: `rotate(${piece.rotate})`, animation: `lhConfettiFall ${piece.duration} ease-in ${piece.delay} forwards` }}>
+        <Box key={index} component="span" sx={{ position: 'absolute', [piece.side]: { xs: '-8vw', sm: '-3vw' }, bottom: { xs: '7vh', sm: '9vh' }, fontSize: { xs: 20, sm: 25 }, '--x': piece.x, '--y': piece.y, animation: `${piece.side === 'left' ? 'lhConfettiBurstLeft' : 'lhConfettiBurstRight'} ${piece.duration} cubic-bezier(.18,.72,.25,1) ${piece.delay} forwards` }}>
           {piece.symbol}
         </Box>
       ))}

@@ -158,12 +158,15 @@ export function hydroAvatarUrl(value: string | undefined, userId: number): strin
   if (value) {
     try {
       const url = new URL(value, PUBLIC_HYDRO_BASE);
-      if (url.hostname === new URL(PUBLIC_HYDRO_BASE).hostname) return url.toString();
+      if (url.hostname === new URL(PUBLIC_HYDRO_BASE).hostname || url.host === new URL(FALLBACK_BASE).host) {
+        return hydroNativeUrl(`${url.pathname}${url.search}${url.hash}`);
+      }
+      return url.toString();
     } catch {
       // Fall through to the canonical Hydro avatar URL.
     }
   }
-  return hydroPublicUrl(`/file/${encodeURIComponent(String(userId))}/.avatar.jpg`);
+  return hydroNativeUrl(`/file/${encodeURIComponent(String(userId))}/.avatar.jpg`);
 }
 
 function fallbackUrl(path: string): string {

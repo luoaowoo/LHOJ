@@ -152,6 +152,7 @@ export default function UserPage() {
       >
         <Avatar
           src={hydroAvatarUrl(profile.avatarUrl, profile._id)}
+          onError={(event) => event.currentTarget.removeAttribute('src')}
           alt=""
           sx={{ width: 72, height: 72, bgcolor: 'primary.main', fontSize: 26 }}
         >

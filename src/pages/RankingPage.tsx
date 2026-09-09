@@ -141,6 +141,7 @@ export default function RankingPage() {
                         <Stack direction="row" spacing={1.2} alignItems="center">
                           <Avatar
                             src={uid !== null ? hydroAvatarUrl(undefined, uid) : undefined}
+                            onError={(event) => event.currentTarget.removeAttribute('src')}
                             sx={{ width: 30, height: 30, fontSize: 13 }}
                           >
                             {row.user.slice(0, 1)}

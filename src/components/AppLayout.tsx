@@ -206,7 +206,7 @@ export default function AppLayout() {
                   '&:hover': { bgcolor: 'action.hover' },
                 }}
               >
-                <Avatar src={hydroAvatarUrl(user.avatarUrl, user._id)} sx={{ width: 28, height: 28 }} alt="">{user.uname.slice(0, 2)}</Avatar>
+                <Avatar src={hydroAvatarUrl(user.avatarUrl, user._id)} onError={(event) => event.currentTarget.removeAttribute('src')} sx={{ width: 28, height: 28 }} alt="">{user.uname.slice(0, 2)}</Avatar>
                 <Typography noWrap sx={{ fontSize: 13.5, fontWeight: 600, color: userColor ?? 'text.primary', maxWidth: 140 }}>
                   {user.uname}
                 </Typography>
