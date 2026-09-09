@@ -1,5 +1,5 @@
 import { Component, lazy, Suspense, useEffect, useMemo } from 'react';
-import type { ErrorInfo, ReactNode } from 'react';
+import type { ComponentType, ErrorInfo, ReactNode } from 'react';
 import {
   BrowserRouter, Navigate, Outlet, Route, Routes, useLocation,
 } from 'react-router-dom';
@@ -23,11 +23,13 @@ class RouteErrorBoundary extends Component<{ children: ReactNode }, { error: Err
   }
 }
 
-function lazyPage<T extends { default: React.ComponentType }>(load: () => Promise<T>) {
+function lazyPage<T extends { default: ComponentType }>(load: () => Promise<T>) {
   let retried = false;
   return lazy(async () => {
     try {
-      return await load();
+      const module = await load();
+      try { sessionStorage.removeItem('lh-oj.chunk-reload'); } catch { /* best effort */ }
+      return module;
     } catch (error) {
       if (retried) throw error;
       retried = true;

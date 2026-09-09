@@ -161,7 +161,8 @@ export function hydroAvatarUrl(value: string | undefined, userId: number): strin
       if (url.hostname === new URL(PUBLIC_HYDRO_BASE).hostname || url.host === new URL(FALLBACK_BASE).host) {
         return hydroNativeUrl(`${url.pathname}${url.search}${url.hash}`);
       }
-      return url.toString();
+      if (url.hostname === 'cn.gravatar.com') url.hostname = 'www.gravatar.com';
+      return url.protocol === 'http:' || url.protocol === 'https:' ? url.toString() : `https:${url.toString()}`;
     } catch {
       // Fall through to the canonical Hydro avatar URL.
     }
