@@ -29,6 +29,14 @@ function ruleColor(rule: string): 'success' | 'info' | 'warning' | 'secondary' |
   return 'default';
 }
 
+function contestDay(date?: string): string {
+  if (!date) return '--';
+  const parsed = new Date(date);
+  if (!Number.isNaN(parsed.getTime())) return String(parsed.getDate()).padStart(2, '0');
+  const match = date.match(/(?:^|[-/年])([0-9]{1,2})(?:日)?(?:\s|$)/);
+  return match ? match[1].padStart(2, '0') : '--';
+}
+
 export default function ContestsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
@@ -70,8 +78,8 @@ export default function ContestsPage() {
         <Box sx={{ p: { xs: 1.5, md: 2 }, bgcolor: 'rgba(255,255,255,.025)' }}><Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}><TextField fullWidth size="small" value={keyword} onChange={(event) => { setKeyword(event.target.value); update({ q: event.target.value, page: '' }); }} placeholder="搜索比赛" slotProps={{ input: { startAdornment: <InputAdornment position="start"><Search size={17} /></InputAdornment> } }} /><Select size="small" value={rule} onChange={(event) => { setRule(event.target.value); update({ rule: event.target.value, page: '' }); }} sx={{ minWidth: { sm: 145 } }}>{rules.map((item) => <MenuItem key={item} value={item}>{item}</MenuItem>)}</Select></Stack></Box>
         <Divider />
         {filtered.length ? <Stack divider={<Divider />}>
-          {filtered.map((item, index) => { const label = ruleLabel(item.rule); return <Box key={item.id || item.href || item.title} component={RouterLink} to={`/contests/${encodeURIComponent(item.id)}`} sx={{ display: 'grid', gridTemplateColumns: { xs: '42px minmax(0,1fr)', sm: '58px minmax(0,1fr) auto' }, gap: { xs: 1.2, sm: 2 }, alignItems: 'start', px: { xs: 1.5, md: 2.2 }, py: { xs: 1.7, md: 2.2 }, color: 'inherit', textDecoration: 'none', '&:hover': { bgcolor: 'action.hover' } }}>
-            <Typography sx={{ fontFamily: 'monospace', fontWeight: 800, fontSize: '1.15rem', color: 'primary.main' }}>{item.id ? item.id.slice(-3).padStart(2, '0') : String(index + 1).padStart(2, '0')}</Typography>
+          {filtered.map((item) => { const label = ruleLabel(item.rule); return <Box key={item.id || item.href || item.title} component={RouterLink} to={`/contests/${encodeURIComponent(item.id)}`} sx={{ display: 'grid', gridTemplateColumns: { xs: '42px minmax(0,1fr)', sm: '58px minmax(0,1fr) auto' }, gap: { xs: 1.2, sm: 2 }, alignItems: 'start', px: { xs: 1.5, md: 2.2 }, py: { xs: 1.7, md: 2.2 }, color: 'inherit', textDecoration: 'none', '&:hover': { bgcolor: 'action.hover' } }}>
+            <Typography sx={{ fontWeight: 800, fontSize: '1.15rem', color: 'primary.main' }}>{contestDay(item.date)}</Typography>
             <Box sx={{ minWidth: 0 }}><Typography sx={{ fontWeight: 700, fontSize: '1rem', overflowWrap: 'anywhere' }}>{item.title || '未命名比赛'}</Typography><Stack direction="row" spacing={.7} useFlexGap sx={{ mt: .8, flexWrap: 'wrap' }}><Chip icon={<CalendarDays size={14} />} label={item.date || '时间待定'} size="small" variant="outlined" /><Chip icon={<Trophy size={14} />} label={label} size="small" color={ruleColor(label)} /><Chip icon={<Clock3 size={14} />} label={item.duration || '时长待定'} size="small" variant="outlined" />{item.rated ? <Chip label="Rated" size="small" color="warning" /> : null}{item.attend ? <Chip icon={<Users size={14} />} label={item.attend} size="small" variant="outlined" /> : null}</Stack></Box>
             <Typography variant="caption" color="text.secondary" sx={{ display: { xs: 'none', sm: 'block' }, pt: .3 }}>查看详情 ›</Typography>
           </Box>; })}
