@@ -5,7 +5,7 @@ import { Bell, CircleUserRound, ExternalLink, Globe2, Image, Search, Settings2, 
 import { useAuth } from '../auth';
 import PageHeader from '../components/PageHeader';
 import { ErrorBox, FullPageLoader } from '../components/StateBox';
-import { fetchUserByUname } from '../lib/api';
+import { fetchUserByIdentifier } from '../lib/api';
 import { hydroAvatarUrl, hydroPublicUrl } from '../lib/endpoint';
 import { parseRp, ratingColor } from '../lib/rating';
 import { formatDate } from '../lib/scrape';
@@ -45,7 +45,7 @@ export default function UserPage() {
     setLoading(true);
     setProfile(null);
     setError('');
-    fetchUserByUname(uname)
+    fetchUserByIdentifier(uname)
       .then((user) => {
         if (!active) return;
         if (!user) {
@@ -93,7 +93,7 @@ export default function UserPage() {
     const target = compareInput.trim();
     if (!target || compareLoading) return;
     setCompareLoading(true);
-    try { setCompareUser(await fetchUserByUname(target)); }
+    try { setCompareUser(await fetchUserByIdentifier(target)); }
     finally { setCompareLoading(false); }
   };
   const ratingHistory = Object.values(profile.rpInfo ?? {}).find((value) => Array.isArray(value)) as unknown[] | undefined;

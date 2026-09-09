@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link as RouterLink, useSearchParams } from 'react-router-dom';
 import {
-  Box, Button, Pagination, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography,
+  Box, Button, Pagination, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
 } from '@mui/material';
 import { BarChart3, RefreshCw } from 'lucide-react';
+import PageHeader from '../components/PageHeader';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
 import { scrapeRankingRows } from '../lib/scrape';
 import type { RankingRow } from '../types';
@@ -42,20 +43,16 @@ export default function RankingPage() {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 1.5, mb: 2.4, flexWrap: 'wrap' }}>
-        <Box>
-          <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', gap: 1, fontWeight: 700 }}>
-            <BarChart3 size={21} />
-            排行榜
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-            按 Hydro RP 排序的用户榜单。
-          </Typography>
-        </Box>
-        <Button variant="outlined" startIcon={<RefreshCw size={16} />} onClick={retry}>
-          刷新
-        </Button>
-      </Box>
+      <PageHeader
+        icon={<BarChart3 size={20} />}
+        title="排行榜"
+        subtitle="按 Hydro RP 排序的用户榜单。"
+        actions={(
+          <Button variant="outlined" startIcon={<RefreshCw size={16} />} onClick={retry}>
+            刷新
+          </Button>
+        )}
+      />
 
       {error ? (
         <ErrorBox message={error} onRetry={retry} />
@@ -86,7 +83,7 @@ export default function RankingPage() {
                   <TableCell>{row.rank || '-'}</TableCell>
                   <TableCell>
                     {row.user ? (
-                      <RouterLink to={`/user/${encodeURIComponent(row.user)}`}>{row.user}</RouterLink>
+                      <RouterLink to={row.userHref?.match(/\/user\/([^/?#]+)/)?.[1] ? `/user/${row.userHref.match(/\/user\/([^/?#]+)/)?.[1]}` : `/user/${encodeURIComponent(row.user)}`}>{row.user}</RouterLink>
                     ) : (
                       '-'
                     )}

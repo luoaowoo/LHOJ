@@ -81,6 +81,17 @@ export async function fetchUserByUname(uname: string): Promise<HydroUser | null>
   return data.user;
 }
 
+export async function fetchUserByIdentifier(identifier: string): Promise<HydroUser | null> {
+  const value = decodeURIComponent(identifier).trim();
+  if (/^\d+$/.test(value)) {
+    return gql<{ user: HydroUser | null }>(
+      `query UserById($id: Int!) { user(id: $id) { ${userFields} } }`,
+      { id: Number(value) },
+    ).then((data) => data.user);
+  }
+  return fetchUserByUname(value);
+}
+
 export async function login(uname: string, password: string, remember: boolean, tfa = ''): Promise<void> {
   await ensureEndpoint();
   const body = new URLSearchParams({
