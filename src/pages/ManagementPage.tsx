@@ -1,13 +1,17 @@
 import { useState } from 'react';
 import { Box, Dialog, DialogContent, DialogTitle, Divider, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Stack, Typography } from '@mui/material';
 import {
-  BookOpen, Check, ChevronRight, ClipboardList, FileCode2, Gauge, Globe2, GraduationCap, X,
+  BookOpen, Check, ChevronRight, ClipboardList, FileCode2, Gauge, Globe2, GraduationCap, Images, X,
   Settings2, ShieldCheck, TerminalSquare, Trophy, UserCog, Users, Wrench,
 } from 'lucide-react';
 import { useAuth } from '../auth';
 import PageHeader from '../components/PageHeader';
 import { ErrorBox } from '../components/StateBox';
 import HydroAdminWorkspace from '../components/HydroAdminWorkspace';
+import CarouselAdminPanel from '../components/CarouselAdminPanel';
+
+// Sentinel path: this entry opens our own panel instead of a scraped Hydro form.
+const carouselPath = 'lhoj:carousel';
 
 const groups = [
   {
@@ -25,6 +29,7 @@ const groups = [
   {
     title: '域与内容',
     items: [
+      { label: '首页轮播图', path: carouselPath, icon: Images },
       { label: '域管理', path: '/domain/dashboard', icon: Globe2 },
       { label: '域资料', path: '/domain/edit', icon: Settings2 },
       { label: '域成员', path: '/domain/user', icon: Users },
@@ -105,7 +110,9 @@ export default function ManagementPage() {
             </IconButton>
           </DialogTitle>
           <DialogContent dividers sx={{ p: { xs: 1.5, sm: 3 } }}>
-            <HydroAdminWorkspace path={selectedItem.path} title={selectedItem.label} />
+            {selectedItem.path === carouselPath
+              ? <CarouselAdminPanel />
+              : <HydroAdminWorkspace path={selectedItem.path} title={selectedItem.label} />}
           </DialogContent>
         </Dialog>
       ) : null}

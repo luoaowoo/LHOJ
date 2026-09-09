@@ -5,11 +5,6 @@ import {
   Alert,
   Box,
   Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   Divider,
   FormControl,
   IconButton,
@@ -26,6 +21,8 @@ import {
 } from '@mui/material';
 import { Clipboard, Download, FileCode2, FileUp, RotateCcw, Send } from 'lucide-react';
 import CodeEditor from '../components/CodeEditor';
+import ConfirmDialog from '../components/ConfirmDialog';
+import PageHeader from '../components/PageHeader';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
 import { fetchSubmitConfig, submitCode, submitFile, submitPretest } from '../lib/api';
 import type { HydroProblem } from '../types';
@@ -299,19 +296,12 @@ export default function SubmitPage() {
       data-submit-form="true"
       sx={{ p: { xs: 2, sm: 3 } }}
     >
+      <PageHeader
+        title={problem.title}
+        subtitle={`#${problem.pid ?? problem.docId}${tid ? ` · 比赛提交 #${tid}` : ''}`}
+      />
+      <Divider sx={{ mb: 2.5 }} />
       <Stack spacing={2.5}>
-        <Box>
-          <Typography variant="h5" sx={{ fontWeight: 700, lineHeight: 1.3 }}>
-            {problem.title}
-          </Typography>
-          <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
-            #{problem.pid ?? problem.docId}
-            {tid ? ` · 比赛提交 #${tid}` : ''}
-          </Typography>
-        </Box>
-
-        <Divider />
-
         <FormControl fullWidth>
           <InputLabel id="language-label">语言</InputLabel>
           <Select
@@ -403,16 +393,16 @@ export default function SubmitPage() {
           </Button>
         </Box>
       </Stack>
-      <Dialog open={resetDialogOpen} onClose={() => setResetDialogOpen(false)} aria-labelledby="reset-code-title">
-        <DialogTitle id="reset-code-title">载入代码模板？</DialogTitle>
-        <DialogContent>
-          <DialogContentText>当前编辑器内容将被所选语言的默认模板替换。</DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button color="inherit" onClick={() => setResetDialogOpen(false)}>取消</Button>
-          <Button variant="contained" onClick={resetCode}>替换</Button>
-        </DialogActions>
-      </Dialog>
+      <ConfirmDialog
+        open={resetDialogOpen}
+        title="载入代码模板？"
+        content="当前编辑器内容将被所选语言的默认模板替换。"
+        confirmLabel="替换"
+        cancelLabel="取消"
+        destructive={false}
+        onConfirm={resetCode}
+        onClose={() => setResetDialogOpen(false)}
+      />
     </Paper>
   );
 }

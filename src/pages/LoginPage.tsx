@@ -66,16 +66,17 @@ export default function LoginPage() {
         sx={{
           width: '100%',
           maxWidth: 420,
-          p: { xs: 2.8, sm: 3.6 },
+          p: { xs: 3, sm: 4 },
+          borderRadius: 3,
           display: 'flex',
           flexDirection: 'column',
           gap: 2.2,
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1.25 }}>
-          <Box component="img" src="/校徽.png" alt="LH-oj" sx={{ width: 42, height: 42, borderRadius: '8px', objectFit: 'cover' }} />
+          <Box component="img" src="/校徽.png" alt="LH-oj" sx={{ width: 42, height: 42, borderRadius: 2, objectFit: 'cover' }} />
           <Box>
-            <Typography component="h1" variant="h5" sx={{ fontWeight: 750 }}>
+            <Typography component="h1" variant="h5" sx={{ fontWeight: 700 }}>
               LH-oj
             </Typography>
             <Typography variant="caption" color="text.secondary">
@@ -87,6 +88,7 @@ export default function LoginPage() {
         {connectionError ? (
           <Alert
             severity="warning"
+            variant="outlined"
             action={(
               <Button color="inherit" size="small" startIcon={<RefreshCw size={15} />} onClick={() => void refresh()}>
                 重试
@@ -144,7 +146,7 @@ export default function LoginPage() {
         >
           {submitting ? '登录中...' : '登录'}
         </Button>
-        <Divider>账户帮助</Divider>
+        <Divider sx={{ color: 'text.secondary', fontSize: 13 }}>账户帮助</Divider>
         <Box sx={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 0.5 }}>
           <Button component="a" href={hydroPublicUrl('/register')} target="_blank" rel="noreferrer" size="small" endIcon={<ExternalLink size={14} />}>注册账号</Button>
           <Button

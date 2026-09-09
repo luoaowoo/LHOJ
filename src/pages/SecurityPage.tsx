@@ -2,8 +2,10 @@ import { useCallback, useEffect, useState } from 'react';
 import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, List, ListItem, ListItemText, Paper, Stack, TextField, Typography } from '@mui/material';
 import { LogOut, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../auth';
-import { confirmSudo, postHydroForm, scrapeSecurity } from '../lib/scrape';
+import { confirmSudo, formatDate, postHydroForm, scrapeSecurity } from '../lib/scrape';
 import type { UserSession } from '../types';
+import ConfirmDialog from '../components/ConfirmDialog';
+import PageHeader from '../components/PageHeader';
 import { ErrorBox, FullPageLoader } from '../components/StateBox';
 import { hydroPublicUrl } from '../lib/endpoint';
 
@@ -12,6 +14,7 @@ export default function SecurityPage() {
   const [sessions, setSessions] = useState<UserSession[] | null>(null);
   const [error, setError] = useState('');
   const [sudoOpen, setSudoOpen] = useState(false);
+  const [confirmAllOpen, setConfirmAllOpen] = useState(false);
   const [password, setPassword] = useState('');
   const [tfa, setTfa] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
@@ -42,9 +45,9 @@ export default function SecurityPage() {
     finally { setBusy(false); }
   };
   const removeAll = async () => {
-    if (busy || !window.confirm('确定退出全部会话吗？当前会话也会失效。')) return;
+    if (busy) return;
     setBusy(true); setError('');
-    try { await postHydroForm('/home/security', { operation: 'delete_all_tokens' }); await clearAuth(); }
+    try { await postHydroForm('/home/security', { operation: 'delete_all_tokens' }); setConfirmAllOpen(false); await clearAuth(); }
     catch (cause) { setError(cause instanceof Error ? cause.message : '退出全部会话失败。'); }
     finally { setBusy(false); }
   };
@@ -66,7 +69,7 @@ export default function SecurityPage() {
   if (!sessions && !error) return <FullPageLoader />;
   if (!sessions && error) return <ErrorBox message={error} onRetry={() => void load()} />;
   return <Box sx={{ maxWidth: 820 }}>
-    <Typography variant="h5" sx={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}><ShieldCheck size={22} />安全设置</Typography>
+    <PageHeader icon={<ShieldCheck size={20} />} title="安全设置" />
     {error ? <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert> : null}
     <Paper variant="outlined" sx={{ p: { xs: 2, md: 2.5 } }}>
       <Typography variant="h6">活动会话</Typography>
@@ -75,12 +78,12 @@ export default function SecurityPage() {
       <List disablePadding>{sessions?.map((session) => {
         const ua = `${session.updateUaInfo?.os?.name || ''} ${session.updateUaInfo?.os?.version || ''}`.trim() || '未知设备';
         const browser = `${session.updateUaInfo?.browser?.name || ''} ${session.updateUaInfo?.browser?.version || ''}`.trim();
-        const detail = [browser, session.updateIp, session.updateGeoip?.display, session.updateAt ? new Date(session.updateAt).toLocaleString('zh-CN') : ''].filter(Boolean).join(' · ');
+        const detail = [browser, session.updateIp, session.updateGeoip?.display, session.updateAt ? formatDate(session.updateAt) : ''].filter(Boolean).join(' · ');
         return <ListItem key={session.id} divider secondaryAction={!session.isCurrent ? <Button color="error" startIcon={<LogOut size={16} />} onClick={() => void remove(session)} disabled={busy}>退出</Button> : null}>
           <ListItemText primary={`${ua}${session.isCurrent ? ' · 当前会话' : ''}`} secondary={detail || '暂无设备详情'} />
         </ListItem>;
       })}</List>
-      <Button color="error" variant="outlined" startIcon={<LogOut size={16} />} onClick={() => void removeAll()} disabled={busy || !sessions?.length} sx={{ mt: 1 }}>退出全部会话</Button>
+      <Button color="error" variant="outlined" startIcon={<LogOut size={16} />} onClick={() => setConfirmAllOpen(true)} disabled={busy || !sessions?.length} sx={{ mt: 1 }}>退出全部会话</Button>
     </Paper>
     <Paper component="form" variant="outlined" sx={{ p: { xs: 2, md: 2.5 }, mt: 2 }} onSubmit={(event) => { event.preventDefault(); void changePassword(); }}>
       <Typography variant="h6">修改密码</Typography>
@@ -98,5 +101,14 @@ export default function SecurityPage() {
       <DialogContent><Stack spacing={1.5} sx={{ pt: 1 }}><TextField label="密码" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoFocus /><TextField label="两步验证码（可选）" value={tfa} onChange={(e) => setTfa(e.target.value)} inputMode="numeric" /></Stack></DialogContent>
       <DialogActions><Button onClick={() => setSudoOpen(false)} disabled={busy}>取消</Button><Button variant="contained" onClick={() => void verify()} disabled={busy || (!password && !tfa)}>验证</Button></DialogActions>
     </Dialog>
+    <ConfirmDialog
+      open={confirmAllOpen}
+      title="退出全部会话"
+      content="确定退出全部会话吗？当前会话也会失效。"
+      confirmLabel="退出全部"
+      loading={busy}
+      onConfirm={() => void removeAll()}
+      onClose={() => setConfirmAllOpen(false)}
+    />
   </Box>;
 }

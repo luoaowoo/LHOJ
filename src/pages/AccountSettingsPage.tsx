@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
-  Alert, Box, Button, Checkbox, Divider, FormControlLabel, MenuItem,
+  Alert, Box, Button, Checkbox, FormControlLabel, MenuItem,
   Paper, Stack, TextField, Typography,
 } from '@mui/material';
 import { Save, Settings2 } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import { postHydroForm, scrapeAccountSettings } from '../lib/scrape';
 import type { HydroSetting } from '../types';
+import PageHeader from '../components/PageHeader';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
 
 const categories = new Set(['preference', 'account', 'domain']);
@@ -78,25 +79,20 @@ export default function AccountSettingsPage() {
 
   return (
     <Box sx={{ maxWidth: 900, mx: 'auto' }}>
-      <Stack direction="row" spacing={1.2} alignItems="center" sx={{ mb: 0.7 }}>
-        <Settings2 size={22} />
-        <Typography variant="h4">{title}</Typography>
-      </Stack>
-      <Typography color="text.secondary" sx={{ mb: 2.5 }}>
-        修改账号资料和 Hydro 提供的扩展设置。保存后会立即同步到源站。
-      </Typography>
+      <PageHeader
+        icon={<Settings2 size={20} />}
+        title={title}
+        subtitle="修改账号资料和 Hydro 提供的扩展设置。保存后会立即同步到源站。"
+      />
       {error ? <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert> : null}
       {saved ? <Alert severity="success" sx={{ mb: 2 }}>设置已保存。</Alert> : null}
       {!groups.length ? <Paper variant="outlined"><EmptyBox message="当前分类没有可编辑的设置" /></Paper> : (
         <Box component="form" onSubmit={(event) => { event.preventDefault(); void save(); }}>
           <Stack spacing={2}>
             {groups.map(([family, items]) => (
-              <Paper key={family} variant="outlined" sx={{ overflow: 'hidden' }}>
-                <Box sx={{ px: { xs: 2, md: 3 }, py: 1.8, bgcolor: 'rgba(255,255,255,.035)' }}>
-                  <Typography variant="h6">{family}</Typography>
-                </Box>
-                <Divider />
-                <Stack spacing={2.3} sx={{ p: { xs: 2, md: 3 } }}>
+              <Paper key={family} variant="outlined" sx={{ p: { xs: 2, md: 3 } }}>
+                <Typography sx={{ fontWeight: 650, mb: 2 }}>{family}</Typography>
+                <Stack spacing={2.3}>
                   {items.map((item) => {
                     const value = values[item.key];
                     if (item.type === 'boolean') {

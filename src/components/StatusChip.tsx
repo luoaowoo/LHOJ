@@ -34,16 +34,15 @@ export default function StatusChip({ text, score }: StatusChipProps) {
     <Chip
       component="span"
       size="small"
-      variant="outlined"
+      variant="filled"
       label={label}
       sx={{
-        height: 24,
-        fontSize: 12,
-        fontWeight: 650,
+        height: 22,
+        fontSize: 11.5,
+        fontWeight: 500,
         whiteSpace: 'nowrap',
         color: palette,
-        borderColor: alpha(palette, 0.48),
-        bgcolor: alpha(palette, 0.09),
+        bgcolor: alpha(palette, 0.12),
         '& .MuiChip-label': { px: 1, py: 0 },
       }}
     />

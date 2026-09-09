@@ -1,16 +1,18 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link as RouterLink, useParams } from 'react-router-dom';
 import {
-  Alert, Box, Button, Chip, Paper, Stack, Table, TableBody, TableCell, TableContainer,
+  Alert, Box, Button, Chip, Paper, Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Typography,
 } from '@mui/material';
 import { ArrowLeft, ClipboardList, Code2, ExternalLink, FileText, Settings2 } from 'lucide-react';
 import { useAuth } from '../auth';
 import Markdown from '../components/Markdown';
+import PageHeader from '../components/PageHeader';
+import ScoreboardTable from '../components/ScoreboardTable';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
 import { hydroPublicUrl } from '../lib/endpoint';
 import { localizedContent } from '../lib/api';
-import { postHydroForm, scrapeHomeworkDetail, scrapeHomeworkScoreboard } from '../lib/scrape';
+import { formatDate, postHydroForm, scrapeHomeworkDetail, scrapeHomeworkScoreboard } from '../lib/scrape';
 import type { HomeworkDetail, ScoreboardRow } from '../types';
 
 export default function HomeworkDetailPage() {
@@ -64,20 +66,12 @@ export default function HomeworkDetailPage() {
       <Button component={RouterLink} to="/homework" color="inherit" size="small" startIcon={<ArrowLeft size={16} />} sx={{ mb: 2 }}>
         作业列表
       </Button>
-      <Paper variant="outlined" sx={{ p: { xs: 2, md: 2.5 }, mb: 2 }}>
-        <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap' }}>
-          <Box sx={{ minWidth: 0 }}>
-            <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', gap: 1, fontWeight: 700 }}>
-              <ClipboardList size={21} />
-              {homework.title}
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 0.8, flexWrap: 'wrap', mt: 1.3 }}>
-              <Chip label={homework.status} size="small" color={homework.status === '进行中' ? 'success' : 'default'} />
-              <Chip label={`${homework.problemCount} 道题`} size="small" variant="outlined" />
-              <Chip label={`参与 ${homework.attend ?? '—'}`} size="small" variant="outlined" />
-            </Box>
-          </Box>
-          <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap' }}>
+      <PageHeader
+        icon={<ClipboardList size={21} />}
+        title={homework.title}
+        subtitle={`${homework.beginAt ? `开始：${formatDate(homework.beginAt)}` : ''}${homework.endAt ? `　截止：${formatDate(homework.endAt)}` : ''}` || undefined}
+        actions={(
+          <>
             {user && !homework.attended && homework.status !== '已结束' ? (
               <Button variant="contained" size="small" onClick={() => void attend()} disabled={attending}>
                 {attending ? '参加中' : '参加作业'}
@@ -97,15 +91,14 @@ export default function HomeworkDetailPage() {
                 编辑作业
               </Button>
             ) : null}
-          </Stack>
-        </Box>
-        <Box sx={{ mt: 2 }}>
-          <Typography variant="body2" color="text.secondary">
-            {homework.beginAt ? `开始：${new Date(homework.beginAt).toLocaleString('zh-CN')}` : ''}
-            {homework.endAt ? `　截止：${new Date(homework.endAt).toLocaleString('zh-CN')}` : ''}
-          </Typography>
-        </Box>
-      </Paper>
+          </>
+        )}
+      />
+      <Box sx={{ display: 'flex', gap: 0.8, flexWrap: 'wrap', mb: 2.5 }}>
+        <Chip label={homework.status} size="small" color={homework.status === '进行中' ? 'success' : 'default'} />
+        <Chip label={`${homework.problemCount} 道题`} size="small" variant="outlined" />
+        <Chip label={`参与 ${homework.attend ?? '—'}`} size="small" variant="outlined" />
+      </Box>
 
       {actionError ? <Alert severity="error" onClose={() => setActionError('')} sx={{ mb: 2 }}>{actionError}</Alert> : null}
 
@@ -115,17 +108,7 @@ export default function HomeworkDetailPage() {
       </Paper>
 
       {scoreboard?.rows.length ? (
-        <Paper variant="outlined" sx={{ mb: 2 }}>
-          <Box sx={{ px: { xs: 2, md: 2.5 }, py: 1.5, borderBottom: '1px solid', borderColor: 'divider' }}>
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>作业排行榜</Typography>
-          </Box>
-          <TableContainer sx={{ overflowX: 'auto' }}>
-            <Table size="small" sx={{ minWidth: 620 }} aria-label="作业排行榜">
-              {scoreboard.headers.length ? <TableHead><TableRow>{scoreboard.headers.map((header, index) => <TableCell key={index}>{header || `列 ${index + 1}`}</TableCell>)}</TableRow></TableHead> : null}
-              <TableBody>{scoreboard.rows.map((row, index) => <TableRow key={index} hover>{row.cells.map((cell, cellIndex) => <TableCell key={cellIndex}>{cell || '-'}</TableCell>)}</TableRow>)}</TableBody>
-            </Table>
-          </TableContainer>
-        </Paper>
+        <ScoreboardTable title="作业排行榜" headers={scoreboard.headers} rows={scoreboard.rows} />
       ) : null}
 
       <Paper variant="outlined">

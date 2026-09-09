@@ -6,6 +6,7 @@ import {
 } from '@mui/material';
 import { GraduationCap, Plus, RefreshCw, Search } from 'lucide-react';
 import { useAuth } from '../auth';
+import PageHeader from '../components/PageHeader';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
 import { hydroPublicUrl } from '../lib/endpoint';
 import { scrapeTrainingRows } from '../lib/scrape';
@@ -45,27 +46,23 @@ export default function TrainingListPage() {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 1.5, mb: 2.4, flexWrap: 'wrap' }}>
-        <Box>
-          <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', gap: 1, fontWeight: 700 }}>
-            <GraduationCap size={21} />
-            训练
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-            按章节循序完成题目，记录自己的训练进度。
-          </Typography>
-        </Box>
-        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-          {user?.role === 'root' ? (
-            <Button component="a" href={hydroPublicUrl('/training/create')} target="_blank" rel="noreferrer" variant="contained" startIcon={<Plus size={16} />}>
-              创建训练
+      <PageHeader
+        icon={<GraduationCap size={21} />}
+        title="训练"
+        subtitle="按章节循序完成题目，记录自己的训练进度。"
+        actions={(
+          <>
+            {user?.role === 'root' ? (
+              <Button component="a" href={hydroPublicUrl('/training/create')} target="_blank" rel="noreferrer" variant="contained" startIcon={<Plus size={16} />}>
+                创建训练
+              </Button>
+            ) : null}
+            <Button variant="outlined" startIcon={<RefreshCw size={16} />} onClick={() => void load()}>
+              刷新
             </Button>
-          ) : null}
-          <Button variant="outlined" startIcon={<RefreshCw size={16} />} onClick={() => void load()}>
-            刷新
-          </Button>
-        </Box>
-      </Box>
+          </>
+        )}
+      />
 
       <TextField
         value={query}

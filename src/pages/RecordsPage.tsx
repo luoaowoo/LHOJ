@@ -4,7 +4,8 @@ import {
   Box, Button, FormControl, InputLabel, MenuItem, Pagination, Paper, Select, Table, TableBody,
   TableCell, TableContainer, TableHead, TableRow, TextField, Typography,
 } from '@mui/material';
-import { RefreshCw } from 'lucide-react';
+import { ListChecks, RefreshCw } from 'lucide-react';
+import PageHeader from '../components/PageHeader';
 import StatusChip from '../components/StatusChip';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
 import { hydroPublicUrl } from '../lib/endpoint';
@@ -126,11 +127,9 @@ export default function RecordsPage() {
 
   return (
     <Box>
-      <Box sx={{ mb: 2.3 }}>
-        <Typography variant="h4" sx={{ fontWeight: 800 }}>评测记录</Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mt: .45 }}>查看提交状态、运行时间和评测结果</Typography>
-      </Box>
-      <Box
+      <PageHeader icon={<ListChecks size={20} />} title="评测记录" subtitle="查看提交状态、运行时间和评测结果" />
+      <Paper
+        variant="outlined"
         sx={{
           mb: 2,
           display: 'flex',
@@ -138,10 +137,6 @@ export default function RecordsPage() {
           alignItems: 'center',
           gap: 1.2,
           p: { xs: 1.4, md: 1.8 },
-          border: '1px solid',
-          borderColor: 'divider',
-          borderRadius: 2,
-          bgcolor: 'rgba(255,255,255,.025)',
         }}
       >
         <TextField
@@ -188,7 +183,7 @@ export default function RecordsPage() {
         >
           刷新
         </Button>
-      </Box>
+      </Paper>
 
       {loading && initialLoadRef.current ? <FullPageLoader /> : null}
       {!loading && error ? <ErrorBox message={error} onRetry={applyFilters} /> : null}
@@ -199,13 +194,13 @@ export default function RecordsPage() {
             <Table size="small" sx={{ minWidth: 900 }}>
             <TableHead>
               <TableRow>
-                <TableCell sx={{ fontWeight: 650 }}>状态</TableCell>
-                <TableCell sx={{ fontWeight: 650 }}>题目</TableCell>
-                <TableCell sx={{ fontWeight: 650 }}>提交者</TableCell>
-                <TableCell sx={{ fontWeight: 650 }}>时间</TableCell>
-                <TableCell sx={{ fontWeight: 650 }}>内存</TableCell>
-                <TableCell sx={{ fontWeight: 650 }}>语言</TableCell>
-                <TableCell sx={{ fontWeight: 650 }}>提交时间</TableCell>
+                <TableCell>状态</TableCell>
+                <TableCell>题目</TableCell>
+                <TableCell>提交者</TableCell>
+                <TableCell>时间</TableCell>
+                <TableCell>内存</TableCell>
+                <TableCell>语言</TableCell>
+                <TableCell>提交时间</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>

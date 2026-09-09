@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link as RouterLink, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import {
-  Alert, Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText,
-  DialogTitle, Divider, Pagination, Paper, Stack, TextField, Typography,
+  Alert, Box, Button, CircularProgress, Pagination, Paper, Stack, TextField, Typography,
 } from '@mui/material';
 import { ArrowLeft, ExternalLink, LogIn, MessageSquare, Pencil, Send, Trash2 } from 'lucide-react';
 import { useAuth } from '../auth';
+import ConfirmDialog from '../components/ConfirmDialog';
 import Markdown from '../components/Markdown';
+import PageHeader from '../components/PageHeader';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
 import { hydroPublicUrl } from '../lib/endpoint';
 import { postHydroForm, scrapeDiscussionDetail } from '../lib/scrape';
@@ -138,18 +139,26 @@ export default function DiscussionDetailPage() {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1, mb: 2, flexWrap: 'wrap' }}>
+      <Box sx={{ mb: 1.5 }}>
         <Button component={RouterLink} to="/discuss" color="inherit" size="small" startIcon={<ArrowLeft size={16} />}>
           讨论列表
         </Button>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          {canManageDiscussion ? <Button size="small" startIcon={<Pencil size={15} />} onClick={() => { setEditTitle(discussion.title); setEditContent(discussion.content); setEditingDiscussion(true); }}>编辑</Button> : null}
-          {canManageDiscussion ? <Button size="small" color="error" startIcon={<Trash2 size={15} />} onClick={() => setDeletingDiscussion(true)}>删除</Button> : null}
-          <Button component="a" href={hydroPublicUrl(`/discuss/${encodeURIComponent(id)}`)} target="_blank" rel="noreferrer" size="small" endIcon={<ExternalLink size={15} />}>
-            Hydro 原始页面
-          </Button>
-        </Box>
       </Box>
+
+      <PageHeader
+        icon={<MessageSquare size={20} />}
+        title={discussion.title}
+        subtitle={`${discussion.parentId ? `${discussion.parentId} · ` : ''}${discussion.author || '未知作者'} · ${discussion.views} 次浏览 · ${discussion.replies} 条回复`}
+        actions={
+          <>
+            {canManageDiscussion ? <Button size="small" startIcon={<Pencil size={15} />} onClick={() => { setEditTitle(discussion.title); setEditContent(discussion.content); setEditingDiscussion(true); }}>编辑</Button> : null}
+            {canManageDiscussion ? <Button size="small" color="error" startIcon={<Trash2 size={15} />} onClick={() => setDeletingDiscussion(true)}>删除</Button> : null}
+            <Button component="a" href={hydroPublicUrl(`/discuss/${encodeURIComponent(id)}`)} target="_blank" rel="noreferrer" size="small" endIcon={<ExternalLink size={15} />}>
+              Hydro 原始页面
+            </Button>
+          </>
+        }
+      />
 
       <Paper component="article" variant="outlined" sx={{ p: { xs: 2, md: 3 }, mb: 2 }}>
         {editingDiscussion ? (
@@ -158,11 +167,7 @@ export default function DiscussionDetailPage() {
             <TextField fullWidth multiline minRows={6} label="正文" value={editContent} onChange={(event) => setEditContent(event.target.value)} sx={{ mt: 1.5 }} />
             <Stack direction="row" spacing={1} justifyContent="flex-end" sx={{ mt: 1 }}><Button color="inherit" onClick={() => setEditingDiscussion(false)} disabled={posting}>取消</Button><Button type="submit" variant="contained" disabled={posting || !editTitle.trim() || !editContent.trim()}>保存</Button></Stack>
           </Box>
-        ) : <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', gap: 1, fontWeight: 700 }}><MessageSquare size={21} />{discussion.title}</Typography>}
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.7 }}>
-          {discussion.parentId ? `${discussion.parentId} · ` : ''}{discussion.author || '未知作者'} · {discussion.views} 次浏览 · {discussion.replies} 条回复
-        </Typography>
-        {!editingDiscussion ? <><Divider sx={{ my: 2 }} />{discussion.content ? <Markdown content={discussion.content} /> : <EmptyBox message="暂无正文" />}</> : null}
+        ) : discussion.content ? <Markdown content={discussion.content} /> : <EmptyBox message="暂无正文" />}
       </Paper>
 
       <Stack spacing={1.5} sx={{ mb: 2 }}>
@@ -232,8 +237,24 @@ export default function DiscussionDetailPage() {
           <Button component={RouterLink} to="/login" state={{ from: `/discuss/${id}` }} variant="contained" startIcon={<LogIn size={16} />}>登录</Button>
         </Paper>
       )}
-      <Dialog open={deletingDiscussion} onClose={() => { if (!posting) setDeletingDiscussion(false); }}><DialogTitle>删除讨论？</DialogTitle><DialogContent><DialogContentText>讨论及全部回复将被永久删除，此操作不能撤销。</DialogContentText></DialogContent><DialogActions><Button color="inherit" onClick={() => setDeletingDiscussion(false)} disabled={posting}>取消</Button><Button color="error" variant="contained" onClick={() => void updateDiscussion('delete')} disabled={posting}>删除</Button></DialogActions></Dialog>
-      <Dialog open={Boolean(deletingReply)} onClose={() => { if (!posting) setDeletingReply(null); }}><DialogTitle>删除回复？</DialogTitle><DialogContent><DialogContentText>这条回复将被永久删除，此操作不能撤销。</DialogContentText></DialogContent><DialogActions><Button color="inherit" onClick={() => setDeletingReply(null)} disabled={posting}>取消</Button><Button color="error" variant="contained" onClick={() => void updateReply(deletingReply?.drrid ? 'delete_tail_reply' : 'delete_reply')} disabled={posting}>删除</Button></DialogActions></Dialog>
+      <ConfirmDialog
+        open={deletingDiscussion}
+        title="删除讨论？"
+        content="讨论及全部回复将被永久删除，此操作不能撤销。"
+        confirmLabel="删除"
+        loading={posting}
+        onConfirm={() => void updateDiscussion('delete')}
+        onClose={() => setDeletingDiscussion(false)}
+      />
+      <ConfirmDialog
+        open={Boolean(deletingReply)}
+        title="删除回复？"
+        content="这条回复将被永久删除，此操作不能撤销。"
+        confirmLabel="删除"
+        loading={posting}
+        onConfirm={() => void updateReply(deletingReply?.drrid ? 'delete_tail_reply' : 'delete_reply')}
+        onClose={() => setDeletingReply(null)}
+      />
     </Box>
   );
 }

@@ -37,6 +37,7 @@ const StatusPage = lazy(() => import('./pages/StatusPage'));
 const MessagesPage = lazy(() => import('./pages/MessagesPage'));
 const SecurityPage = lazy(() => import('./pages/SecurityPage'));
 const AccountSettingsPage = lazy(() => import('./pages/AccountSettingsPage'));
+const AboutPage = lazy(() => import('./pages/AboutPage'));
 
 function Protected() {
   const { user, loading, error, refresh } = useAuth();
@@ -57,11 +58,12 @@ function RoutesRoot() {
       ['/login', '登录'], ['/problems', '题库'], ['/problem/', '题库'],
       ['/records', '评测记录'], ['/contests', '比赛'], ['/training', '训练'],
       ['/homework', '作业'], ['/discuss', '讨论'], ['/ranking', '排行榜'],
-      ['/user', '个人中心'], ['/settings', '设置'], ['/management', '管理中心'],
+      ['/user', '个人中心'], ['/settings', 'UI 设置'], ['/management', '管理中心'],
       ['/status', '系统状态'],
       ['/messages', '站内消息'],
       ['/security', '安全设置'],
       ['/account-settings', '账户设置'],
+      ['/about', '风格简介'],
     ];
     const known = labels.find(([path]) => location.pathname.startsWith(path))?.[1];
     const label = known ?? (location.pathname === '/' ? '主页' : '页面不存在');
@@ -90,6 +92,7 @@ function RoutesRoot() {
           <Route path="/discuss" element={<DiscussionListPage />} />
           <Route path="/discuss/:id" element={<DiscussionDetailPage />} />
           <Route path="/ranking" element={<RankingPage />} />
+          <Route path="/about" element={<AboutPage />} />
           <Route path="/user/:uname" element={<UserPage />} />
           <Route element={<Protected />}>
             <Route path="/problem/:id/submit" element={<SubmitPage />} />
@@ -110,8 +113,10 @@ function RoutesRoot() {
 }
 
 export default function App() {
-  const { mode, accent } = usePreferences();
-  const theme = useMemo(() => buildTheme(mode, accent), [mode, accent]);
+  const { mode, accent, resolvedMode, customBgColor } = usePreferences();
+  const theme = useMemo(() => buildTheme(mode, accent, {
+    bgColor: customBgColor || undefined,
+  }), [mode, accent, resolvedMode, customBgColor]);
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />

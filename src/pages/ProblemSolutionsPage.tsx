@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link as RouterLink, useParams, useSearchParams } from 'react-router-dom';
-import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Pagination, Paper, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, Pagination, Paper, Stack, TextField, Typography } from '@mui/material';
 import { ArrowDown, ArrowLeft, ArrowUp, ExternalLink, Lightbulb, MessageSquare, Pencil, Send, Trash2 } from 'lucide-react';
 import { useAuth } from '../auth';
+import ConfirmDialog from '../components/ConfirmDialog';
 import Markdown from '../components/Markdown';
+import PageHeader from '../components/PageHeader';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
 import { hydroPublicUrl } from '../lib/endpoint';
 import { postHydroForm, scrapeProblemSolutions } from '../lib/scrape';
@@ -80,11 +82,18 @@ export default function ProblemSolutionsPage() {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1, flexWrap: 'wrap', mb: 2 }}>
+      <Box sx={{ mb: 1.5 }}>
         <Button component={RouterLink} to={`/problem/${encodeURIComponent(id)}`} color="inherit" size="small" startIcon={<ArrowLeft size={16} />}>返回题目</Button>
-        <Button component="a" href={hydroPublicUrl(`/p/${encodeURIComponent(id)}/solution`)} target="_blank" rel="noreferrer" size="small" endIcon={<ExternalLink size={15} />}>发布或管理题解</Button>
       </Box>
-      <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', gap: 1, fontWeight: 700, mb: 2 }}><Lightbulb size={21} />题解</Typography>
+      <PageHeader
+        icon={<Lightbulb size={22} />}
+        title="题解"
+        actions={(
+          <Button component="a" href={hydroPublicUrl(`/p/${encodeURIComponent(id)}/solution`)} target="_blank" rel="noreferrer" size="small" endIcon={<ExternalLink size={15} />}>
+            发布或管理题解
+          </Button>
+        )}
+      />
       {actionError ? <Alert severity="error" onClose={() => setActionError('')} sx={{ mb: 2 }}>{actionError}</Alert> : null}
       {!result?.items.length ? <EmptyBox message="暂无公开题解" /> : (
         <Stack spacing={1.5}>
@@ -153,16 +162,24 @@ export default function ProblemSolutionsPage() {
       )}
       {result && result.pageCount > 1 ? <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}><Pagination page={page} count={result.pageCount} onChange={(_event, value) => { const next = new URLSearchParams(searchParams); if (value === 1) next.delete('page'); else next.set('page', String(value)); setSearchParams(next); }} /></Box> : null}
       {user ? <Paper component="form" variant="outlined" sx={{ p: 2, mt: 2 }} onSubmit={(event) => { event.preventDefault(); void operate('submit'); }}><TextField fullWidth multiline minRows={5} label="发布题解" value={content} onChange={(event) => setContent(event.target.value)} /><Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1.5 }}><Button type="submit" variant="contained" startIcon={<Send size={16} />} disabled={acting || !content.trim()}>发布</Button></Box></Paper> : null}
-      <Dialog open={Boolean(deleting)} onClose={() => { if (!acting) setDeleting(''); }}>
-        <DialogTitle>删除题解？</DialogTitle>
-        <DialogContent><DialogContentText>题解及其回复将被删除，此操作不能撤销。</DialogContentText></DialogContent>
-        <DialogActions><Button color="inherit" onClick={() => setDeleting('')} disabled={acting}>取消</Button><Button color="error" variant="contained" onClick={() => void operate('delete_solution', deleting)} disabled={acting}>删除</Button></DialogActions>
-      </Dialog>
-      <Dialog open={Boolean(deletingReply)} onClose={() => { if (!acting) setDeletingReply(null); }}>
-        <DialogTitle>删除回复？</DialogTitle>
-        <DialogContent><DialogContentText>这条回复将被永久删除，此操作不能撤销。</DialogContentText></DialogContent>
-        <DialogActions><Button color="inherit" onClick={() => setDeletingReply(null)} disabled={acting}>取消</Button><Button color="error" variant="contained" onClick={() => { if (deletingReply) void operate('delete_reply', deletingReply.psid, deletingReply.psrid); }} disabled={acting}>删除</Button></DialogActions>
-      </Dialog>
+      <ConfirmDialog
+        open={Boolean(deleting)}
+        title="删除题解？"
+        content="题解及其回复将被删除，此操作不能撤销。"
+        confirmLabel="删除"
+        loading={acting}
+        onConfirm={() => void operate('delete_solution', deleting)}
+        onClose={() => setDeleting('')}
+      />
+      <ConfirmDialog
+        open={Boolean(deletingReply)}
+        title="删除回复？"
+        content="这条回复将被永久删除，此操作不能撤销。"
+        confirmLabel="删除"
+        loading={acting}
+        onConfirm={() => { if (deletingReply) void operate('delete_reply', deletingReply.psid, deletingReply.psrid); }}
+        onClose={() => setDeletingReply(null)}
+      />
     </Box>
   );
 }

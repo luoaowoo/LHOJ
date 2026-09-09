@@ -1,4 +1,4 @@
-export type ThemeMode = 'light' | 'dark';
+export type ThemeMode = 'light' | 'dark' | 'system';
 
 export interface HydroUser {
   _id: number;
@@ -66,14 +66,26 @@ export interface ProblemRow {
 export interface RecordRow {
   rid: string;
   status: string;
+  statusCode?: number;
   score: string;
   problem: string;
+  pid?: string;
+  problemTitle?: string;
   problemHref?: string;
   submitter: string;
   time: string;
   memory: string;
   language: string;
   submittedAt: string;
+}
+
+export interface UnsolvedProblem {
+  pid: string;
+  title: string;
+  href: string;
+  status: string;
+  attempts: number;
+  lastAttemptAt: string;
 }
 
 export interface ContestRow {

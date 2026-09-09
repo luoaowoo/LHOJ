@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link as RouterLink, useParams } from 'react-router-dom';
-import { Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
+import { Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import { ArrowLeft, BarChart3 } from 'lucide-react';
+import PageHeader from '../components/PageHeader';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
 import { scrapeProblemStats } from '../lib/scrape';
 import type { ProblemStat } from '../types';
@@ -16,8 +17,10 @@ export default function ProblemStatsPage() {
   if (error) return <ErrorBox message={error} onRetry={() => void load()} />;
   return (
     <Box>
-      <Button component={RouterLink} to={`/problem/${encodeURIComponent(id)}`} color="inherit" size="small" startIcon={<ArrowLeft size={16} />} sx={{ mb: 2 }}>返回题目</Button>
-      <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', gap: 1, fontWeight: 700, mb: 2 }}><BarChart3 size={21} />最优提交</Typography>
+      <Box sx={{ mb: 1.5 }}>
+        <Button component={RouterLink} to={`/problem/${encodeURIComponent(id)}`} color="inherit" size="small" startIcon={<ArrowLeft size={16} />}>返回题目</Button>
+      </Box>
+      <PageHeader icon={<BarChart3 size={22} />} title="最优提交" />
       {!rows?.length ? <EmptyBox message="暂无统计数据" /> : (
         <TableContainer component={Paper} variant="outlined" sx={{ overflowX: 'auto' }}>
           <Table size="small" aria-label="题目提交统计"><TableHead><TableRow><TableCell>用户</TableCell><TableCell>语言</TableCell><TableCell>代码长度</TableCell><TableCell>时间</TableCell><TableCell>内存</TableCell></TableRow></TableHead><TableBody>

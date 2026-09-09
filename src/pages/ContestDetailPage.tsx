@@ -1,33 +1,26 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link as RouterLink, useParams } from 'react-router-dom';
 import {
-  Alert, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel,
-  Paper, Stack, Switch, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography,
+  Alert, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel,
+  Paper, Switch, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography,
 } from '@mui/material';
 import { CircleDot, Code2, ExternalLink, MessageCircleQuestion, Printer, Settings2, Trophy, Users, Clock3, Square } from 'lucide-react';
 import { useAuth } from '../auth';
+import ConfirmDialog from '../components/ConfirmDialog';
 import Markdown from '../components/Markdown';
+import PageHeader from '../components/PageHeader';
+import ScoreboardTable from '../components/ScoreboardTable';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
 import { fetchContest, fetchProblemsByIds, localizedContent } from '../lib/api';
-import { postHydroForm, scrapeContestParticipation, scrapeContestScoreboard } from '../lib/scrape';
+import { formatDate, postHydroForm, scrapeContestParticipation, scrapeContestScoreboard } from '../lib/scrape';
 import type { ContestParticipation } from '../lib/scrape';
 import { hydroPublicUrl } from '../lib/endpoint';
 import type { ScoreboardRow } from '../types';
 import type { HydroContest, HydroProblem } from '../types';
 
-const dateTimeFormatter = new Intl.DateTimeFormat('zh-CN', {
-  dateStyle: 'medium',
-  timeStyle: 'short',
-});
-
 interface ContestState {
   label: string;
   color: 'default' | 'error' | 'success' | 'warning';
-}
-
-function formatDate(value: string): string {
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? value : dateTimeFormatter.format(date);
 }
 
 function getContestState(contest: HydroContest): ContestState {
@@ -148,21 +141,11 @@ export default function ContestDetailPage() {
 
   return (
     <Box>
-      <Paper variant="outlined" sx={{ p: { xs: 2, md: 2.5 }, mb: 2 }}>
-        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, flexWrap: 'wrap' }}>
-          <Box sx={{ flex: 1, minWidth: 220 }}>
-            <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', gap: 1, fontWeight: 700 }}>
-              <Trophy size={21} />
-              {contest.title}
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 1.5 }}>
-              <Chip label={state.label} color={state.color} size="small" />
-              <Chip icon={<Clock3 size={14} />} label={`开始 ${formatDate(contest.beginAt)}`} variant="outlined" size="small" />
-              <Chip icon={<Clock3 size={14} />} label={`结束 ${formatDate(contest.endAt)}`} variant="outlined" size="small" />
-              <Chip icon={<Users size={14} />} label={`参与 ${contest.attend}`} variant="outlined" size="small" />
-            </Box>
-          </Box>
-          <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap' }}>
+      <PageHeader
+        icon={<Trophy size={20} />}
+        title={contest.title}
+        actions={(
+          <>
             {user && participation && !participation.attended && state.label !== '已结束' ? (
               <Button variant="contained" size="small" onClick={() => participation.requiresCode ? setJoinOpen(true) : void joinContest()} disabled={acting}>
                 {acting ? '报名中' : '报名比赛'}
@@ -213,9 +196,16 @@ export default function ContestDetailPage() {
                 管理比赛
               </Button>
             ) : null}
-          </Stack>
-        </Box>
-      </Paper>
+          </>
+        )}
+      />
+
+      <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2.5 }}>
+        <Chip label={state.label} color={state.color} size="small" />
+        <Chip icon={<Clock3 size={14} />} label={`开始 ${formatDate(contest.beginAt)}`} variant="outlined" size="small" />
+        <Chip icon={<Clock3 size={14} />} label={`结束 ${formatDate(contest.endAt)}`} variant="outlined" size="small" />
+        <Chip icon={<Users size={14} />} label={`参与 ${contest.attend}`} variant="outlined" size="small" />
+      </Box>
 
       {actionError ? <Alert severity="error" onClose={() => setActionError('')} sx={{ mb: 2 }}>{actionError}</Alert> : null}
 
@@ -227,17 +217,7 @@ export default function ContestDetailPage() {
       </Paper>
 
       {scoreboard?.rows.length ? (
-        <Paper variant="outlined" sx={{ mb: 2 }}>
-          <Box sx={{ px: { xs: 2, md: 2.5 }, py: 1.5, borderBottom: '1px solid', borderColor: 'divider' }}>
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>排行榜</Typography>
-          </Box>
-          <TableContainer sx={{ overflowX: 'auto' }}>
-            <Table size="small" sx={{ minWidth: 620 }} aria-label="比赛排行榜">
-              {scoreboard.headers.length ? <TableHead><TableRow>{scoreboard.headers.map((header, index) => <TableCell key={index}>{header || `列 ${index + 1}`}</TableCell>)}</TableRow></TableHead> : null}
-              <TableBody>{scoreboard.rows.map((row, index) => <TableRow key={index} hover>{row.cells.map((cell, cellIndex) => <TableCell key={cellIndex}>{cell || '-'}</TableCell>)}</TableRow>)}</TableBody>
-            </Table>
-          </TableContainer>
-        </Paper>
+        <ScoreboardTable title="排行榜" headers={scoreboard.headers} rows={scoreboard.rows} />
       ) : null}
 
       <Paper variant="outlined">
@@ -287,11 +267,16 @@ export default function ContestDetailPage() {
           <Button variant="contained" onClick={() => void joinContest()} disabled={acting || !inviteCode.trim()}>报名</Button>
         </DialogActions>
       </Dialog>
-      <Dialog open={earlyEndOpen} onClose={() => { if (!acting) setEarlyEndOpen(false); }} fullWidth maxWidth="xs">
-        <DialogTitle>提前结束比赛？</DialogTitle>
-        <DialogContent><DialogContentText>结束后将不能继续提交本场比赛，且此操作无法撤销。</DialogContentText></DialogContent>
-        <DialogActions><Button color="inherit" onClick={() => setEarlyEndOpen(false)} disabled={acting}>取消</Button><Button color="error" variant="contained" onClick={() => void earlyEnd()} disabled={acting}>确认结束</Button></DialogActions>
-      </Dialog>
+      <ConfirmDialog
+        open={earlyEndOpen}
+        title="提前结束比赛？"
+        content="结束后将不能继续提交本场比赛，且此操作无法撤销。"
+        confirmLabel="确认结束"
+        destructive
+        loading={acting}
+        onConfirm={() => void earlyEnd()}
+        onClose={() => setEarlyEndOpen(false)}
+      />
     </Box>
   );
 }

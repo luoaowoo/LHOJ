@@ -20,6 +20,7 @@ import {
 import { BarChart3, Files, MessageSquare, Send, Settings2, SlidersHorizontal, Star } from 'lucide-react';
 import { useAuth } from '../auth';
 import Markdown from '../components/Markdown';
+import PageHeader from '../components/PageHeader';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
 import { fetchProblem, localizedContent } from '../lib/api';
 import { hydroPublicUrl } from '../lib/endpoint';
@@ -122,16 +123,8 @@ export default function ProblemPage() {
         }}
       >
         <Paper component="article" variant="outlined" sx={{ p: { xs: 2, sm: 3 }, minWidth: 0 }}>
-          <Typography variant="overline" sx={{ color: 'primary.main', fontFamily: 'monospace' }}>
-            PROBLEM / {pid}
-          </Typography>
-          <Typography variant="h5" sx={{ fontWeight: 700, lineHeight: 1.3 }}>
-            {problem.title}
-          </Typography>
-          <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
-            #{pid}
-          </Typography>
-          <Divider sx={{ my: 1.5 }} />
+          <PageHeader title={problem.title} subtitle={`#${pid}`} />
+          <Divider sx={{ mb: 1.5 }} />
           <Box sx={{ maxWidth: 860 }}>
             {content.trim() ? (
               <Markdown content={content} />

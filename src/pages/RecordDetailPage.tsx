@@ -1,9 +1,10 @@
 import { Fragment, useEffect, useState } from 'react';
 import { Link as RouterLink, useParams, useSearchParams } from 'react-router-dom';
-import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, LinearProgress, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
+import { Alert, Box, Button, LinearProgress, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { Download, ExternalLink, RefreshCw, ShieldAlert, XCircle } from 'lucide-react';
 import { useAuth } from '../auth';
+import ConfirmDialog from '../components/ConfirmDialog';
 import StatusChip from '../components/StatusChip';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
 import { postHydroForm, scrapeRecordDetail } from '../lib/scrape';
@@ -233,12 +234,12 @@ export default function RecordDetailPage() {
           <Table size="small" sx={{ minWidth: 620 }}>
             <TableHead>
               <TableRow>
-                <TableCell sx={{ fontWeight: 650 }}>测试点</TableCell>
-                <TableCell sx={{ fontWeight: 650 }}>状态</TableCell>
-                <TableCell sx={{ fontWeight: 650 }}>得分</TableCell>
-                <TableCell sx={{ fontWeight: 650 }}>时间</TableCell>
-                <TableCell sx={{ fontWeight: 650 }}>内存</TableCell>
-                <TableCell sx={{ fontWeight: 650 }}>信息</TableCell>
+                <TableCell>测试点</TableCell>
+                <TableCell>状态</TableCell>
+                <TableCell>得分</TableCell>
+                <TableCell>时间</TableCell>
+                <TableCell>内存</TableCell>
+                <TableCell>信息</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -274,14 +275,17 @@ export default function RecordDetailPage() {
           {detail.code}
         </Paper>
       ) : null}
-      <Dialog open={cancelOpen} onClose={() => { if (!acting) setCancelOpen(false); }} aria-labelledby="cancel-record-title">
-        <DialogTitle id="cancel-record-title">取消评测结果？</DialogTitle>
-        <DialogContent><DialogContentText>该记录会被标记为已取消，分数、时间和内存数据将清零。</DialogContentText></DialogContent>
-        <DialogActions>
-          <Button color="inherit" onClick={() => setCancelOpen(false)} disabled={acting}>返回</Button>
-          <Button color="error" variant="contained" onClick={() => void runOperation('cancel')} disabled={acting}>确认取消</Button>
-        </DialogActions>
-      </Dialog>
+      <ConfirmDialog
+        open={cancelOpen}
+        title="取消评测结果？"
+        content="该记录会被标记为已取消，分数、时间和内存数据将清零。"
+        confirmLabel="确认取消"
+        cancelLabel="返回"
+        destructive
+        loading={acting}
+        onConfirm={() => void runOperation('cancel')}
+        onClose={() => setCancelOpen(false)}
+      />
     </Box>
   );
 }

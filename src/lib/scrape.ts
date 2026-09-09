@@ -2,7 +2,7 @@ import type {
   ContestRow, DiscussionDetail, DiscussionReply, DiscussionRow, HomeworkDetail,
   HomeworkProblem, HomeworkRow, ProblemFile, ProblemRow, ProblemStat,
   ProblemSolutionsResult, RankingRow, RecordDetail, RecordRow, ScoreboardRow,
-  HydroSetting, TrainingDetail, TrainingNode, TrainingProblem, TrainingRow, UserMessage, UserSession,
+  HydroSetting, TrainingDetail, TrainingNode, TrainingProblem, TrainingRow, UnsolvedProblem, UserMessage, UserSession,
 } from '../types';
 import { ApiError, sessionExpiredError } from './errors';
 import { ensureEndpoint, fetchRead, hydroNativeUrl, requestSignal } from './endpoint';
@@ -357,8 +357,11 @@ function parseRecordRowsPayload(payload: Record<string, unknown>): RecordRow[] |
     return [{
       rid,
       status: formatStatus(item.status),
+      statusCode: numberValue(item.status) ?? undefined,
       score: textValue(item.score),
       problem: title ? `${pid} ${title}` : pid,
+      pid,
+      problemTitle: title || undefined,
       problemHref: `/p/${encodeURIComponent(pid)}`,
       submitter: textValue(userDoc?.uname) || textValue(item.uid),
       time: formatTime(item.time),
@@ -609,6 +612,66 @@ export async function scrapeRecordRows(params: Record<string, string> = {}): Pro
       submittedAt: clean(row.querySelector<HTMLElement>('td.col--submit-at')?.textContent),
     };
   });
+}
+
+export async function scrapeDomainBulletin(): Promise<string> {
+  // Every Hydro PJAX response embeds UiContext.domain; /p is public so this
+  // also works for logged-out visitors on the public homepage.
+  const page = await readHydroPageResponse('/p?page=1');
+  const uiContext = isRecord(page.payload?.UiContext) ? page.payload.UiContext : null;
+  const domain = isRecord(uiContext?.domain) ? uiContext.domain : null;
+  return typeof domain?.bulletin === 'string' ? domain.bulletin : '';
+}
+
+// Hydro's /record?status= filter is exact-match only, so "attempted but never
+// accepted" has to be diffed client side. Only these codes are real failures:
+// in-flight (0/20/21/22) and non-verdict (9/30) records must not count as
+// attempts, or a submission that is still judging would look unsolved.
+const acceptedStatus = 1;
+const failedStatuses = new Set([2, 3, 4, 5, 6, 7, 8, 10, 11, 31]);
+
+function classifyRecord(row: RecordRow): 'accepted' | 'failed' | 'pending' {
+  if (typeof row.statusCode === 'number') {
+    if (row.statusCode === acceptedStatus) return 'accepted';
+    return failedStatuses.has(row.statusCode) ? 'failed' : 'pending';
+  }
+  // HTML fallback rows carry no numeric code, so fall back to the label.
+  const text = row.status.toLowerCase();
+  if (/(通过|accepted|\bac\b)/.test(text)) return 'accepted';
+  if (/(等待|评测|排队|运行|编译中|waiting|running|compiling|fetched|pending|已取消|cancel|忽略|ignore)/.test(text)) return 'pending';
+  return text ? 'failed' : 'pending';
+}
+
+export async function scrapeUnsolvedProblems(uname: string, limit = 8, pages = 2): Promise<UnsolvedProblem[]> {
+  const solved = new Set<string>();
+  const candidates = new Map<string, UnsolvedProblem>();
+  for (let pageNumber = 1; pageNumber <= pages; pageNumber += 1) {
+    const rows = await scrapeRecordRows({ uidOrName: uname, page: String(pageNumber) });
+    if (!rows.length) break;
+    for (const row of rows) {
+      const pid = row.pid && row.pid !== '*'
+        ? row.pid
+        : row.problemHref?.match(/(?:^|\/)p\/([^/?#]+)/i)?.[1];
+      if (!pid) continue;
+      const verdict = classifyRecord(row);
+      if (verdict === 'accepted') { solved.add(pid); continue; }
+      if (verdict === 'pending') continue;
+      // Records arrive newest first, so keep the first failure seen per problem.
+      const existing = candidates.get(pid);
+      if (existing) { existing.attempts += 1; continue; }
+      candidates.set(pid, {
+        pid,
+        title: row.problemTitle || row.problem || pid,
+        href: row.problemHref ?? `/p/${encodeURIComponent(pid)}`,
+        status: row.status,
+        attempts: 1,
+        lastAttemptAt: row.submittedAt,
+      });
+    }
+  }
+  return Array.from(candidates.values())
+    .filter((item) => !solved.has(item.pid))
+    .slice(0, limit);
 }
 
 export async function scrapeContestRows(pageNumber = 1): Promise<ContestRow[]> {

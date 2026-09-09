@@ -1,10 +1,7 @@
 import { createTheme } from '@mui/material/styles';
-import { alpha } from '@mui/material/styles';
 
 export interface ThemeCustomization {
-  cardRadius?: number;
-  paperAlpha?: number;
-  cardBorder?: { width: number; color: string; opacity: number };
+  bgColor?: string;
 }
 
 const fontStack = [
@@ -51,7 +48,10 @@ const tone = {
   },
 };
 
-export const sidebarSurface = { light: tone.light.surfaceDim, dark: tone.dark.surfaceDim };
+export function resolveChromeBg(mode: 'light' | 'dark', bgColor?: string): string {
+  if (bgColor) return bgColor;
+  return mode === 'dark' ? tone.dark.surfaceDim : tone.light.surfaceDim;
+}
 
 export function buildTheme(mode: 'light' | 'dark' | 'system', accent: string, custom?: ThemeCustomization) {
   const resolvedMode = mode === 'system'
@@ -60,12 +60,8 @@ export function buildTheme(mode: 'light' | 'dark' | 'system', accent: string, cu
   const dark = resolvedMode === 'dark';
   const t = dark ? tone.dark : tone.light;
   const menuShadow = dark ? '0 1px 3px rgba(0,0,0,0.32)' : '0 1px 3px rgba(0,0,0,0.06)';
-  const cardRadius = custom?.cardRadius ?? 12;
-  const paperBg = custom?.paperAlpha != null ? alpha(t.surfaceBright, custom.paperAlpha) : t.surfaceBright;
-  const cardBorderColor = custom?.cardBorder
-    ? alpha(custom.cardBorder.color, custom.cardBorder.opacity)
-    : t.outlineVariant;
-  const cardBorderWidth = custom?.cardBorder?.width ?? 1;
+  const cardRadius = 12;
+  const pageBg = custom?.bgColor || t.surface;
 
   return createTheme({
     palette: {
@@ -101,7 +97,7 @@ export function buildTheme(mode: 'light' | 'dark' | 'system', accent: string, cu
         dark: '#0369a1',
         contrastText: '#ffffff',
       },
-      background: { default: t.surface, paper: paperBg },
+      background: { default: pageBg, paper: t.surfaceBright },
       text: { primary: t.onSurface, secondary: t.onSurfaceVariant },
       divider: t.outlineVariant,
       action: {
@@ -173,8 +169,7 @@ export function buildTheme(mode: 'light' | 'dark' | 'system', accent: string, cu
         styleOverrides: {
           root: {
             backgroundImage: 'none',
-            borderColor: cardBorderColor,
-            borderWidth: cardBorderWidth,
+            borderColor: t.outlineVariant,
             borderRadius: cardRadius,
             boxShadow: 'none',
           },
@@ -184,8 +179,7 @@ export function buildTheme(mode: 'light' | 'dark' | 'system', accent: string, cu
         styleOverrides: {
           root: {
             border: '1px solid',
-            borderColor: cardBorderColor,
-            borderWidth: cardBorderWidth,
+            borderColor: t.outlineVariant,
             borderRadius: cardRadius,
             boxShadow: 'none',
             backgroundImage: 'none',

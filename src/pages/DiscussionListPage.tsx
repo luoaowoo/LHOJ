@@ -2,19 +2,14 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link as RouterLink, useSearchParams } from 'react-router-dom';
 import {
   Box, Button, Chip, InputAdornment, Pagination, Paper, Table, TableBody, TableCell,
-  TableContainer, TableHead, TableRow, TextField, Typography,
+  TableContainer, TableHead, TableRow, TextField,
 } from '@mui/material';
 import { ExternalLink, MessageSquare, RefreshCw, Search } from 'lucide-react';
+import PageHeader from '../components/PageHeader';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
 import { hydroPublicUrl } from '../lib/endpoint';
-import { scrapeDiscussionRows } from '../lib/scrape';
+import { formatDate, scrapeDiscussionRows } from '../lib/scrape';
 import type { DiscussionRow } from '../types';
-
-function formatUpdatedAt(value?: string): string {
-  if (!value) return '—';
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? value : date.toLocaleString('zh-CN');
-}
 
 export default function DiscussionListPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -57,32 +52,28 @@ export default function DiscussionListPage() {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 1.5, mb: 2.4, flexWrap: 'wrap' }}>
-        <Box>
-          <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', gap: 1, fontWeight: 700 }}>
-            <MessageSquare size={21} />
-            讨论
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-            交流题解、经验和站内问题。
-          </Typography>
-        </Box>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button variant="outlined" startIcon={<RefreshCw size={16} />} onClick={() => void load()}>
-            刷新
-          </Button>
-          <Button
-            component="a"
-            href={hydroPublicUrl('/discuss/node/%E9%97%AE%E7%AD%94/create')}
-            target="_blank"
-            rel="noreferrer"
-            variant="contained"
-            endIcon={<ExternalLink size={15} />}
-          >
-            发布讨论
-          </Button>
-        </Box>
-      </Box>
+      <PageHeader
+        icon={<MessageSquare size={20} />}
+        title="讨论"
+        subtitle="交流题解、经验和站内问题。"
+        actions={
+          <>
+            <Button variant="outlined" startIcon={<RefreshCw size={16} />} onClick={() => void load()}>
+              刷新
+            </Button>
+            <Button
+              component="a"
+              href={hydroPublicUrl('/discuss/node/%E9%97%AE%E7%AD%94/create')}
+              target="_blank"
+              rel="noreferrer"
+              variant="contained"
+              endIcon={<ExternalLink size={15} />}
+            >
+              发布讨论
+            </Button>
+          </>
+        }
+      />
 
       <TextField
         value={query}
@@ -117,7 +108,7 @@ export default function DiscussionListPage() {
                   <TableCell>{row.author || '—'}</TableCell>
                   <TableCell>{row.replies}</TableCell>
                   <TableCell>{row.views}</TableCell>
-                  <TableCell>{formatUpdatedAt(row.updatedAt)}</TableCell>
+                  <TableCell>{formatDate(row.updatedAt)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
