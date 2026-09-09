@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link as RouterLink, useSearchParams } from 'react-router-dom';
 import {
-  Avatar, Box, Button, Pagination, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
+  Box, Button, Pagination, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
   Typography, alpha, useTheme,
 } from '@mui/material';
 import { BarChart3, RefreshCw } from 'lucide-react';
@@ -9,6 +9,7 @@ import { useAuth } from '../auth';
 import PageHeader from '../components/PageHeader';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
 import { hydroAvatarUrl } from '../lib/endpoint';
+import HydroAvatar from '../components/HydroAvatar';
 import { ratingColor } from '../lib/rating';
 import { scrapeRankingRows } from '../lib/scrape';
 import { usePreferences } from '../prefs';
@@ -139,13 +140,7 @@ export default function RankingPage() {
                     <TableCell>
                       {row.user ? (
                         <Stack direction="row" spacing={1.2} alignItems="center">
-                          <Avatar
-                            src={uid !== null ? hydroAvatarUrl(undefined, uid) : undefined}
-                            onError={(event) => event.currentTarget.removeAttribute('src')}
-                            sx={{ width: 30, height: 30, fontSize: 13 }}
-                          >
-                            {row.user.slice(0, 1)}
-                          </Avatar>
+                          <HydroAvatar src={uid !== null ? hydroAvatarUrl(undefined, uid) : undefined} name={row.user} userId={uid ?? undefined} size={30} />
                           <Typography
                             component={RouterLink}
                             to={userTo}

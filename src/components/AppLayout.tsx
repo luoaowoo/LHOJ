@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Outlet, useLocation, Link as RouterLink } from 'react-router-dom';
 import {
-  AppBar, Avatar, BottomNavigation, BottomNavigationAction, Box, Divider, Drawer, IconButton, List, ListItem,
+  AppBar, BottomNavigation, BottomNavigationAction, Box, Divider, Drawer, IconButton, List, ListItem,
   ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem, Paper, Toolbar,
   Tooltip, Typography, useMediaQuery, useTheme,
 } from '@mui/material';
@@ -16,6 +16,7 @@ import { usePreferences } from '../prefs';
 import { hydroAvatarUrl } from '../lib/endpoint';
 import { parseRp, ratingColor } from '../lib/rating';
 import { resolveChromeBg } from '../theme';
+import HydroAvatar from './HydroAvatar';
 
 const drawerWidth = 260;
 const railWidth = 72;
@@ -206,7 +207,7 @@ export default function AppLayout() {
                   '&:hover': { bgcolor: 'action.hover' },
                 }}
               >
-                <Avatar src={hydroAvatarUrl(user.avatarUrl, user._id)} onError={(event) => event.currentTarget.removeAttribute('src')} sx={{ width: 28, height: 28 }} alt="">{user.uname.slice(0, 2)}</Avatar>
+                <HydroAvatar src={hydroAvatarUrl(user.avatarUrl, user._id)} name={user.uname} userId={user._id} size={28} />
                 <Typography noWrap sx={{ fontSize: 13.5, fontWeight: 600, color: userColor ?? 'text.primary', maxWidth: 140 }}>
                   {user.uname}
                 </Typography>

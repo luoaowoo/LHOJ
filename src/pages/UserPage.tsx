@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link as RouterLink, useParams } from 'react-router-dom';
-import { Accordion, AccordionDetails, AccordionSummary, Alert, Avatar, Box, Button, Chip, CircularProgress, Divider, LinearProgress, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Stack, Tab, Tabs, TextField, Typography } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, Alert, Box, Button, Chip, CircularProgress, Divider, LinearProgress, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Stack, Tab, Tabs, TextField, Typography } from '@mui/material';
 import { Bell, CheckCircle2, ChevronDown, CircleUserRound, ExternalLink, Globe2, Image, Search, Settings2, ShieldCheck, Trophy, Wrench } from 'lucide-react';
 import { useAuth } from '../auth';
 import PageHeader from '../components/PageHeader';
 import { ErrorBox, FullPageLoader } from '../components/StateBox';
 import { fetchUserByIdentifier } from '../lib/api';
 import { hydroAvatarUrl, hydroPublicUrl } from '../lib/endpoint';
+import HydroAvatar from '../components/HydroAvatar';
 import { difficultyColor } from '../lib/difficulty';
 import { parseRp, ratingColor } from '../lib/rating';
 import { formatDate, scrapeProblemRows } from '../lib/scrape';
@@ -100,7 +101,6 @@ export default function UserPage() {
     return <ErrorBox message={error || '请先登录后查看个人中心。'} />;
   }
 
-  const initials = profile.uname.trim().slice(0, 2).toUpperCase() || '?';
   const encodedUname = encodeURIComponent(profile.uname);
   const canOpenOriginal = typeof profile._id === 'number';
   const ownProfile = !uname || profile._id === sessionUser?._id;
@@ -150,14 +150,7 @@ export default function UserPage() {
           flexWrap: 'wrap',
         }}
       >
-        <Avatar
-          src={hydroAvatarUrl(profile.avatarUrl, profile._id)}
-          onError={(event) => event.currentTarget.removeAttribute('src')}
-          alt=""
-          sx={{ width: 72, height: 72, bgcolor: 'primary.main', fontSize: 26 }}
-        >
-          {initials}
-        </Avatar>
+        <HydroAvatar src={hydroAvatarUrl(profile.avatarUrl, profile._id)} name={profile.uname} userId={profile._id} size={72} />
         <Box sx={{ flex: 1, minWidth: 220 }}>
           <Typography variant="h6" sx={{ fontWeight: 700, color: nameColor ?? 'text.primary' }}>
             {profile.displayName || profile.uname}
