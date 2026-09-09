@@ -701,7 +701,7 @@ export async function scrapeContestRows(pageNumber = 1): Promise<ContestRow[]> {
     const id = href.match(/\/contest\/([0-9a-fA-F]{24})/)?.[1] ?? '';
     const meta = Array.from(item.querySelectorAll<HTMLElement>('ul.supplementary li'))
       .map((li) => clean(li.textContent));
-    const rule = meta.find((value) => ['OI', 'IOI', 'ACM', 'CF', 'ICPC', '作业'].some((kind) => value.includes(kind)));
+    const rule = meta.find((value) => ['OI', 'IOI', 'ACM', 'CF', 'ICPC', 'Ledo', '作业'].some((kind) => value.includes(kind)));
     const rated = meta.some((value) => value.includes('Rated'));
     return {
       id,
@@ -732,6 +732,7 @@ export interface ContestParticipation {
   subscribed: boolean;
   requiresCode: boolean;
   ended: boolean;
+  rule?: string;
 }
 
 export async function scrapeContestParticipation(id: string): Promise<ContestParticipation> {
@@ -743,6 +744,7 @@ export async function scrapeContestParticipation(id: string): Promise<ContestPar
     subscribed: status?.subscribe === 1 || status?.subscribe === true,
     requiresCode: Boolean(contest?._code),
     ended: Boolean(status?.endAt),
+    rule: textValue(contest?.rule) || undefined,
   };
 }
 

@@ -15,6 +15,7 @@ import { fetchContest, fetchProblemsByIds, localizedContent } from '../lib/api';
 import { formatDate, postHydroForm, scrapeContestParticipation, scrapeContestScoreboard } from '../lib/scrape';
 import type { ContestParticipation } from '../lib/scrape';
 import { hydroPublicUrl } from '../lib/endpoint';
+import { contestRuleMeta } from '../lib/contestRule';
 import type { ScoreboardRow } from '../types';
 import type { HydroContest, HydroProblem } from '../types';
 
@@ -93,6 +94,7 @@ export default function ContestDetailPage() {
   }
 
   const state = getContestState(contest);
+  const rule = contestRuleMeta(participation?.rule);
 
   const joinContest = async () => {
     if (acting) return;
@@ -202,6 +204,7 @@ export default function ContestDetailPage() {
 
       <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2.5 }}>
         <Chip label={state.label} color={state.color} size="small" />
+        {participation?.rule ? <Chip icon={<Trophy size={14} />} label={rule.label} size="small" sx={{ bgcolor: rule.color, color: rule.label === '作业' ? '#6f3030' : '#fff', '& .MuiChip-icon': { color: 'inherit' } }} /> : null}
         <Chip icon={<Clock3 size={14} />} label={`开始 ${formatDate(contest.beginAt)}`} variant="outlined" size="small" />
         <Chip icon={<Clock3 size={14} />} label={`结束 ${formatDate(contest.endAt)}`} variant="outlined" size="small" />
         <Chip icon={<Users size={14} />} label={`参与 ${contest.attend}`} variant="outlined" size="small" />

@@ -13,6 +13,7 @@ import HomeCarousel from '../components/HomeCarousel';
 import StatusChip from '../components/StatusChip';
 import { fetchHomepageConfig } from '../lib/homepage';
 import type { CarouselSlide } from '../lib/homepage';
+import { contestRuleMeta } from '../lib/contestRule';
 import { scrapeContestRows, scrapeUnsolvedProblems } from '../lib/scrape';
 import type { ContestRow, UnsolvedProblem } from '../types';
 
@@ -144,7 +145,7 @@ function RecentContestsPanel() {
               <Box sx={{ minWidth: 0, width: '100%' }}>
                 <Typography variant="body2" sx={{ fontWeight: 700 }} noWrap>{item.title || '未命名比赛'}</Typography>
                 <Stack direction="row" spacing={0.6} useFlexGap sx={{ mt: 0.7, flexWrap: 'wrap' }}>
-                  {item.rule ? <Chip icon={<Trophy size={12} />} label={item.rule} size="small" color="success" sx={{ height: 23 }} /> : null}
+                  {item.rule ? <Chip icon={<Trophy size={12} />} label={contestRuleMeta(item.rule).label} size="small" sx={{ height: 23, bgcolor: contestRuleMeta(item.rule).color, color: contestRuleMeta(item.rule).label === '作业' ? '#6f3030' : '#fff', '& .MuiChip-icon': { color: 'inherit' } }} /> : null}
                   <Chip icon={<CalendarDays size={12} />} label={item.date || '时间待定'} size="small" variant="outlined" sx={{ height: 23, maxWidth: '100%' }} />
                 </Stack>
               </Box>

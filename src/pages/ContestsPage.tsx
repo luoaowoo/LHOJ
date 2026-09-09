@@ -8,26 +8,11 @@ import { CalendarDays, Clock3, Plus, RefreshCw, Search, Trophy, Users } from 'lu
 import { useAuth } from '../auth';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
 import { hydroPublicUrl } from '../lib/endpoint';
+import { contestRuleMeta } from '../lib/contestRule';
 import { scrapeContestRows } from '../lib/scrape';
 import type { ContestRow } from '../types';
 
-const rules = ['全部', 'ACM/ICPC', 'OI', 'IOI', 'CF'];
-
-function ruleLabel(rule?: string): string {
-  if (!rule) return '未分类';
-  if (/ICPC|ACM/i.test(rule)) return 'ACM/ICPC';
-  if (/IOI/i.test(rule)) return 'IOI';
-  if (/CF|Codeforces/i.test(rule)) return 'CF';
-  return rule;
-}
-
-function ruleColor(rule: string): 'success' | 'info' | 'warning' | 'secondary' | 'default' {
-  if (rule === 'ACM/ICPC') return 'success';
-  if (rule === 'OI') return 'info';
-  if (rule === 'IOI') return 'secondary';
-  if (rule === 'CF') return 'warning';
-  return 'default';
-}
+const rules = ['全部', 'ACM', 'OI', 'IOI', 'IOI(Strict)', 'Ledo', 'CF'];
 
 function contestDay(date?: string): string {
   if (!date) return '--';
@@ -58,7 +43,7 @@ export default function ContestsPage() {
 
   const filtered = useMemo(() => {
     const query = keyword.trim().toLowerCase();
-    return (rows ?? []).filter((item) => (!query || `${item.title} ${item.id} ${item.rule}`.toLowerCase().includes(query)) && (rule === '全部' || ruleLabel(item.rule) === rule));
+    return (rows ?? []).filter((item) => (!query || `${item.title} ${item.id} ${item.rule}`.toLowerCase().includes(query)) && (rule === '全部' || contestRuleMeta(item.rule).label === rule));
   }, [keyword, rows, rule]);
   const update = (next: Record<string, string>) => {
     const params = new URLSearchParams(searchParams);
@@ -78,9 +63,9 @@ export default function ContestsPage() {
         <Box sx={{ p: { xs: 1.5, md: 2 }, bgcolor: 'rgba(255,255,255,.025)' }}><Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}><TextField fullWidth size="small" value={keyword} onChange={(event) => { setKeyword(event.target.value); update({ q: event.target.value, page: '' }); }} placeholder="搜索比赛" slotProps={{ input: { startAdornment: <InputAdornment position="start"><Search size={17} /></InputAdornment> } }} /><Select size="small" value={rule} onChange={(event) => { setRule(event.target.value); update({ rule: event.target.value, page: '' }); }} sx={{ minWidth: { sm: 145 } }}>{rules.map((item) => <MenuItem key={item} value={item}>{item}</MenuItem>)}</Select></Stack></Box>
         <Divider />
         {filtered.length ? <Stack divider={<Divider />}>
-          {filtered.map((item) => { const label = ruleLabel(item.rule); return <Box key={item.id || item.href || item.title} component={RouterLink} to={`/contests/${encodeURIComponent(item.id)}`} sx={{ display: 'grid', gridTemplateColumns: { xs: '42px minmax(0,1fr)', sm: '58px minmax(0,1fr) auto' }, gap: { xs: 1.2, sm: 2 }, alignItems: 'start', px: { xs: 1.5, md: 2.2 }, py: { xs: 1.7, md: 2.2 }, color: 'inherit', textDecoration: 'none', '&:hover': { bgcolor: 'action.hover' } }}>
+          {filtered.map((item) => { const meta = contestRuleMeta(item.rule); return <Box key={item.id || item.href || item.title} component={RouterLink} to={`/contests/${encodeURIComponent(item.id)}`} sx={{ display: 'grid', gridTemplateColumns: { xs: '42px minmax(0,1fr)', sm: '58px minmax(0,1fr) auto' }, gap: { xs: 1.2, sm: 2 }, alignItems: 'start', px: { xs: 1.5, md: 2.2 }, py: { xs: 1.7, md: 2.2 }, color: 'inherit', textDecoration: 'none', '&:hover': { bgcolor: 'action.hover' } }}>
             <Typography sx={{ fontWeight: 800, fontSize: '1.15rem', color: 'primary.main' }}>{contestDay(item.date)}</Typography>
-            <Box sx={{ minWidth: 0 }}><Typography sx={{ fontWeight: 700, fontSize: '1rem', overflowWrap: 'anywhere' }}>{item.title || '未命名比赛'}</Typography><Stack direction="row" spacing={.7} useFlexGap sx={{ mt: .8, flexWrap: 'wrap' }}><Chip icon={<CalendarDays size={14} />} label={item.date || '时间待定'} size="small" variant="outlined" /><Chip icon={<Trophy size={14} />} label={label} size="small" color={ruleColor(label)} /><Chip icon={<Clock3 size={14} />} label={item.duration || '时长待定'} size="small" variant="outlined" />{item.rated ? <Chip label="Rated" size="small" color="warning" /> : null}{item.attend ? <Chip icon={<Users size={14} />} label={item.attend} size="small" variant="outlined" /> : null}</Stack></Box>
+            <Box sx={{ minWidth: 0 }}><Typography sx={{ fontWeight: 700, fontSize: '1rem', overflowWrap: 'anywhere' }}>{item.title || '未命名比赛'}</Typography><Stack direction="row" spacing={.7} useFlexGap sx={{ mt: .8, flexWrap: 'wrap' }}><Chip icon={<CalendarDays size={14} />} label={item.date || '时间待定'} size="small" variant="outlined" /><Chip icon={<Trophy size={14} />} label={meta.label} size="small" sx={{ bgcolor: meta.color, color: meta.label === '作业' ? '#6f3030' : '#fff', '& .MuiChip-icon': { color: 'inherit' } }} /><Chip icon={<Clock3 size={14} />} label={item.duration || '时长待定'} size="small" variant="outlined" />{item.rated ? <Chip label="Rated" size="small" color="warning" /> : null}{item.attend ? <Chip icon={<Users size={14} />} label={item.attend} size="small" variant="outlined" /> : null}</Stack></Box>
             <Typography variant="caption" color="text.secondary" sx={{ display: { xs: 'none', sm: 'block' }, pt: .3 }}>查看详情 ›</Typography>
           </Box>; })}
         </Stack> : <EmptyBox message="暂无匹配的比赛" />}
