@@ -17,12 +17,12 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import { BarChart3, Files, MessageSquare, Send, Settings2, SlidersHorizontal, Star } from 'lucide-react';
+import { BarChart3, CheckCircle2, Files, Gauge, Hash, MessageSquare, Send, Settings2, SlidersHorizontal, Star } from 'lucide-react';
 import { useAuth } from '../auth';
 import Markdown from '../components/Markdown';
-import PageHeader from '../components/PageHeader';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
 import { fetchProblem, localizedContent } from '../lib/api';
+import { difficultyColor } from '../lib/difficulty';
 import { hydroPublicUrl } from '../lib/endpoint';
 import { postHydroForm, scrapeProblemStar } from '../lib/scrape';
 import type { HydroProblem } from '../types';
@@ -114,6 +114,19 @@ export default function ProblemPage() {
 
   return (
     <>
+      <Paper variant="outlined" sx={{ p: { xs: 2, sm: 2.5 }, mb: 2 }}>
+        <Typography component="h1" variant="h4" sx={{ wordBreak: 'break-word' }}>
+          {pid} {problem.title}
+        </Typography>
+        <Stack direction="row" useFlexGap sx={{ mt: 1.5, gap: .8, flexWrap: 'wrap' }}>
+          <Chip icon={<Gauge size={14} />} label={problem.difficulty ?? '未评定'} sx={{ color: difficultyColor(String(problem.difficulty ?? '')) }} />
+          <Chip icon={<Hash size={14} />} label="传统题" variant="outlined" />
+          {submittedCount != null ? <Chip icon={<Send size={14} />} label={`${submittedCount} 提交`} variant="outlined" /> : null}
+          {accepted != null ? <Chip icon={<CheckCircle2 size={14} />} label={`${accepted} 通过`} variant="outlined" /> : null}
+          {tags.map((tag) => <Chip key={tag} label={tag} variant="outlined" />)}
+          {problem.hidden ? <Chip label="隐藏题目" color="warning" /> : null}
+        </Stack>
+      </Paper>
       <Box
         sx={{
           display: 'grid',
@@ -123,8 +136,7 @@ export default function ProblemPage() {
         }}
       >
         <Paper component="article" variant="outlined" sx={{ p: { xs: 2, sm: 3 }, minWidth: 0 }}>
-          <PageHeader title={problem.title} subtitle={`#${pid}`} />
-          <Divider sx={{ mb: 1.5 }} />
+          <Typography component="h2" variant="h5" sx={{ mb: 2 }}>题目描述</Typography>
           <Box sx={{ maxWidth: 860 }}>
             {content.trim() ? (
               <Markdown content={content} />
@@ -136,9 +148,6 @@ export default function ProblemPage() {
 
         <Paper component="aside" variant="outlined" sx={{ p: 2 }}>
           <Stack spacing={1.8}>
-            <Typography variant="subtitle2" color="text.secondary">
-              题目信息
-            </Typography>
             <Button
               fullWidth
               variant="contained"
@@ -180,6 +189,7 @@ export default function ProblemPage() {
               </Box>
             ) : null}
             <Divider />
+            <Typography variant="subtitle2">题目信息</Typography>
             <Box>
               <Typography variant="caption" color="text.secondary">
                 通过 / 提交
@@ -206,7 +216,6 @@ export default function ProblemPage() {
                 <Typography sx={{ fontWeight: 650 }}>—</Typography>
               )}
             </Box>
-            {problem.hidden && <Chip label="隐藏题目" color="warning" size="small" />}
           </Stack>
         </Paper>
       </Box>

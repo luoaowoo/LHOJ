@@ -1,8 +1,8 @@
-import { Fragment, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link as RouterLink, useParams, useSearchParams } from 'react-router-dom';
-import { Alert, Box, Button, LinearProgress, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
+import { Alert, Box, Button, Chip, Divider, LinearProgress, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
-import { Download, ExternalLink, RefreshCw, ShieldAlert, XCircle } from 'lucide-react';
+import { Clock3, Code2, Cpu, Download, ExternalLink, HardDrive, ListChecks, RefreshCw, ShieldAlert, UserRound, XCircle } from 'lucide-react';
 import { useAuth } from '../auth';
 import ConfirmDialog from '../components/ConfirmDialog';
 import StatusChip from '../components/StatusChip';
@@ -10,6 +10,10 @@ import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
 import { postHydroForm, scrapeRecordDetail } from '../lib/scrape';
 import { hydroPublicUrl, hydroWebSocketUrl } from '../lib/endpoint';
 import type { RecordDetail } from '../types';
+
+function detailValue(items: RecordDetail['detail'], patterns: RegExp[]) {
+  return items.find((item) => patterns.some((pattern) => pattern.test(item.label)))?.value || '';
+}
 
 export default function RecordDetailPage() {
   const { user } = useAuth();
@@ -24,6 +28,7 @@ export default function RecordDetailPage() {
   const [acting, setActing] = useState(false);
   const [cancelOpen, setCancelOpen] = useState(false);
   const [actionError, setActionError] = useState('');
+  const [tab, setTab] = useState<'result' | 'code'>('result');
 
   useEffect(() => {
     if (!rid) {
@@ -119,6 +124,19 @@ export default function RecordDetailPage() {
     }
   };
 
+  const judge = detailValue(detail.detail, [/评测机|judge|judger/i]) || 'LH评测机';
+  const submittedAt = detailValue(detail.detail, [/提交时间|评测时间|submit|judged/i]);
+  const totalTime = detailValue(detail.detail, [/总时间|运行时间|time/i]);
+  const totalMemory = detailValue(detail.detail, [/总内存|内存|memory/i]);
+  const infoRows = [
+    { icon: UserRound, label: '用户', value: detail.submitter || detailValue(detail.detail, [/提交者|用户|user/i]) || '—' },
+    { icon: ListChecks, label: '题目', value: detail.problem || '—' },
+    { icon: Clock3, label: '时间', value: submittedAt || '—' },
+    { icon: Code2, label: '语言', value: detail.language || detailValue(detail.detail, [/语言|language/i]) || '—' },
+    { icon: Clock3, label: '总时间', value: totalTime || '—' },
+    { icon: HardDrive, label: '总内存', value: totalMemory || '—' },
+  ];
+
   return (
     <Box sx={{ display: 'grid', gap: 2 }}>
       {loading ? <LinearProgress aria-label="正在更新评测状态" /> : null}
@@ -128,7 +146,8 @@ export default function RecordDetailPage() {
         </Alert>
       ) : null}
       {actionError ? <Alert severity="error" onClose={() => setActionError('')}>{actionError}</Alert> : null}
-      <Paper variant="outlined" sx={{ p: { xs: 1.8, sm: 2.4 } }}>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'minmax(0, 1fr)', lg: 'minmax(0, 1fr) 310px' }, gap: 2, alignItems: 'start' }}>
+      <Paper variant="outlined" sx={{ p: { xs: 1.4, sm: 2.2 }, minWidth: 0 }}>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1.5 }}>
           <StatusChip text={detail.status ?? '未知'} score={detail.score} />
           {detail.progress ? (
@@ -196,85 +215,34 @@ export default function RecordDetailPage() {
           </Button>
         </Box>
 
-        {detail.problem ? (
-          detail.problemHref ? (
-            <Typography
-              component={RouterLink}
-              to={`/problem/${encodeURIComponent(detail.problemHref.split('/').filter(Boolean).pop() ?? '')}`}
-              variant="subtitle1"
-              sx={{ display: 'inline-block', mt: 1.8, fontWeight: 650, color: 'primary.main' }}
-            >
-              {detail.problem}
-            </Typography>
-          ) : <Typography variant="subtitle1" sx={{ mt: 1.8, fontWeight: 650 }}>{detail.problem}</Typography>
-        ) : null}
-
-        {detail.detail.length > 0 ? (
-          <Box
-            sx={{
-              mt: 2,
-              display: 'grid',
-              gridTemplateColumns: { xs: 'minmax(120px, 0.8fr) 1fr', sm: 'minmax(160px, 0.7fr) 1fr' },
-              gap: 0.75,
-              alignItems: 'start',
-            }}
-          >
-            {detail.detail.map((item, index) => (
-              <Fragment key={`${item.label}-${index}`}>
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>{item.label}</Typography>
-                <Typography variant="body2" sx={{ minWidth: 0, wordBreak: 'break-word' }}>{item.value}</Typography>
-              </Fragment>
-            ))}
-          </Box>
-        ) : null}
+        <Tabs value={tab} onChange={(_, value: 'result' | 'code') => setTab(value)} sx={{ mt: 1.5, borderBottom: 1, borderColor: 'divider' }}>
+          <Tab value="result" label="评测结果" />
+          <Tab value="code" label="代码" />
+        </Tabs>
+        {tab === 'result' ? (
+          detail.testCases?.length ? <Box sx={{ pt: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1, mb: 1.5 }}>
+              <Typography variant="h5" sx={{ color: /Accepted|通过|AC/i.test(detail.status ?? '') ? 'success.main' : 'text.primary' }}>{detail.score || '—'}</Typography>
+              <Typography sx={{ fontWeight: 650 }}>{detail.status || '未知状态'}</Typography>
+            </Box>
+            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(132px, 1fr))', gap: 1.2 }}>
+            {detail.testCases.map((testCase, index) => <Paper key={index} variant="outlined" sx={{ p: 1.3, minHeight: 104, borderColor: /Accepted|通过|AC/i.test(testCase.status) ? 'success.main' : undefined }}>
+              <Typography variant="caption" color="text.secondary">#{index + 1}</Typography>
+              <Typography sx={{ mt: 1, fontWeight: 700, color: /Accepted|通过|AC/i.test(testCase.status) ? 'success.main' : 'text.primary' }}>{testCase.status}</Typography>
+              <Typography variant="caption" color="text.secondary">{testCase.time || '—'} / {testCase.memory || '—'}</Typography>
+              {testCase.message ? <Typography variant="caption" display="block" sx={{ mt: .5, wordBreak: 'break-word' }}>{testCase.message}</Typography> : null}
+            </Paper>)}
+            </Box>
+          </Box> : <EmptyBox message="暂无测试点数据" />
+        ) : detail.code ? <Box component="pre" sx={{ m: 0, mt: 2, p: 2, overflow: 'auto', bgcolor: 'action.hover', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 13, lineHeight: 1.55 }}>{detail.code}</Box> : <EmptyBox message="暂无代码" />}
       </Paper>
-
-      {detail.testCases?.length ? (
-        <TableContainer component={Paper} variant="outlined">
-          <Table size="small" sx={{ minWidth: 620 }}>
-            <TableHead>
-              <TableRow>
-                <TableCell>测试点</TableCell>
-                <TableCell>状态</TableCell>
-                <TableCell>得分</TableCell>
-                <TableCell>时间</TableCell>
-                <TableCell>内存</TableCell>
-                <TableCell>信息</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {detail.testCases.map((testCase, index) => (
-                <TableRow key={index}>
-                  <TableCell>{index + 1}</TableCell>
-                  <TableCell><StatusChip text={testCase.status} score={testCase.score} /></TableCell>
-                  <TableCell>{testCase.score || '-'}</TableCell>
-                  <TableCell>{testCase.time || '-'}</TableCell>
-                  <TableCell>{testCase.memory || '-'}</TableCell>
-                  <TableCell sx={{ maxWidth: 360, wordBreak: 'break-word' }}>{testCase.message || '-'}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      ) : null}
-
-      {detail.code ? (
-        <Paper
-          component="pre"
-          variant="outlined"
-          sx={{
-            m: 0,
-            p: 2,
-            overflow: 'auto',
-            fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
-            fontSize: 13,
-            lineHeight: 1.55,
-            whiteSpace: 'pre',
-          }}
-        >
-          {detail.code}
-        </Paper>
-      ) : null}
+      <Paper component="aside" variant="outlined" sx={{ p: 2 }}>
+        <Typography variant="h6" sx={{ mb: 1.5 }}>评测 #{detail.rid}</Typography>
+        <Stack spacing={1.5}>{infoRows.map(({ icon: Icon, label, value }) => <Box key={label} sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}><Icon size={17} color="currentColor" /><Box sx={{ minWidth: 0 }}><Typography variant="caption" color="text.secondary">{label}</Typography><Typography variant="body2" sx={{ wordBreak: 'break-word' }}>{value}</Typography></Box></Box>)}</Stack>
+        <Divider sx={{ my: 1.8 }} />
+        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}><Cpu size={17} /><Typography variant="body2">{judge}</Typography><Chip size="small" label="评测" /></Box>
+      </Paper>
+      </Box>
       <ConfirmDialog
         open={cancelOpen}
         title="取消评测结果？"

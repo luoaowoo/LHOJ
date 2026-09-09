@@ -390,6 +390,7 @@ function parseRecordDetailPayload(
   addDetail('运行时间', formatTime(record.time));
   addDetail('内存', formatMemory(record.memory));
   addDetail('评测时间', formatDate(record.judgeAt));
+  addDetail('评测机', textValue(record.judger ?? record.judgeServer ?? record.judgeHost));
   if (Array.isArray(record.testCases)) addDetail('测试点', `共 ${record.testCases.length} 个`);
   if (Array.isArray(record.judgeTexts) && record.judgeTexts.length > 0) {
     const messages = record.judgeTexts.map(textValue).filter(Boolean).join('；');
