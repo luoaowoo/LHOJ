@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link as RouterLink, useParams, useSearchParams } from 'react-router-dom';
 import { Alert, Box, Button, Chip, Divider, LinearProgress, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
@@ -6,10 +6,12 @@ import { Clock3, Code2, Cpu, Download, ExternalLink, HardDrive, ListChecks, Refr
 import { useAuth } from '../auth';
 import ConfirmDialog from '../components/ConfirmDialog';
 import StatusChip from '../components/StatusChip';
+import ConfettiCelebration from '../components/ConfettiCelebration';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
 import { postHydroForm, scrapeRecordDetail } from '../lib/scrape';
 import { hydroPublicUrl, hydroWebSocketUrl } from '../lib/endpoint';
 import type { RecordDetail } from '../types';
+import { usePreferences } from '../prefs';
 
 function detailValue(items: RecordDetail['detail'], patterns: RegExp[]) {
   return items.find((item) => patterns.some((pattern) => pattern.test(item.label)))?.value || '';
@@ -17,6 +19,7 @@ function detailValue(items: RecordDetail['detail'], patterns: RegExp[]) {
 
 export default function RecordDetailPage() {
   const { user } = useAuth();
+  const { confettiEmojis } = usePreferences();
   const { rid } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const revision = searchParams.get('rev') ?? '';
@@ -29,6 +32,9 @@ export default function RecordDetailPage() {
   const [cancelOpen, setCancelOpen] = useState(false);
   const [actionError, setActionError] = useState('');
   const [tab, setTab] = useState<'result' | 'code'>('result');
+  const [celebrating, setCelebrating] = useState(false);
+  const previousStatus = useRef<string | null>(null);
+  const celebrate = useCallback(() => setCelebrating(true), []);
 
   useEffect(() => {
     if (!rid) {
@@ -42,6 +48,14 @@ export default function RecordDetailPage() {
     scrapeRecordDetail(rid, revision || undefined)
       .then((data) => {
         if (cancelled) return;
+        const wasPending = /Waiting|Running|Compiling|Fetched|Pending|Queued|Judging|等待|运行|编译|排队|评测/i.test(previousStatus.current ?? '');
+        const accepted = /Accepted|通过|\bAC\b/i.test(data?.status ?? '');
+        const marker = `lh-oj.confetti-shown.${rid}`;
+        if (!revision && accepted && !localStorage.getItem(marker) && (wasPending || !previousStatus.current)) {
+          localStorage.setItem(marker, '1');
+          celebrate();
+        }
+        previousStatus.current = data?.status ?? null;
         setDetail(data);
       })
       .catch((err: unknown) => {
@@ -54,7 +68,7 @@ export default function RecordDetailPage() {
     return () => {
       cancelled = true;
     };
-  }, [rid, reloadKey, revision]);
+  }, [celebrate, rid, reloadKey, revision]);
 
   useEffect(() => {
     if (revision || !rid || !detail?.domainId || !/Waiting|Running|Compiling|Fetched|Pending|Queued|Judging|等待|运行|编译|排队|评测/i.test(detail.status ?? '')) return;
@@ -139,6 +153,7 @@ export default function RecordDetailPage() {
 
   return (
     <Box sx={{ display: 'grid', gap: 2 }}>
+      {celebrating ? <ConfettiCelebration emojis={confettiEmojis} onDone={() => setCelebrating(false)} /> : null}
       {loading ? <LinearProgress aria-label="正在更新评测状态" /> : null}
       {error ? (
         <Alert severity="warning" action={<Button color="inherit" size="small" onClick={() => setReloadKey((value) => value + 1)}>重试</Button>}>

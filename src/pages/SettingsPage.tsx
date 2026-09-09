@@ -1,5 +1,5 @@
 import {
-  Box, Button, Divider, FormControl, InputLabel, MenuItem, Paper, Select, Stack,
+  Box, Button, Divider, FormControl, InputLabel, MenuItem, Paper, Select, Stack, TextField,
   ToggleButton, ToggleButtonGroup, Tooltip, Typography,
 } from '@mui/material';
 import { Database, Moon, Palette, Sparkles, Sun } from 'lucide-react';
@@ -15,7 +15,7 @@ export default function SettingsPage() {
   const {
     mode, accent, endpoint, codeTheme, usernameColoring, trainingNodesCollapsed,
     setMode, setAccent, setEndpoint, setCodeTheme, setUsernameColoring, setTrainingNodesCollapsed,
-    customBgColor, setCustomBgColor,
+    customBgColor, setCustomBgColor, confettiEmojis, setConfettiEmojis,
   } = usePreferences();
 
   return (
@@ -73,6 +73,16 @@ export default function SettingsPage() {
             <Divider />
 
             <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2.5 }}>
+              <TextField
+                fullWidth
+                size="small"
+                label="AC 庆祝彩纸"
+                placeholder="例如：🎉🎊✨"
+                value={confettiEmojis}
+                inputProps={{ maxLength: 6, 'aria-label': 'AC 庆祝彩纸' }}
+                helperText="最多 3 个 emoji，留空使用默认彩纸礼炮"
+                onChange={(event) => setConfettiEmojis(event.target.value)}
+              />
               <FormControl fullWidth size="small">
                 <InputLabel id="code-theme-label">代码主题</InputLabel>
                 <Select

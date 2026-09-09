@@ -15,6 +15,7 @@ export interface Preferences {
   usernameColoring: UsernameColoring;
   trainingNodesCollapsed: boolean;
   customBgColor: string;
+  confettiEmojis: string;
 }
 
 interface PreferencesContextValue extends Preferences {
@@ -26,6 +27,7 @@ interface PreferencesContextValue extends Preferences {
   setUsernameColoring: (value: UsernameColoring) => void;
   setTrainingNodesCollapsed: (value: boolean) => void;
   setCustomBgColor: (value: string) => void;
+  setConfettiEmojis: (value: string) => void;
 }
 
 const defaultPreferences: Preferences = {
@@ -36,6 +38,7 @@ const defaultPreferences: Preferences = {
   usernameColoring: 'rp',
   trainingNodesCollapsed: false,
   customBgColor: '',
+  confettiEmojis: '',
 };
 
 const PreferencesContext = createContext<PreferencesContextValue | null>(null);
@@ -67,6 +70,7 @@ function readStored(): Preferences {
         ? parsed.trainingNodesCollapsed
         : defaultPreferences.trainingNodesCollapsed,
       customBgColor: typeof parsed.customBgColor === 'string' ? parsed.customBgColor : defaultPreferences.customBgColor,
+      confettiEmojis: typeof parsed.confettiEmojis === 'string' ? Array.from(parsed.confettiEmojis).slice(0, 3).join('') : defaultPreferences.confettiEmojis,
     };
   } catch {
     return defaultPreferences;
@@ -118,6 +122,7 @@ export function StoredPreferencesProvider({ children }: { children: ReactNode })
     setUsernameColoring: (usernameColoring) => setPreferences((current) => ({ ...current, usernameColoring })),
     setTrainingNodesCollapsed: (trainingNodesCollapsed) => setPreferences((current) => ({ ...current, trainingNodesCollapsed })),
     setCustomBgColor: (customBgColor) => setPreferences((current) => ({ ...current, customBgColor })),
+    setConfettiEmojis: (confettiEmojis) => setPreferences((current) => ({ ...current, confettiEmojis: Array.from(confettiEmojis).slice(0, 3).join('') })),
   }), [preferences, resolvedMode]);
 
   return <PreferencesContext.Provider value={value}>{children}</PreferencesContext.Provider>;
