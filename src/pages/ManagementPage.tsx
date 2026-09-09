@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Box, Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Stack, Typography } from '@mui/material';
+import { Box, Dialog, DialogContent, DialogTitle, Divider, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Stack, Typography } from '@mui/material';
 import {
-  BookOpen, Check, ChevronRight, ClipboardList, FileCode2, Gauge, Globe2, GraduationCap,
+  BookOpen, Check, ChevronRight, ClipboardList, FileCode2, Gauge, Globe2, GraduationCap, X,
   Settings2, ShieldCheck, TerminalSquare, Trophy, UserCog, Users, Wrench,
 } from 'lucide-react';
 import { useAuth } from '../auth';
@@ -51,6 +51,7 @@ const groups = [
 export default function ManagementPage() {
   const { user } = useAuth();
   const [selected, setSelected] = useState(groups[0].items[0].label);
+  const [workspaceOpen, setWorkspaceOpen] = useState(false);
   if (user?.role !== 'root') return <ErrorBox message="当前账号没有系统管理权限。" />;
 
   const selectedItem = groups.flatMap((group) => group.items).find((item) => item.label === selected);
@@ -76,7 +77,7 @@ export default function ManagementPage() {
             <List disablePadding aria-label={`${group.title}管理`}>
               {group.items.map((item, index) => (
                 <ListItem key={item.path} disablePadding divider={index < group.items.length - 1}>
-                  <ListItemButton selected={selected === item.label} onClick={() => setSelected(item.label)} sx={{ minHeight: 52 }}>
+                  <ListItemButton selected={selected === item.label} onClick={() => { setSelected(item.label); setWorkspaceOpen(true); }} sx={{ minHeight: 52 }}>
                     <ListItemIcon sx={{ minWidth: 40 }}><item.icon size={18} /></ListItemIcon>
                     <ListItemText primary={item.label} />
                     <ChevronRight size={15} aria-hidden="true" />
@@ -87,7 +88,27 @@ export default function ManagementPage() {
           </Paper>
         ))}
       </Box>
-      {selectedItem && selectedItem.path !== '/manage' ? <Paper variant="outlined" sx={{ mt: 2, p: { xs: 2, sm: 3 } }}><HydroAdminWorkspace path={selectedItem.path} title={selectedItem.label} /></Paper> : null}
+      {selectedItem && selectedItem.path !== '/manage' ? (
+        <Dialog
+          open={workspaceOpen}
+          onClose={() => setWorkspaceOpen(false)}
+          fullWidth
+          maxWidth="lg"
+          scroll="paper"
+          aria-labelledby="management-workspace-title"
+          PaperProps={{ sx: { maxHeight: 'min(860px, calc(100vh - 48px))' } }}
+        >
+          <DialogTitle id="management-workspace-title" sx={{ pr: 6 }}>
+            {selectedItem.label}
+            <IconButton aria-label="关闭管理工作区" onClick={() => setWorkspaceOpen(false)} sx={{ position: 'absolute', right: 12, top: 10 }}>
+              <X size={20} />
+            </IconButton>
+          </DialogTitle>
+          <DialogContent dividers sx={{ p: { xs: 1.5, sm: 3 } }}>
+            <HydroAdminWorkspace path={selectedItem.path} title={selectedItem.label} />
+          </DialogContent>
+        </Dialog>
+      ) : null}
     </Box>
   );
 }
