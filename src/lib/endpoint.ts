@@ -154,12 +154,14 @@ export function hydroAssetUrl(value?: string): string | undefined {
   return value;
 }
 
-export function hydroAvatarUrl(value: string | undefined, _userId: number): string {
+export function hydroAvatarUrl(value: string | undefined, userId: number): string {
+  const uploaded = hydroPublicUrl(`/file/${encodeURIComponent(String(userId))}/.avatar.jpg`);
+  if (userId > 0) return uploaded;
   if (value) {
     try {
       const url = new URL(value, PUBLIC_HYDRO_BASE);
       if (url.hostname === new URL(PUBLIC_HYDRO_BASE).hostname || url.host === new URL(FALLBACK_BASE).host) {
-        return hydroNativeUrl(`${url.pathname}${url.search}${url.hash}`);
+        return hydroPublicUrl(`${url.pathname}${url.search}${url.hash}`);
       }
       if (url.hostname === 'cn.gravatar.com') url.hostname = 'www.gravatar.com';
       return url.protocol === 'http:' || url.protocol === 'https:' ? url.toString() : `https:${url.toString()}`;
@@ -167,7 +169,7 @@ export function hydroAvatarUrl(value: string | undefined, _userId: number): stri
       // Fall through to the canonical Hydro avatar URL.
     }
   }
-  return '';
+  return uploaded;
 }
 
 function fallbackUrl(path: string): string {
