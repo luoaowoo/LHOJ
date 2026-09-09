@@ -154,6 +154,10 @@ export function hydroAssetUrl(value?: string): string | undefined {
   return value;
 }
 
+export function hydroAvatarUrl(value: string | undefined, userId: number): string {
+  return hydroAssetUrl(value) ?? hydroNativeUrl(`/avatar/${encodeURIComponent(String(userId))}`);
+}
+
 function fallbackUrl(path: string): string {
   const normalized = path.startsWith('/') ? path : `/${path}`;
   return `/hydro-native${normalized}`;

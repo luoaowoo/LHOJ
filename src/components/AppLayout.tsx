@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../auth';
 import { usePreferences } from '../prefs';
-import { hydroAssetUrl, hydroPublicUrl } from '../lib/endpoint';
+import { hydroAvatarUrl, hydroPublicUrl } from '../lib/endpoint';
 import { parseRp, ratingColor } from '../lib/rating';
 import { sidebarSurface } from '../theme';
 
@@ -89,7 +89,7 @@ export default function AppLayout() {
   const navigationWidth = compactRail ? railWidth : drawerWidth;
   const sidebarBg = theme.palette.mode === 'dark' ? sidebarSurface.dark : sidebarSurface.light;
   const { user, logout } = useAuth();
-  const { accent, usernameColoring, customBgEnabled, customBgUrl } = usePreferences();
+  const { usernameColoring, customBgEnabled, customBgUrl } = usePreferences();
   const location = useLocation();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [userAnchor, setUserAnchor] = useState<HTMLElement | null>(null);
@@ -232,9 +232,7 @@ export default function AppLayout() {
                   '&:hover': { bgcolor: 'action.hover' },
                 }}
               >
-                {user.avatarUrl
-                  ? <Avatar src={hydroAssetUrl(user.avatarUrl)} sx={{ width: 28, height: 28 }} alt="">{user.uname.slice(0, 2)}</Avatar>
-                  : <Avatar sx={{ width: 28, height: 28, bgcolor: accent, fontSize: 12 }}>{user.uname.slice(0, 2)}</Avatar>}
+                <Avatar src={hydroAvatarUrl(user.avatarUrl, user._id)} sx={{ width: 28, height: 28 }} alt="">{user.uname.slice(0, 2)}</Avatar>
                 <Typography noWrap sx={{ fontSize: 13.5, fontWeight: 600, color: userColor ?? 'text.primary', maxWidth: 140 }}>
                   {user.uname}
                 </Typography>

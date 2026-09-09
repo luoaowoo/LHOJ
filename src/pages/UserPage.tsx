@@ -6,7 +6,7 @@ import { useAuth } from '../auth';
 import PageHeader from '../components/PageHeader';
 import { ErrorBox, FullPageLoader } from '../components/StateBox';
 import { fetchUserByUname } from '../lib/api';
-import { hydroAssetUrl, hydroPublicUrl } from '../lib/endpoint';
+import { hydroAvatarUrl, hydroPublicUrl } from '../lib/endpoint';
 import { parseRp, ratingColor } from '../lib/rating';
 import { formatDate } from '../lib/scrape';
 import { usePreferences } from '../prefs';
@@ -100,7 +100,7 @@ export default function UserPage() {
         }}
       >
         <Avatar
-          src={hydroAssetUrl(profile.avatarUrl)}
+          src={hydroAvatarUrl(profile.avatarUrl, profile._id)}
           alt=""
           sx={{ width: 72, height: 72, bgcolor: 'primary.main', fontSize: 26 }}
         >
