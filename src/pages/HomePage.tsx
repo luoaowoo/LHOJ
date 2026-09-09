@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { Box, Button, Card, CardActionArea, CircularProgress, Paper, Stack, Typography } from '@mui/material';
+import { Box, Button, Card, CardActionArea, Chip, CircularProgress, Paper, Stack, Typography } from '@mui/material';
 import {
-  ArrowRight, BookOpen, ClipboardList, GraduationCap, ListChecks,
+  ArrowRight, BookOpen, CalendarDays, ClipboardList, GraduationCap, ListChecks,
   BarChart3, Megaphone, MessageSquare, Settings2, Trophy,
 } from 'lucide-react';
 import { useAuth } from '../auth';
@@ -13,8 +13,8 @@ import HomeCarousel from '../components/HomeCarousel';
 import StatusChip from '../components/StatusChip';
 import { fetchHomepageConfig } from '../lib/homepage';
 import type { CarouselSlide } from '../lib/homepage';
-import { scrapeUnsolvedProblems } from '../lib/scrape';
-import type { UnsolvedProblem } from '../types';
+import { scrapeContestRows, scrapeUnsolvedProblems } from '../lib/scrape';
+import type { ContestRow, UnsolvedProblem } from '../types';
 
 const cards = [
   { to: '/problems', title: '题库', body: '题目列表', icon: BookOpen },
@@ -105,6 +105,57 @@ function UnsolvedPanel() {
   );
 }
 
+function RecentContestsPanel() {
+  const [items, setItems] = useState<ContestRow[] | null>(null);
+  const [error, setError] = useState('');
+  const load = useCallback(() => {
+    setItems(null); setError('');
+    void scrapeContestRows(1)
+      .then((rows) => setItems(rows.slice(0, 5)))
+      .catch((cause) => setError(cause instanceof Error ? cause.message : '比赛加载失败。'));
+  }, []);
+  useEffect(load, [load]);
+
+  return (
+    <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
+      <Box sx={{ px: 2, py: 1.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Typography sx={{ fontWeight: 700 }}>最近比赛</Typography>
+        <Button component={RouterLink} to="/contests" size="small">全部比赛</Button>
+      </Box>
+      {error ? (
+        <Box sx={{ px: 2, py: 3, display: 'grid', placeItems: 'center', gap: 1 }}>
+          <Typography variant="body2" color="error">{error}</Typography>
+          <Button size="small" onClick={load}>重试</Button>
+        </Box>
+      ) : !items ? (
+        <Box sx={{ py: 4, display: 'grid', placeItems: 'center' }}><CircularProgress size={22} /></Box>
+      ) : !items.length ? (
+        <PanelMessage>暂无比赛</PanelMessage>
+      ) : (
+        <Stack divider={<Box sx={{ borderTop: '1px solid', borderColor: 'divider' }} />}>
+          {items.map((item) => (
+            <Button
+              key={item.id}
+              component={RouterLink}
+              to={`/contests/${encodeURIComponent(item.id)}`}
+              color="inherit"
+              sx={{ px: 2, py: 1.25, minHeight: 68, justifyContent: 'flex-start', textAlign: 'left', borderRadius: 0 }}
+            >
+              <Box sx={{ minWidth: 0, width: '100%' }}>
+                <Typography variant="body2" sx={{ fontWeight: 700 }} noWrap>{item.title || '未命名比赛'}</Typography>
+                <Stack direction="row" spacing={0.6} useFlexGap sx={{ mt: 0.7, flexWrap: 'wrap' }}>
+                  {item.rule ? <Chip icon={<Trophy size={12} />} label={item.rule} size="small" color="success" sx={{ height: 23 }} /> : null}
+                  <Chip icon={<CalendarDays size={12} />} label={item.date || '时间待定'} size="small" variant="outlined" sx={{ height: 23, maxWidth: '100%' }} />
+                </Stack>
+              </Box>
+            </Button>
+          ))}
+        </Stack>
+      )}
+    </Paper>
+  );
+}
+
 export default function HomePage() {
   const { user } = useAuth();
   const [announcement, setAnnouncement] = useState('');
@@ -160,9 +211,10 @@ export default function HomePage() {
             ))}
           </Box>
         </Stack>
-        <Box sx={{ minWidth: 0 }}>
+        <Stack spacing={2} sx={{ minWidth: 0 }}>
           <UnsolvedPanel />
-        </Box>
+          <RecentContestsPanel />
+        </Stack>
       </Box>
     </Box>
   );
