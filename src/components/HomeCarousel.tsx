@@ -66,7 +66,35 @@ export default function HomeCarousel({ slides }: { slides: CarouselSlide[] }) {
 
   useEffect(() => { if (count && index >= count) setIndex(0); }, [count, index]);
 
-  if (!count) return null;
+  if (!count) {
+    return (
+      <Box
+        role="region"
+        aria-label="LH-oj 首页封面"
+        sx={{
+          aspectRatio: { xs: '16 / 9', sm: '21 / 8' },
+          minHeight: { xs: 220, sm: 260 },
+          borderRadius: 3,
+          border: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'primary.main',
+          color: 'primary.contrastText',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: { xs: 2, sm: 3 },
+          px: 3,
+          overflow: 'hidden',
+        }}
+      >
+        <Box component="img" src="/校徽.png" alt="学校校徽" sx={{ width: { xs: 76, sm: 108 }, height: { xs: 76, sm: 108 }, objectFit: 'contain', flex: '0 0 auto' }} />
+        <Box sx={{ minWidth: 0 }}>
+          <Box sx={{ fontSize: { xs: '2rem', sm: '3rem' }, lineHeight: 1.1, fontWeight: 800 }}>LH-oj</Box>
+          <Box sx={{ mt: 1, fontSize: { xs: '.95rem', sm: '1.2rem' }, opacity: .9 }}>成就龙中学子信竞梦</Box>
+        </Box>
+      </Box>
+    );
+  }
 
   return (
     <Box
