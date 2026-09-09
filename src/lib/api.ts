@@ -203,7 +203,7 @@ export function fetchContest(id: string): Promise<HydroContest | null> {
   return gql<ContestData>(
     `query Contest($id: ObjectID!) {
       contest(id: $id) {
-        _id domainId docId owner beginAt title content endAt attend pids rated allowPrint
+        _id domainId docId owner beginAt title content endAt attend pids rated
       }
     }`,
     { id },
