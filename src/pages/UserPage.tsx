@@ -1,16 +1,17 @@
 import { useEffect, useState } from 'react';
 import { Link as RouterLink, useParams } from 'react-router-dom';
-import { Avatar, Box, Button, CircularProgress, Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Stack, Tab, Tabs, TextField, Typography } from '@mui/material';
-import { Bell, CircleUserRound, ExternalLink, Globe2, Image, Search, Settings2, ShieldCheck, Wrench } from 'lucide-react';
+import { Accordion, AccordionDetails, AccordionSummary, Alert, Avatar, Box, Button, Chip, CircularProgress, Divider, LinearProgress, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Stack, Tab, Tabs, TextField, Typography } from '@mui/material';
+import { Bell, CheckCircle2, ChevronDown, CircleUserRound, ExternalLink, Globe2, Image, Search, Settings2, ShieldCheck, Trophy, Wrench } from 'lucide-react';
 import { useAuth } from '../auth';
 import PageHeader from '../components/PageHeader';
 import { ErrorBox, FullPageLoader } from '../components/StateBox';
 import { fetchUserByIdentifier } from '../lib/api';
 import { hydroAvatarUrl, hydroPublicUrl } from '../lib/endpoint';
+import { difficultyColor } from '../lib/difficulty';
 import { parseRp, ratingColor } from '../lib/rating';
-import { formatDate } from '../lib/scrape';
+import { formatDate, scrapeProblemRows } from '../lib/scrape';
 import { usePreferences } from '../prefs';
-import type { HydroUser } from '../types';
+import type { HydroUser, ProblemRow } from '../types';
 
 function profileMetric(info: Record<string, unknown> | undefined, keys: string[]): string | null {
   for (const key of keys) {
@@ -28,10 +29,13 @@ export default function UserPage() {
   const [profile, setProfile] = useState<HydroUser | null>(uname ? null : sessionUser);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(Boolean(uname));
-  const [tab, setTab] = useState<'profile' | 'compare' | 'rating'>('profile');
+  const [tab, setTab] = useState<'profile' | 'solved' | 'compare' | 'rating'>('profile');
   const [compareInput, setCompareInput] = useState('');
   const [compareUser, setCompareUser] = useState<HydroUser | null>(null);
   const [compareLoading, setCompareLoading] = useState(false);
+  const [solvedProblems, setSolvedProblems] = useState<ProblemRow[] | null>(null);
+  const [solvedLoading, setSolvedLoading] = useState(false);
+  const [solvedError, setSolvedError] = useState('');
 
   useEffect(() => {
     if (!uname) {
@@ -67,6 +71,30 @@ export default function UserPage() {
     };
   }, [uname, sessionUser]);
 
+  useEffect(() => {
+    if (tab !== 'solved' || solvedProblems || solvedLoading || !profile || profile._id !== sessionUser?._id) return;
+    let active = true;
+    setSolvedLoading(true);
+    setSolvedError('');
+    void (async () => {
+      try {
+        const rows: ProblemRow[] = [];
+        // ponytail: cap at 20 pages; switch to a server aggregate when the site exceeds 1,000 problems.
+        for (let page = 1; page <= 20; page += 1) {
+          const next = await scrapeProblemRows({ page: String(page) });
+          rows.push(...next);
+          if (!next.length) break;
+        }
+        if (active) setSolvedProblems(rows.filter((problem) => /通过|accepted|\bac\b/i.test(problem.status ?? '')));
+      } catch (cause) {
+        if (active) setSolvedError(cause instanceof Error ? cause.message : '做题数据加载失败。');
+      } finally {
+        if (active) setSolvedLoading(false);
+      }
+    })();
+    return () => { active = false; };
+  }, [profile, sessionUser?._id, solvedProblems, tab]);
+
   if (loading) return <FullPageLoader />;
   if (error || !profile) {
     return <ErrorBox message={error || '请先登录后查看个人中心。'} />;
@@ -97,6 +125,17 @@ export default function UserPage() {
     finally { setCompareLoading(false); }
   };
   const ratingHistory = Object.values(profile.rpInfo ?? {}).find((value) => Array.isArray(value)) as unknown[] | undefined;
+  const solvedGroups = (() => {
+    const groups = new Map<string, ProblemRow[]>();
+    for (const problem of solvedProblems ?? []) {
+      const difficulty = problem.difficulty || '未评定';
+      groups.set(difficulty, [...(groups.get(difficulty) ?? []), problem]);
+    }
+    return Array.from(groups.entries()).sort(([left], [right]) => left.localeCompare(right, 'zh-CN'));
+  })();
+  const solvedCount = solvedProblems?.length ?? 0;
+  const maxDifficultyCount = Math.max(1, ...solvedGroups.map(([, problems]) => problems.length));
+  const nextMilestone = Math.max(50, Math.ceil((solvedCount + 1) / 50) * 50);
 
   return (
     <Box>
@@ -157,11 +196,45 @@ export default function UserPage() {
       </Paper>
 
       <Paper variant="outlined" sx={{ mt: 2, overflow: 'hidden' }}>
-        <Tabs value={tab} onChange={(_event, value: 'profile' | 'compare' | 'rating') => setTab(value)} variant="scrollable" scrollButtons="auto" aria-label="用户资料页签">
+        <Tabs value={tab} onChange={(_event, value: 'profile' | 'solved' | 'compare' | 'rating') => setTab(value)} variant="scrollable" scrollButtons="auto" aria-label="用户资料页签">
           <Tab value="profile" label="个人简介" />
+          <Tab value="solved" label="通过的题目" />
           <Tab value="compare" label="做题对比" />
           <Tab value="rating" label="Rating 历史" />
         </Tabs>
+        {tab === 'solved' ? <Box sx={{ p: { xs: 2, md: 2.5 } }}>
+          {!ownProfile ? <Alert severity="info">Hydro 未向公开个人资料提供逐题通过状态。</Alert> : solvedLoading ? <Box sx={{ py: 6, textAlign: 'center' }}><CircularProgress size={28} /><Typography variant="body2" color="text.secondary" sx={{ mt: 1.5 }}>正在整理做题数据</Typography></Box> : solvedError ? <Alert severity="error">{solvedError}</Alert> : <>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, minmax(0, 1fr))' }, gap: 1.2 }}>
+              {[
+                { label: '总通过', value: solvedCount, icon: CheckCircle2 },
+                { label: '覆盖难度', value: solvedGroups.length, icon: Trophy },
+                { label: '下一里程碑', value: `${nextMilestone} 题`, icon: CircleUserRound },
+              ].map(({ label, value, icon: Icon }) => <Paper key={label} variant="outlined" sx={{ p: 1.7 }}><Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><Icon size={18} color="currentColor" /><Typography variant="caption" color="text.secondary">{label}</Typography></Box><Typography variant="h5" sx={{ mt: .8, fontWeight: 700 }}>{value}</Typography></Paper>)}
+            </Box>
+
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 1.1fr) minmax(260px, .9fr)' }, gap: 1.5, mt: 1.5 }}>
+              <Paper variant="outlined" sx={{ p: 2 }}>
+                <Typography sx={{ fontWeight: 700, mb: 1.5 }}>难度分布</Typography>
+                {solvedGroups.length ? <Stack spacing={1.1}>{solvedGroups.map(([difficulty, problems]) => <Box key={difficulty}><Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1, mb: .45 }}><Typography variant="body2">{difficulty}</Typography><Typography variant="caption" color="text.secondary">{problems.length}</Typography></Box><LinearProgress variant="determinate" value={(problems.length / maxDifficultyCount) * 100} sx={{ height: 7, borderRadius: 1, bgcolor: 'action.hover', '& .MuiLinearProgress-bar': { bgcolor: difficultyColor(difficulty), borderRadius: 1 } }} /></Box>)}</Stack> : <Typography variant="body2" color="text.secondary">暂无通过记录</Typography>}
+              </Paper>
+              <Paper variant="outlined" sx={{ p: 2 }}>
+                <Typography sx={{ fontWeight: 700 }}>做题进度</Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: .6 }}>下一里程碑 {nextMilestone} 题</Typography>
+                <LinearProgress variant="determinate" value={Math.min(100, (solvedCount / nextMilestone) * 100)} sx={{ mt: 2, height: 9, borderRadius: 1 }} />
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>{solvedCount} / {nextMilestone}，还差 {nextMilestone - solvedCount} 题</Typography>
+              </Paper>
+            </Box>
+
+            <Paper variant="outlined" sx={{ mt: 1.5, overflow: 'hidden' }}>
+              <Box sx={{ px: 2, py: 1.5 }}><Typography sx={{ fontWeight: 700 }}>通过的题目</Typography></Box>
+              <Divider />
+              {solvedGroups.length ? solvedGroups.map(([difficulty, problems]) => <Accordion key={difficulty} disableGutters elevation={0} square sx={{ '&:before': { display: 'none' }, borderBottom: '1px solid', borderColor: 'divider' }}>
+                <AccordionSummary expandIcon={<ChevronDown size={18} />}><Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><Box sx={{ width: 9, height: 9, borderRadius: '50%', bgcolor: difficultyColor(difficulty) }} /><Typography sx={{ fontWeight: 600 }}>{difficulty}</Typography><Chip size="small" label={`${problems.length} 题`} /></Box></AccordionSummary>
+                <AccordionDetails sx={{ pt: 0, display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, minmax(0, 1fr))' }, gap: .7 }}>{problems.map((problem) => <Button key={problem.docId} component={RouterLink} to={`/problem/${encodeURIComponent(problem.pid || String(problem.docId))}`} color="inherit" sx={{ justifyContent: 'flex-start', textAlign: 'left' }}>{problem.pid} {problem.title}</Button>)}</AccordionDetails>
+              </Accordion>) : <Box sx={{ p: 3, textAlign: 'center' }}><Typography color="text.secondary">暂无通过记录</Typography></Box>}
+            </Paper>
+          </>}
+        </Box> : null}
         {tab === 'compare' ? <Box sx={{ p: { xs: 2, md: 2.5 } }}>
           <Typography sx={{ fontWeight: 700 }}>做题对比</Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, mb: 1.5 }}>选择另一位用户，查看双方已有的通过题目和 Rating 数据。</Typography>
