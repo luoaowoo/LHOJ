@@ -154,7 +154,7 @@ export function hydroAssetUrl(value?: string): string | undefined {
   return value;
 }
 
-export function hydroAvatarUrl(value: string | undefined, userId: number): string {
+export function hydroAvatarUrl(value: string | undefined, _userId: number): string {
   if (value) {
     try {
       const url = new URL(value, PUBLIC_HYDRO_BASE);
@@ -167,7 +167,7 @@ export function hydroAvatarUrl(value: string | undefined, userId: number): strin
       // Fall through to the canonical Hydro avatar URL.
     }
   }
-  return hydroNativeUrl(`/file/${encodeURIComponent(String(userId))}/.avatar.jpg`);
+  return '';
 }
 
 function fallbackUrl(path: string): string {
