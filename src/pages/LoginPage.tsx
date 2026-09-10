@@ -17,6 +17,10 @@ export default function LoginPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const requestedDestination = (location.state as { from?: unknown } | null)?.from;
+  const destination = typeof requestedDestination === 'string' && requestedDestination.startsWith('/') && !requestedDestination.startsWith('//')
+    ? requestedDestination
+    : '/problems';
 
   if (loading) {
     return (
@@ -27,10 +31,8 @@ export default function LoginPage() {
   }
 
   if (user) {
-    return <Navigate to="/problems" replace />;
+    return <Navigate to={destination} replace />;
   }
-
-  const destination = (location.state as { from?: string } | null)?.from ?? '/problems';
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

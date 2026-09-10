@@ -141,6 +141,7 @@ function RoutesRoot() {
             <Route path="/status" element={<StatusPage />} />
             <Route path="/messages" element={<MessagesPage />} />
             <Route path="/security" element={<SecurityPage />} />
+            <Route path="/account-settings" element={<Navigate to="/account-settings/account" replace />} />
             <Route path="/account-settings/:category" element={<AccountSettingsPage />} />
           </Route>
           <Route path="*" element={<NotFoundPage />} />
