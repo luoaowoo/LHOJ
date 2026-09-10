@@ -155,7 +155,7 @@ export function hydroAssetUrl(value?: string): string | undefined {
 }
 
 export function hydroAvatarUrl(value: string | undefined, userId: number): string {
-  const uploaded = hydroPublicUrl(`/file/${encodeURIComponent(String(userId))}/.avatar.jpg`);
+  const uploaded = `${FALLBACK_BASE}/file/${encodeURIComponent(String(userId))}/.avatar.jpg`;
   if (userId > 0) return uploaded;
   if (value) {
     try {
