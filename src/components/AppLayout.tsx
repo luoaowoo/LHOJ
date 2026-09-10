@@ -130,10 +130,9 @@ export default function AppLayout() {
 
   const drawerContent = (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <Box sx={{ px: compactRail ? 1 : 2.5, pt: 3.5, pb: 3, minHeight: 56, display: 'flex', justifyContent: compactRail ? 'center' : 'flex-start', alignItems: 'center' }}>
-        {!compactRail
-          ? <Typography sx={{ fontWeight: 600, fontSize: 15, letterSpacing: '-0.01em' }}>LH-oj</Typography>
-          : <Typography sx={{ fontWeight: 600, fontSize: 15 }}>OJ</Typography>}
+      <Box sx={{ px: compactRail ? 1 : 2.5, pt: 3.5, pb: 3, minHeight: 56, display: 'flex', gap: 1.25, justifyContent: compactRail ? 'center' : 'flex-start', alignItems: 'center' }}>
+        <Box component="img" src="/校徽.png" alt="学校校徽" sx={{ width: 32, height: 32, objectFit: 'contain', flexShrink: 0 }} />
+        {!compactRail && <Typography sx={{ fontWeight: 600, fontSize: 15 }}>LH-oj</Typography>}
       </Box>
       <List dense sx={{ px: 1.5, py: 0, flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
         {visibleNavItems.map((item) => (
