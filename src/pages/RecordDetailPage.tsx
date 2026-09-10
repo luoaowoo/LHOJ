@@ -7,6 +7,7 @@ import { useAuth } from '../auth';
 import ConfirmDialog from '../components/ConfirmDialog';
 import StatusChip from '../components/StatusChip';
 import ConfettiCelebration from '../components/ConfettiCelebration';
+import CodeEditor from '../components/CodeEditor';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
 import { postHydroForm, scrapeRecordDetail } from '../lib/scrape';
 import { hydroPublicUrl, hydroWebSocketUrl } from '../lib/endpoint';
@@ -15,6 +16,23 @@ import { usePreferences } from '../prefs';
 
 function detailValue(items: RecordDetail['detail'], patterns: RegExp[]) {
   return items.find((item) => patterns.some((pattern) => pattern.test(item.label)))?.value || '';
+}
+
+function recordEditorLanguage(language?: string): string {
+  const value = (language ?? '').toLowerCase();
+  if (value.includes('c++') || value.includes('cpp') || value === 'cc') return 'cpp';
+  if (value === 'c') return 'c';
+  if (value.includes('python') || value === 'py') return 'python';
+  if (value.includes('java')) return 'java';
+  if (value.includes('javascript') || value === 'js' || value.includes('node')) return 'javascript';
+  if (value.includes('typescript') || value === 'ts') return 'typescript';
+  if (value.includes('rust') || value === 'rs') return 'rust';
+  if (value.includes('go')) return 'go';
+  if (value.includes('kotlin') || value === 'kt') return 'kotlin';
+  if (value.includes('php')) return 'php';
+  if (value.includes('ruby') || value === 'rb') return 'ruby';
+  if (value.includes('c#') || value.includes('csharp') || value === 'cs') return 'csharp';
+  return 'plaintext';
 }
 
 export default function RecordDetailPage() {
@@ -249,7 +267,7 @@ export default function RecordDetailPage() {
             </Paper>)}
             </Box>
           </Box> : <EmptyBox message="暂无测试点数据" />
-        ) : detail.code ? <Box component="pre" sx={{ m: 0, mt: 2, p: 2, overflow: 'auto', bgcolor: 'action.hover', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 13, lineHeight: 1.55 }}>{detail.code}</Box> : <EmptyBox message="暂无代码" />}
+        ) : detail.code ? <Box sx={{ mt: 2 }}><CodeEditor value={detail.code} onChange={() => undefined} language={recordEditorLanguage(detail.language)} readOnly minHeight={520} /></Box> : <EmptyBox message="暂无代码" />}
       </Paper>
       <Paper component="aside" variant="outlined" sx={{ p: 2 }}>
         <Typography variant="h6" sx={{ mb: 1.5 }}>评测 #{detail.rid}</Typography>

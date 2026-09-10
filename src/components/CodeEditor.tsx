@@ -8,6 +8,7 @@ import 'monaco-editor/esm/vs/basic-languages/csharp/csharp.contribution';
 import 'monaco-editor/esm/vs/basic-languages/go/go.contribution';
 import 'monaco-editor/esm/vs/basic-languages/java/java.contribution';
 import 'monaco-editor/esm/vs/basic-languages/javascript/javascript.contribution';
+import 'monaco-editor/esm/vs/basic-languages/typescript/typescript.contribution';
 import 'monaco-editor/esm/vs/basic-languages/kotlin/kotlin.contribution';
 import 'monaco-editor/esm/vs/basic-languages/pascal/pascal.contribution';
 import 'monaco-editor/esm/vs/basic-languages/php/php.contribution';
@@ -90,6 +91,7 @@ interface CodeEditorProps {
   placeholder?: string;
   minHeight?: number;
   language?: string;
+  readOnly?: boolean;
 }
 
 export default function CodeEditor({
@@ -99,6 +101,7 @@ export default function CodeEditor({
   placeholder = '在这里输入代码',
   minHeight = 460,
   language = 'plaintext',
+  readOnly = false,
 }: CodeEditorProps) {
   const theme = useTheme();
   const { codeTheme, resolvedMode } = usePreferences();
@@ -141,6 +144,8 @@ export default function CodeEditor({
           tabCompletion: 'on',
           snippetSuggestions: 'inline',
           acceptSuggestionOnEnter: 'smart',
+          readOnly,
+          domReadOnly: readOnly,
         }}
       />
     </Box>
