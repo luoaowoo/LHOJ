@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Alert, Box, Button, Checkbox, FormControlLabel, MenuItem,
   Paper, Stack, TextField, Typography,
@@ -23,25 +23,27 @@ export default function AccountSettingsPage() {
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    let active = true;
-    setSettings(null);
+  const load = useCallback(async (showLoader = true) => {
+    if (showLoader) setSettings(null);
     setError('');
-    void scrapeAccountSettings(validCategory).then((items) => {
-      if (!active) return;
+    try {
+      const items = await scrapeAccountSettings(validCategory);
       const visible = items.filter((item) => !item.hidden);
       setSettings(visible);
       setValues(Object.fromEntries(visible.map((item) => [
         item.key,
-        typeof item.currentValue === 'boolean'
-          ? item.currentValue
+        item.type === 'boolean'
+          ? Boolean(item.currentValue ?? item.value)
           : String(item.currentValue ?? item.value ?? ''),
       ])));
-    }).catch((cause) => {
-      if (active) setError(cause instanceof Error ? cause.message : '设置加载失败。');
-    });
-    return () => { active = false; };
+      return visible;
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : '设置加载失败。');
+      return null;
+    }
   }, [validCategory]);
+
+  useEffect(() => { void load(); }, [load]);
 
   const groups = useMemo(() => {
     const grouped = new Map<string, HydroSetting[]>();
@@ -55,17 +57,18 @@ export default function AccountSettingsPage() {
     setSaved(false);
     setError('');
     try {
-      const fields: Record<string, string> = { category: validCategory };
+      const fields = new FormData();
+      fields.append('category', validCategory);
       Object.entries(values).forEach(([key, value]) => {
         if (typeof value === 'boolean') {
-          if (value) fields[key] = 'on';
-          fields[`booleanKeys.${key}`] = 'on';
+          if (value) fields.append(key, 'on');
+          fields.append(`booleanKeys.${key}`, 'on');
         } else if (value || !settings.find((item) => item.key === key)?.secret) {
-          fields[key] = value;
+          fields.append(key, value);
         }
       });
       await postHydroForm(`/home/settings/${validCategory}`, fields);
-      setSaved(true);
+      setSaved(Boolean(await load(false)));
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : '设置保存失败。');
     } finally {

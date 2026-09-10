@@ -20,7 +20,7 @@ type Field = HydroAdminField & {
 };
 type Form = HydroAdminForm & {
   method?: string; enctype?: string; fields: Field[];
-  submits?: Array<{ name?: string; value?: string; label: string }>;
+  submits?: HydroAdminSubmit[];
 };
 type Page = Omit<HydroAdminPage, 'forms'> & { forms: Form[] };
 
@@ -41,7 +41,7 @@ function formData(form: Form, values: Record<string, string | boolean | File[]>,
 async function submitForm(form: Form, values: Record<string, string | boolean | File[]>, submit?: HydroAdminSubmit) {
   const data = formData(form, values, submit);
   const action = submit?.action || form.action;
-  return submitHydroAdminForm(action, form.method ?? 'POST', data);
+  return submitHydroAdminForm(action, submit?.method || form.method || 'POST', data, submit?.enctype || form.enctype);
 }
 
 function fieldKey(form: Form, field: Field, index: number) { return field.id ?? `${form.action}:${index}`; }
@@ -92,7 +92,8 @@ export default function HydroAdminWorkspace({ path, title }: { path: string; tit
   const save = async (form: Form, submit?: HydroAdminSubmit) => {
     setSaving(true); setError(''); setNotice('');
     try {
-      if ((form.method ?? 'POST').toUpperCase() === 'GET') {
+      const method = (submit?.method || form.method || 'POST').toUpperCase();
+      if (method === 'GET') {
         const params = new URLSearchParams();
         formData(form, values, submit).forEach((value, key) => params.append(key, typeof value === 'string' ? value : value.name));
         const action = submit?.action || form.action;

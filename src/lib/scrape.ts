@@ -41,6 +41,13 @@ function dictEntry(dict: unknown, key: unknown): Record<string, unknown> | null 
   return isRecord(entry) ? entry : null;
 }
 
+function settingValue(source: Record<string, unknown>, key: string): unknown {
+  if (Object.hasOwn(source, key)) return source[key];
+  return key.split('.').reduce<unknown>((value, part) => (
+    isRecord(value) ? value[part] : undefined
+  ), source);
+}
+
 async function readHydroPageResponse(path: string, pjax = true): Promise<HydroPageResult> {
   await ensureEndpoint();
   const separator = path.includes('?') ? '&' : '?';
@@ -563,6 +570,9 @@ export async function confirmSudo(password: string, tfa = ''): Promise<void> {
 export async function scrapeAccountSettings(category: 'preference' | 'account' | 'domain'): Promise<HydroSetting[]> {
   const page = await readHydroPageResponse(`/home/settings/${category}`);
   const current = isRecord(page.payload?.current) ? page.payload.current : {};
+  const controls = new Map(Array.from(page.doc.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('[name]'))
+    .filter((control) => !control.getAttribute('name')?.startsWith('booleanKeys.'))
+    .map((control) => [control.getAttribute('name') || '', control]));
   return Array.isArray(page.payload?.settings) ? page.payload.settings.flatMap((value) => {
     if (!isRecord(value)) return [];
     const key = textValue(value.key);
@@ -573,6 +583,10 @@ export async function scrapeAccountSettings(category: 'preference' | 'account' |
       : Array.isArray(value.range)
         ? value.range.filter((item): item is [unknown, unknown] => Array.isArray(item) && item.length >= 2).map(([option, label]) => [textValue(option), textValue(label)] as [string, string])
         : undefined;
+    const control = controls.get(key);
+    const htmlValue = control instanceof HTMLInputElement && control.type === 'checkbox'
+      ? control.checked
+      : control?.value;
     return [{
       key,
       family: textValue(value.family) || '账户设置',
@@ -580,7 +594,7 @@ export async function scrapeAccountSettings(category: 'preference' | 'account' |
       description: textValue(value.desc) || undefined,
       type: textValue(value.type) || 'text',
       value: value.value,
-      currentValue: current[key],
+      currentValue: htmlValue ?? settingValue(current, key),
       range,
       hidden: Boolean(flags & 1),
       disabled: Boolean(flags & 2),
@@ -1185,7 +1199,8 @@ function actionFromElement(
 
 function scrapeForm(form: HTMLFormElement, doc: Document, index: number, used: Set<string>, fallbackAction: string): HydroAdminForm {
   const fields = formControls(form).map((element, fieldIndex) => {
-    const type = element instanceof HTMLSelectElement ? 'select' : element instanceof HTMLTextAreaElement ? 'textarea' : element.type || 'text';
+    const auxiliary = element.name.startsWith('booleanKeys.') || Boolean(element.closest('.display-hidden'));
+    const type = auxiliary ? 'hidden' : element instanceof HTMLSelectElement ? 'select' : element instanceof HTMLTextAreaElement ? 'textarea' : element.type || 'text';
     return {
       id: uniqueAdminId(used, element.id, `field-${index + 1}-${fieldIndex + 1}`),
       name: element.name,
