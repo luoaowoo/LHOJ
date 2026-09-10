@@ -14,6 +14,7 @@ import type {
 import { ErrorBox, FullPageLoader } from './StateBox';
 
 type Option = { value: string; label: string; selected?: boolean };
+type FieldValue = string | boolean | string[] | File[];
 type Field = HydroAdminField & {
   id?: string; required?: boolean; placeholder?: string; helpText?: string;
   accept?: string; multiple?: boolean; options?: Option[];
@@ -24,7 +25,7 @@ type Form = HydroAdminForm & {
 };
 type Page = Omit<HydroAdminPage, 'forms'> & { forms: Form[] };
 
-function formData(form: Form, values: Record<string, string | boolean | File[]>, submit?: HydroAdminSubmit) {
+function formData(form: Form, values: Record<string, FieldValue>, submit?: HydroAdminSubmit) {
   const data = new FormData();
   form.fields.forEach((field, index) => {
     const value = values[field.id ?? `${field.name}:${index}`];
@@ -32,13 +33,15 @@ function formData(form: Form, values: Record<string, string | boolean | File[]>,
     if ((field.type === 'checkbox' || field.type === 'radio') && value !== true) return;
     if (field.type === 'file') {
       (Array.isArray(value) ? value : []).forEach((file) => data.append(field.name, file));
+    } else if (Array.isArray(value)) {
+      value.forEach((item) => data.append(field.name, item));
     } else data.append(field.name, value === true ? (field.value || 'on') : String(value ?? ''));
   });
   if (submit?.name) data.append(submit.name, submit.value ?? '');
   return data;
 }
 
-async function submitForm(form: Form, values: Record<string, string | boolean | File[]>, submit?: HydroAdminSubmit) {
+async function submitForm(form: Form, values: Record<string, FieldValue>, submit?: HydroAdminSubmit) {
   const data = formData(form, values, submit);
   const action = submit?.action || form.action;
   return submitHydroAdminForm(action, submit?.method || form.method || 'POST', data, submit?.enctype || form.enctype);
@@ -50,7 +53,7 @@ export default function HydroAdminWorkspace({ path, title }: { path: string; tit
   const [currentPath, setCurrentPath] = useState(path);
   const [page, setPage] = useState<Page | null>(null);
   const [history, setHistory] = useState<string[]>([]);
-  const [values, setValues] = useState<Record<string, string | boolean | File[]>>({});
+  const [values, setValues] = useState<Record<string, FieldValue>>({});
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [loading, setLoading] = useState(true);
@@ -60,9 +63,13 @@ export default function HydroAdminWorkspace({ path, title }: { path: string; tit
     try {
       const next = await scrapeAdminPage(target);
       setPage(next as Page);
-      const initial: Record<string, string | boolean | File[]> = {};
+      const initial: Record<string, FieldValue> = {};
       next.forms.forEach((form) => form.fields.forEach((field, index) => {
-        initial[fieldKey(form, field, index)] = field.type === 'checkbox' || field.type === 'radio' ? field.checked : field.value;
+        initial[fieldKey(form, field, index)] = field.type === 'checkbox' || field.type === 'radio'
+          ? field.checked
+          : field.type === 'select' && field.multiple
+            ? field.options?.filter((option) => option.selected).map((option) => option.value) ?? []
+            : field.value;
       }));
       setValues(initial);
     } catch (cause) { setPage(null); setError(cause instanceof Error ? cause.message : '管理页面加载失败。'); }
@@ -82,7 +89,7 @@ export default function HydroAdminWorkspace({ path, title }: { path: string; tit
     }
     catch { /* Ignore malformed links from upstream HTML. */ }
   };
-  const update = (key: string, value: string | boolean | File[]) => setValues((old) => ({ ...old, [key]: value }));
+  const update = (key: string, value: FieldValue) => setValues((old) => ({ ...old, [key]: value }));
   const goBack = () => {
     const previous = history.at(-1);
     if (!previous) return;
@@ -126,7 +133,7 @@ export default function HydroAdminWorkspace({ path, title }: { path: string; tit
       try {
         const data = new FormData();
         action.fields.forEach((field) => data.append(field.name, field.value));
-        await submitHydroAdminForm(action.action || currentPath, 'POST', data);
+        await submitHydroAdminForm(action.action || currentPath, action.method || 'POST', data);
         await load();
         setNotice('操作已完成。');
       } catch (cause) { setError(cause instanceof Error ? cause.message : '操作失败。'); }
@@ -140,7 +147,7 @@ export default function HydroAdminWorkspace({ path, title }: { path: string; tit
         const key = fieldKey(form, field, index); const value = values[key];
         if (field.type === 'hidden') return null;
         if (field.type === 'file') {
-          const files = Array.isArray(value) ? value : [];
+          const files = Array.isArray(value) ? value.filter((item): item is File => item instanceof File) : [];
           return <Stack key={key} direction={{ xs: 'column', sm: 'row' }} alignItems={{ sm: 'center' }} spacing={1}>
             <Button component="label" variant="outlined">选择文件<input hidden type="file" accept={(field as Field).accept} multiple={(field as Field).multiple} required={field.required} disabled={field.disabled} onChange={(event) => update(key, Array.from(event.target.files ?? []))} /></Button>
             <Typography variant="body2" color="text.secondary">{files.length ? files.map((file) => file.name).join('、') : field.helpText || '未选择文件'}</Typography>
@@ -148,7 +155,7 @@ export default function HydroAdminWorkspace({ path, title }: { path: string; tit
         }
         if (field.type === 'checkbox') return <FormControlLabel key={key} control={<Checkbox checked={value === true} disabled={field.disabled} onChange={(event) => update(key, event.target.checked)} />} label={field.label} />;
         if (field.type === 'radio') return <FormControlLabel key={key} control={<Radio checked={value === true} required={field.required} disabled={field.disabled} onChange={() => form.fields.forEach((candidate, candidateIndex) => { if (candidate.name === field.name) update(fieldKey(form, candidate, candidateIndex), candidate === field); })} />} label={field.label} />;
-        if (field.type === 'select') return <TextField key={key} select fullWidth required={field.required} disabled={field.disabled} label={field.label} helperText={field.helpText} value={value ?? ''} onChange={(event) => update(key, event.target.value)}>{field.options?.map((option) => <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>)}</TextField>;
+        if (field.type === 'select') return <TextField key={key} select fullWidth required={field.required} disabled={field.disabled} label={field.label} helperText={field.helpText} value={value ?? (field.multiple ? [] : '')} SelectProps={{ multiple: field.multiple }} onChange={(event) => update(key, event.target.value)}>{field.options?.map((option) => <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>)}</TextField>;
         const inputType = ['password', 'number', 'date', 'time', 'datetime-local', 'email', 'url', 'tel', 'search', 'month', 'week', 'color', 'range'].includes(field.type) ? field.type : 'text';
         return <TextField key={key} fullWidth required={field.required} disabled={field.disabled} label={field.label} placeholder={field.placeholder} helperText={field.helpText} value={value ?? ''} type={inputType} multiline={field.type === 'textarea'} minRows={field.type === 'textarea' ? 4 : undefined} onChange={(event) => update(key, event.target.value)} />;
       })}</Stack>

@@ -12,6 +12,15 @@ import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
 
 const categories = new Set(['preference', 'account', 'domain']);
 
+function booleanValue(value: unknown): boolean {
+  return value === true || value === 1 || value === '1' || value === 'true' || value === 'on';
+}
+
+function settingMatches(item: HydroSetting, value: string | boolean): boolean {
+  if (item.type === 'boolean') return booleanValue(item.currentValue);
+  return String(item.currentValue ?? '') === String(value);
+}
+
 export default function AccountSettingsPage() {
   const { category = 'account' } = useParams();
   const validCategory = categories.has(category)
@@ -33,7 +42,7 @@ export default function AccountSettingsPage() {
       setValues(Object.fromEntries(visible.map((item) => [
         item.key,
         item.type === 'boolean'
-          ? Boolean(item.currentValue ?? item.value)
+          ? booleanValue(item.currentValue ?? item.value)
           : String(item.currentValue ?? item.value ?? ''),
       ])));
       return visible;
@@ -60,6 +69,8 @@ export default function AccountSettingsPage() {
       const fields = new FormData();
       fields.append('category', validCategory);
       Object.entries(values).forEach(([key, value]) => {
+        const item = settings.find((candidate) => candidate.key === key);
+        if (!item || item.disabled) return;
         if (typeof value === 'boolean') {
           if (value) fields.append(key, 'on');
           fields.append(`booleanKeys.${key}`, 'on');
@@ -68,7 +79,13 @@ export default function AccountSettingsPage() {
         }
       });
       await postHydroForm(`/home/settings/${validCategory}`, fields);
-      setSaved(Boolean(await load(false)));
+      const refreshed = await load(false);
+      const failed = refreshed?.find((item) => {
+        const value = values[item.key];
+        return !item.disabled && !item.secret && value !== undefined && !settingMatches(item, value);
+      });
+      if (failed) throw new Error(`“${failed.name}”没有成功保存，请稍后重试。`);
+      setSaved(Boolean(refreshed));
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : '设置保存失败。');
     } finally {

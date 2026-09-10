@@ -42,10 +42,11 @@ function dictEntry(dict: unknown, key: unknown): Record<string, unknown> | null 
 }
 
 function settingValue(source: Record<string, unknown>, key: string): unknown {
-  if (Object.hasOwn(source, key)) return source[key];
-  return key.split('.').reduce<unknown>((value, part) => (
+  if (Object.hasOwn(source, key) && source[key] != null) return source[key];
+  const nested = key.split('.').reduce<unknown>((value, part) => (
     isRecord(value) ? value[part] : undefined
   ), source);
+  return nested ?? source[key];
 }
 
 async function readHydroPageResponse(path: string, pjax = true): Promise<HydroPageResult> {
@@ -594,7 +595,7 @@ export async function scrapeAccountSettings(category: 'preference' | 'account' |
       description: textValue(value.desc) || undefined,
       type: textValue(value.type) || 'text',
       value: value.value,
-      currentValue: htmlValue ?? settingValue(current, key),
+      currentValue: settingValue(current, key) ?? htmlValue,
       range,
       hidden: Boolean(flags & 1),
       disabled: Boolean(flags & 2),
