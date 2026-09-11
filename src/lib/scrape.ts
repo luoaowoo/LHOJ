@@ -748,6 +748,8 @@ export interface ContestParticipation {
   requiresCode: boolean;
   ended: boolean;
   rule?: string;
+  beginAt?: string;
+  endAt?: string;
 }
 
 export async function scrapeContestParticipation(id: string): Promise<ContestParticipation> {
@@ -760,6 +762,8 @@ export async function scrapeContestParticipation(id: string): Promise<ContestPar
     requiresCode: Boolean(contest?._code),
     ended: Boolean(status?.endAt),
     rule: textValue(contest?.rule) || undefined,
+    beginAt: rawString(contest?.beginAt),
+    endAt: rawString(contest?.endAt),
   };
 }
 
