@@ -123,8 +123,11 @@ export function hydroWebSocketUrl(path: string): string {
 }
 
 export function hydroPublicUrl(path: string): string {
+  // Hydro HTML pages must stay same-origin so the session cookie and the
+  // server-side proxy are preserved. Going through the CDN hostname causes
+  // several native Hydro routes (notably /p/:pid/edit) to return 404.
   const url = new URL(path, `${PUBLIC_HYDRO_BASE}/`);
-  return `${PUBLIC_HYDRO_BASE}${url.pathname}${url.search}${url.hash}`;
+  return hydroNativeUrl(`${url.pathname}${url.search}${url.hash}`);
 }
 
 export function hydroContentUrl(value?: string): string | undefined {
