@@ -752,6 +752,12 @@ export interface ContestParticipation {
   endAt?: string;
 }
 
+export interface ContestParticipant {
+  uid: number;
+  name: string;
+  avatar?: string;
+}
+
 export async function scrapeContestParticipation(id: string): Promise<ContestParticipation> {
   const page = await readHydroPageResponse(`/contest/${encodeURIComponent(id)}`);
   const status = isRecord(page.payload?.tsdoc) ? page.payload.tsdoc : null;
@@ -765,6 +771,16 @@ export async function scrapeContestParticipation(id: string): Promise<ContestPar
     beginAt: rawString(contest?.beginAt),
     endAt: rawString(contest?.endAt),
   };
+}
+
+export async function scrapeContestParticipants(id: string): Promise<ContestParticipant[]> {
+  const doc = (await readHydroPageResponse(`/contest/${encodeURIComponent(id)}/user`, false)).doc;
+  return Array.from(doc.querySelectorAll<HTMLTableRowElement>('tr[data-uid]')).flatMap((row) => {
+    const uid = Number(row.dataset.uid);
+    const name = clean(row.querySelector<HTMLElement>('.col--user a')?.textContent);
+    if (!Number.isInteger(uid) || !name) return [];
+    return [{ uid, name, avatar: row.querySelector<HTMLImageElement>('.col--user img')?.getAttribute('src') ?? undefined }];
+  });
 }
 
 export async function scrapeHomeworkScoreboard(id: string): Promise<{ headers: string[]; rows: ScoreboardRow[] }> {

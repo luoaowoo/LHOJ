@@ -5,18 +5,19 @@ import {
   Paper, Stack, Switch, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
   Tabs, TextField, Typography,
 } from '@mui/material';
-import { CircleDot, Clock3, Code2, ExternalLink, ListChecks, MessageCircleQuestion, Printer, Settings2, Square, Trophy, Users } from 'lucide-react';
+import { Check, CircleDot, Clock3, Code2, ExternalLink, ListChecks, MessageCircleQuestion, Printer, Settings2, Square, Trophy, Users } from 'lucide-react';
 import { useAuth } from '../auth';
 import ConfirmDialog from '../components/ConfirmDialog';
+import HydroAvatar from '../components/HydroAvatar';
 import Markdown from '../components/Markdown';
 import PageHeader from '../components/PageHeader';
 import ScoreboardTable from '../components/ScoreboardTable';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
 import { fetchContest, fetchProblemsByIds, localizedContent } from '../lib/api';
 import { contestRuleMeta } from '../lib/contestRule';
-import { hydroPublicUrl } from '../lib/endpoint';
-import { formatDate, postHydroForm, scrapeContestParticipation, scrapeContestScoreboard } from '../lib/scrape';
-import type { ContestParticipation } from '../lib/scrape';
+import { hydroAvatarUrl, hydroPublicUrl } from '../lib/endpoint';
+import { formatDate, postHydroForm, scrapeContestParticipants, scrapeContestParticipation, scrapeContestScoreboard } from '../lib/scrape';
+import type { ContestParticipant, ContestParticipation } from '../lib/scrape';
 import type { HydroContest, HydroProblem, ScoreboardRow } from '../types';
 
 type ContestTab = 'overview' | 'problems' | 'scoreboard';
@@ -58,6 +59,8 @@ export default function ContestDetailPage() {
   const [problems, setProblems] = useState<HydroProblem[] | null>(null);
   const [scoreboard, setScoreboard] = useState<{ headers: string[]; rows: ScoreboardRow[] } | null>(null);
   const [participation, setParticipation] = useState<ContestParticipation | null>(null);
+  const [participants, setParticipants] = useState<ContestParticipant[]>([]);
+  const [participantsOpen, setParticipantsOpen] = useState(false);
   const [tab, setTab] = useState<ContestTab>('overview');
   const [now, setNow] = useState(Date.now());
   const [contentError, setContentError] = useState('');
@@ -79,9 +82,10 @@ export default function ContestDetailPage() {
       return;
     }
     try {
-      const [data, nextParticipation] = await Promise.all([
+      const [data, nextParticipation, nextParticipants] = await Promise.all([
         fetchContest(id),
         scrapeContestParticipation(id).catch(() => null),
+        user ? scrapeContestParticipants(id).catch(() => []) : Promise.resolve([]),
       ]);
       if (!data) {
         setError('比赛不存在或无权访问。');
@@ -94,7 +98,16 @@ export default function ContestDetailPage() {
       };
       setContest(exactContest);
       setParticipation(nextParticipation);
-      if (Date.now() < Date.parse(exactContest.beginAt)) {
+      setParticipants(nextParticipants);
+      const currentTime = Date.now();
+      if (currentTime < Date.parse(exactContest.beginAt)) {
+        setProblems([]);
+        setScoreboard(null);
+        setTab('overview');
+        return;
+      }
+      const canViewContent = currentTime >= Date.parse(exactContest.endAt) || Boolean(nextParticipation?.attended) || user?.role === 'root';
+      if (!canViewContent) {
         setProblems([]);
         setScoreboard(null);
         setTab('overview');
@@ -121,6 +134,7 @@ export default function ContestDetailPage() {
     setProblems(null);
     setScoreboard(null);
     setParticipation(null);
+    setParticipants([]);
     setTab('overview');
     void load();
   }, [load]);
@@ -145,6 +159,7 @@ export default function ContestDetailPage() {
 
   const state = getContestState(contest, now);
   const started = state.label === '进行中' || state.label === '已结束';
+  const canViewContent = state.label === '已结束' || Boolean(participation?.attended) || user?.role === 'root';
   const rule = contestRuleMeta(participation?.rule);
   const beginAt = Date.parse(contest.beginAt);
 
@@ -195,19 +210,20 @@ export default function ContestDetailPage() {
 
   const registrationButton = !user ? (
     <Button component={RouterLink} to="/login" state={{ from: location.pathname + location.search }} variant="contained" size="small">登录后报名</Button>
+  ) : participation?.attended ? (
+    <Button variant="outlined" size="small" startIcon={<Check size={16} />} disabled>已报名</Button>
   ) : participation && !participation.attended && state.label !== '已结束' ? (
     <Button variant="contained" size="small" onClick={() => participation.requiresCode ? setJoinOpen(true) : void joinContest()} disabled={acting}>{acting ? '报名中' : '报名比赛'}</Button>
   ) : null;
 
   return <Box>
     <PageHeader icon={<Trophy size={20} />} title={contest.title} actions={<>
-      {registrationButton}
       {user && participation?.attended ? <FormControlLabel control={<Switch checked={participation.subscribed} disabled={acting} onChange={(_event, checked) => void setSubscribed(checked)} />} label="比赛通知" /> : null}
       {user && participation?.attended && !participation.ended && state.label === '进行中' ? <Button color="error" size="small" startIcon={<Square size={14} />} onClick={() => setEarlyEndOpen(true)} disabled={acting}>提前结束</Button> : null}
       {started ? <Button component="a" href={hydroPublicUrl(`/contest/${encodeURIComponent(contestId)}/scoreboard`)} target="_blank" rel="noreferrer" size="small" endIcon={<ExternalLink size={15} />}>完整榜单</Button> : null}
       {started ? <Button component="a" href={hydroPublicUrl(`/contest/${encodeURIComponent(contestId)}/code`)} target="_blank" rel="noreferrer" size="small" startIcon={<Code2 size={15} />}>比赛代码</Button> : null}
       {user && participation?.attended && started ? <Button component="a" href={hydroPublicUrl(`/contest/${encodeURIComponent(contestId)}/clarification`)} target="_blank" rel="noreferrer" size="small" startIcon={<MessageCircleQuestion size={15} />}>比赛答疑</Button> : null}
-      {user ? <Button component="a" href={hydroPublicUrl(`/contest/${encodeURIComponent(contestId)}/user`)} target="_blank" rel="noreferrer" size="small" startIcon={<Users size={15} />}>参赛用户</Button> : null}
+      {user ? <Button onClick={() => setParticipantsOpen(true)} size="small" startIcon={<Users size={15} />}>参赛选手</Button> : null}
       {contest.allowPrint && started ? <Button component="a" href={hydroPublicUrl(`/contest/${encodeURIComponent(contestId)}/print`)} target="_blank" rel="noreferrer" size="small" startIcon={<Printer size={15} />}>打印题面</Button> : null}
       {user?.role === 'root' ? <Button component="a" href={hydroPublicUrl(`/contest/${encodeURIComponent(contestId)}/balloon`)} target="_blank" rel="noreferrer" size="small" startIcon={<CircleDot size={15} />}>气球管理</Button> : null}
       {user?.role === 'root' ? <Button component="a" href={hydroPublicUrl(`/contest/${encodeURIComponent(contestId)}/management`)} target="_blank" rel="noreferrer" size="small" startIcon={<Settings2 size={15} />}>管理比赛</Button> : null}
@@ -221,15 +237,18 @@ export default function ContestDetailPage() {
           <Chip icon={<Clock3 size={14} />} label={`开始 ${formatDate(contest.beginAt)}`} variant="outlined" size="small" />
           <Chip icon={<Clock3 size={14} />} label={`结束 ${formatDate(contest.endAt)}`} variant="outlined" size="small" />
         </Stack>
-        <Stack direction="row" spacing={3}>
-          <Box sx={{ textAlign: 'center' }}><Typography variant="caption" color="text.secondary">题目数</Typography><Typography sx={{ fontWeight: 800 }}>{contest.pids.length}</Typography></Box>
-          <Box sx={{ textAlign: 'center' }}><Typography variant="caption" color="text.secondary">参与人数</Typography><Typography sx={{ fontWeight: 800 }}>{contest.attend}</Typography></Box>
+        <Stack spacing={1.25} alignItems="flex-end">
+          <Stack direction="row" spacing={3}>
+            <Box sx={{ textAlign: 'center' }}><Typography variant="caption" color="text.secondary">题目数</Typography><Typography sx={{ fontWeight: 800 }}>{contest.pids.length}</Typography></Box>
+            <Box sx={{ textAlign: 'center' }}><Typography variant="caption" color="text.secondary">参与人数</Typography><Typography sx={{ fontWeight: 800 }}>{contest.attend}</Typography></Box>
+          </Stack>
+          {registrationButton}
         </Stack>
       </Box>
       <Tabs value={tab} onChange={(_event, value: ContestTab) => setTab(value)} sx={{ px: { xs: 1, md: 1.5 }, mt: 1 }} aria-label="比赛内容">
         <Tab value="overview" label="比赛说明" />
-        {started ? <Tab value="problems" label="题目列表" /> : null}
-        {started ? <Tab value="scoreboard" label="排行榜" /> : null}
+        {started && canViewContent ? <Tab value="problems" label="题目列表" /> : null}
+        {started && canViewContent ? <Tab value="scoreboard" label="排行榜" /> : null}
       </Tabs>
     </Paper>
 
@@ -239,8 +258,7 @@ export default function ContestDetailPage() {
       <Stack spacing={2}>
         <Paper variant="outlined" sx={{ p: 2.25 }}>
           <Typography sx={{ fontWeight: 800, color: state.color === 'success' ? 'success.main' : state.color === 'error' ? 'error.main' : 'text.primary' }}>{state.label === '未开始' ? `距离开始还有 ${formatCountdown(beginAt - now)}` : state.label === '进行中' ? '比赛正在进行' : '比赛已经结束'}</Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 1, mb: registrationButton ? 1.5 : 0 }}>{participation?.attended ? '您已报名本场比赛。' : state.label === '未开始' ? '报名后请等待比赛开始，题目将自动开放。' : '比赛题目和排名可从上方页签查看。'}</Typography>
-          {registrationButton}
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1, mb: registrationButton ? 1.5 : 0 }}>{participation?.attended ? '您已报名本场比赛。' : state.label === '未开始' ? '报名后请等待比赛开始，题目将自动开放。' : state.label === '进行中' ? '报名后即可进入比赛并查看题目。' : '比赛题目和排名可从上方页签查看。'}</Typography>
         </Paper>
         <Paper variant="outlined" sx={{ p: 2.25 }}><Typography sx={{ fontWeight: 800, mb: 1 }}>比赛信息</Typography><Stack spacing={1}>
           <Typography variant="body2">开始时间：{formatDate(contest.beginAt)}</Typography><Typography variant="body2">结束时间：{formatDate(contest.endAt)}</Typography><Typography variant="body2">比赛赛制：{participation?.rule ? rule.label : '以主办方设置为准'}</Typography><Typography variant="body2" color="text.secondary">{ruleDescription(participation?.rule)}</Typography>
@@ -263,6 +281,18 @@ export default function ContestDetailPage() {
     {tab === 'scoreboard' && started ? scoreboard?.rows.length ? <ScoreboardTable title={`${rule.label} 排行榜`} headers={scoreboard.headers} rows={scoreboard.rows} /> : <Paper variant="outlined" sx={{ p: 4, textAlign: 'center' }}><ListChecks size={30} /><Typography sx={{ mt: 1, fontWeight: 700 }}>暂无排行榜数据</Typography><Typography variant="body2" color="text.secondary" sx={{ mt: .5 }}>{ruleDescription(participation?.rule)}</Typography></Paper> : null}
 
     <Dialog open={joinOpen} onClose={() => { if (!acting) setJoinOpen(false); }} fullWidth maxWidth="xs"><DialogTitle>报名比赛</DialogTitle><DialogContent><TextField autoFocus fullWidth label="邀请码" value={inviteCode} onChange={(event) => setInviteCode(event.target.value)} sx={{ mt: 1 }} /></DialogContent><DialogActions><Button color="inherit" onClick={() => setJoinOpen(false)} disabled={acting}>取消</Button><Button variant="contained" onClick={() => void joinContest()} disabled={acting || !inviteCode.trim()}>报名</Button></DialogActions></Dialog>
+    <Dialog open={participantsOpen} onClose={() => setParticipantsOpen(false)} fullWidth maxWidth="sm">
+      <DialogTitle>参赛选手（{participants.length}）</DialogTitle>
+      <DialogContent dividers sx={{ p: 0 }}>
+        {participants.length ? <Stack divider={<Box sx={{ borderBottom: '1px solid', borderColor: 'divider' }} />}>
+          {participants.map((participant) => <Box key={participant.uid} component={RouterLink} to={`/user/${participant.uid}`} onClick={() => setParticipantsOpen(false)} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, px: 2.5, py: 1.25, color: 'inherit', textDecoration: 'none', '&:hover': { bgcolor: 'action.hover' } }}>
+            <HydroAvatar src={hydroAvatarUrl(participant.avatar, participant.uid)} name={participant.name} userId={participant.uid} size={36} />
+            <Box sx={{ minWidth: 0 }}><Typography sx={{ fontWeight: 700, overflowWrap: 'anywhere' }}>{participant.name}</Typography><Typography variant="caption" color="text.secondary">UID {participant.uid}</Typography></Box>
+          </Box>)}
+        </Stack> : <EmptyBox message="暂无参赛选手" />}
+      </DialogContent>
+      <DialogActions><Button onClick={() => setParticipantsOpen(false)}>关闭</Button></DialogActions>
+    </Dialog>
     <ConfirmDialog open={earlyEndOpen} title="提前结束比赛？" content="结束后将不能继续提交本场比赛，且此操作无法撤销。" confirmLabel="确认结束" destructive loading={acting} onConfirm={() => void earlyEnd()} onClose={() => setEarlyEndOpen(false)} />
   </Box>;
 }
