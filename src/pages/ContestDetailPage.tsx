@@ -70,7 +70,7 @@ export default function ContestDetailPage() {
       }
       setContest(data);
       const [nextProblems, nextScoreboard, nextParticipation] = await Promise.all([
-        fetchProblemsByIds(data.pids),
+        fetchProblemsByIds(data.pids, id),
         scrapeContestScoreboard(id).catch(() => null),
         user ? scrapeContestParticipation(id).catch(() => null) : Promise.resolve(null),
       ]);

@@ -159,7 +159,27 @@ interface ProblemData {
   problem: HydroProblem | null;
 }
 
-export function fetchProblem(value: string): Promise<HydroProblem | null> {
+export async function fetchProblem(value: string, tid?: string): Promise<HydroProblem | null> {
+  if (tid) {
+    await ensureEndpoint();
+    const query = `?tid=${encodeURIComponent(tid)}`;
+    let response: Response;
+    try {
+      response = await fetchRead(hydroNativeUrl(`/p/${encodeURIComponent(value)}${query}`), {
+        headers: { Accept: 'application/json' },
+        credentials: 'include',
+      });
+    } catch {
+      throw new ApiError('无法读取比赛题目。');
+    }
+    if (!response.ok) return null;
+    try {
+      const payload = await response.json() as { pdoc?: unknown };
+      return payload.pdoc && typeof payload.pdoc === 'object' ? payload.pdoc as HydroProblem : null;
+    } catch {
+      return null;
+    }
+  }
   const numeric = /^\d+$/.test(value);
   const query = `query Problem($id: Int, $pid: String) {
     problem(id: $id, pid: $pid) { ${problemFields} }
@@ -172,15 +192,26 @@ interface ProblemsData {
   problems: HydroProblem[] | null;
 }
 
-export async function fetchProblemsByIds(ids: number[]): Promise<HydroProblem[]> {
+export async function fetchProblemsByIds(ids: number[], tid?: string): Promise<HydroProblem[]> {
   if (!ids.length) return [];
-  const data = await gql<ProblemsData>(
-    `query Problems($ids: [Int]) { problems(ids: $ids) {
-      ${problemFields}
-    } }`,
-    { ids },
-  );
-  return data.problems ?? [];
+  if (tid) {
+    const problems = await Promise.all(ids.map((id) => fetchProblem(String(id), tid).catch(() => null)));
+    return problems.filter((problem): problem is HydroProblem => problem !== null);
+  }
+  try {
+    const data = await gql<ProblemsData>(
+      `query Problems($ids: [Int]) { problems(ids: $ids) {
+        ${problemFields}
+      } }`,
+      { ids },
+    );
+    return data.problems ?? [];
+  } catch {
+    // Hydro rejects the entire batch when one problem is hidden or unavailable.
+    // Retry individually so contests and other mixed-visibility lists remain usable.
+    const problems = await Promise.all(ids.map((id) => fetchProblem(String(id)).catch(() => null)));
+    return problems.filter((problem): problem is HydroProblem => problem !== null);
+  }
 }
 
 const problemScanLimit = Number(import.meta.env.VITE_PROBLEM_SCAN_LIMIT ?? 1200);

@@ -57,7 +57,7 @@ export default function ProblemPage() {
     setLoading(true);
     setError('');
     Promise.all([
-      fetchProblem(id),
+      fetchProblem(id, tid || undefined),
       user ? scrapeProblemStar(id).catch(() => false) : Promise.resolve(false),
     ])
       .then(([nextProblem, nextStarred]) => {
@@ -75,7 +75,7 @@ export default function ProblemPage() {
     return () => {
       active = false;
     };
-  }, [id, user?._id]);
+  }, [id, tid, user?._id]);
 
   useEffect(() => {
     if (submitted) setSnackbarOpen(true);
