@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link as RouterLink, useParams, useSearchParams } from 'react-router-dom';
 import { Alert, Box, Button, Chip, Divider, LinearProgress, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
-import { Clock3, Code2, Cpu, Download, ExternalLink, HardDrive, ListChecks, RefreshCw, ShieldAlert, UserRound, XCircle } from 'lucide-react';
+import { Clock3, Code2, Cpu, Download, HardDrive, ListChecks, RefreshCw, ShieldAlert, UserRound, XCircle } from 'lucide-react';
 import { useAuth } from '../auth';
 import ConfirmDialog from '../components/ConfirmDialog';
 import StatusChip from '../components/StatusChip';
@@ -11,6 +11,7 @@ import CodeEditor from '../components/CodeEditor';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
 import { postHydroForm, scrapeRecordDetail } from '../lib/scrape';
 import { hydroPublicUrl, hydroWebSocketUrl } from '../lib/endpoint';
+import { hydroWorkspaceHref } from '../lib/hydro-workspace';
 import type { RecordDetail } from '../types';
 import { usePreferences } from '../prefs';
 
@@ -237,14 +238,11 @@ export default function RecordDetailPage() {
             下载代码
           </Button>
           <Button
-            component="a"
-            href={hydroPublicUrl(`/record/${rid}`)}
-            target="_blank"
-            rel="noreferrer"
+            component={RouterLink}
+            to={hydroWorkspaceHref(`/record/${rid}`, 'Hydro 评测详情')}
             size="small"
-            endIcon={<ExternalLink size={15} />}
           >
-            Hydro 原始页面
+            完整评测工作区
           </Button>
         </Box>
 

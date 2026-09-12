@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link as RouterLink, useParams, useSearchParams } from 'react-router-dom';
 import { Alert, Box, Button, Pagination, Paper, Stack, TextField, Typography } from '@mui/material';
-import { ArrowDown, ArrowLeft, ArrowUp, ExternalLink, Lightbulb, MessageSquare, Pencil, Send, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowLeft, ArrowUp, Lightbulb, MessageSquare, Pencil, Send, Trash2 } from 'lucide-react';
 import { useAuth } from '../auth';
 import ConfirmDialog from '../components/ConfirmDialog';
 import Markdown from '../components/Markdown';
 import PageHeader from '../components/PageHeader';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
-import { hydroPublicUrl } from '../lib/endpoint';
+import { hydroWorkspaceHref } from '../lib/hydro-workspace';
 import { postHydroForm, scrapeProblemSolutions } from '../lib/scrape';
 import type { ProblemSolutionsResult } from '../types';
 
@@ -89,7 +89,7 @@ export default function ProblemSolutionsPage() {
         icon={<Lightbulb size={22} />}
         title="题解"
         actions={(
-          <Button component="a" href={hydroPublicUrl(`/p/${encodeURIComponent(id)}/solution`)} target="_blank" rel="noreferrer" size="small" endIcon={<ExternalLink size={15} />}>
+          <Button component={RouterLink} to={hydroWorkspaceHref(`/p/${encodeURIComponent(id)}/solution`, '发布或管理题解')} size="small">
             发布或管理题解
           </Button>
         )}

@@ -8,7 +8,7 @@ import { CheckCircle2, Circle, Filter, Gauge, Plus, Search, Shuffle, Tags } from
 import { useAuth } from '../auth';
 import PageHeader from '../components/PageHeader';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
-import { hydroPublicUrl } from '../lib/endpoint';
+import { hydroWorkspaceHref } from '../lib/hydro-workspace';
 import { difficultyColor } from '../lib/difficulty';
 import { scrapeProblemRows } from '../lib/scrape';
 import type { ProblemRow } from '../types';
@@ -79,11 +79,11 @@ export default function ProblemListPage() {
         subtitle="成就龙中学子信竞梦 · 选择一道题开始训练"
         actions={(
           <>
-            <Button component="a" href={hydroPublicUrl('/problem/random')} target="_blank" rel="noreferrer" color="inherit" startIcon={<Shuffle size={16} />}>
+            <Button component={RouterLink} to={hydroWorkspaceHref('/problem/random', '随机一题')} color="inherit" startIcon={<Shuffle size={16} />}>
               随机一题
             </Button>
             {user?.role === 'root' ? (
-              <Button component="a" href={hydroPublicUrl('/problem/create')} target="_blank" rel="noreferrer" variant="contained" startIcon={<Plus size={16} />}>
+              <Button component={RouterLink} to={hydroWorkspaceHref('/problem/create', '创建题目')} variant="contained" startIcon={<Plus size={16} />}>
                 创建题目
               </Button>
             ) : null}
