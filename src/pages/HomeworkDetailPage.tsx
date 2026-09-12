@@ -4,13 +4,13 @@ import {
   Alert, Box, Button, Chip, Paper, Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Typography,
 } from '@mui/material';
-import { ArrowLeft, ClipboardList, Code2, ExternalLink, FileText, Settings2 } from 'lucide-react';
+import { ArrowLeft, ClipboardList, Code2, FileText, Settings2 } from 'lucide-react';
 import { useAuth } from '../auth';
 import Markdown from '../components/Markdown';
 import PageHeader from '../components/PageHeader';
 import ScoreboardTable from '../components/ScoreboardTable';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
-import { hydroPublicUrl } from '../lib/endpoint';
+import HydroWorkspaceButton from '../components/HydroWorkspaceButton';
 import { localizedContent } from '../lib/api';
 import { formatDate, postHydroForm, scrapeHomeworkDetail, scrapeHomeworkScoreboard } from '../lib/scrape';
 import type { HomeworkDetail, ScoreboardRow } from '../types';
@@ -77,19 +77,19 @@ export default function HomeworkDetailPage() {
                 {attending ? '参加中' : '参加作业'}
               </Button>
             ) : homework.attended ? <Chip label="已参加" color="primary" variant="outlined" /> : null}
-            <Button component="a" href={hydroPublicUrl(`/homework/${encodeURIComponent(homework.id)}/scoreboard`)} target="_blank" rel="noreferrer" size="small" endIcon={<ExternalLink size={15} />}>
+            <HydroWorkspaceButton path={`/homework/${encodeURIComponent(homework.id)}/scoreboard`} title="作业完整榜单" size="small">
               完整榜单
-            </Button>
-            <Button component="a" href={hydroPublicUrl(`/homework/${encodeURIComponent(homework.id)}/code`)} target="_blank" rel="noreferrer" size="small" startIcon={<Code2 size={15} />}>
+            </HydroWorkspaceButton>
+            <HydroWorkspaceButton path={`/homework/${encodeURIComponent(homework.id)}/code`} title="作业代码" size="small" startIcon={<Code2 size={15} />}>
               作业代码
-            </Button>
-            <Button component="a" href={hydroPublicUrl(`/homework/${encodeURIComponent(homework.id)}/file`)} target="_blank" rel="noreferrer" size="small" startIcon={<FileText size={15} />}>
+            </HydroWorkspaceButton>
+            <HydroWorkspaceButton path={`/homework/${encodeURIComponent(homework.id)}/file`} title="作业文件" size="small" startIcon={<FileText size={15} />}>
               作业文件
-            </Button>
+            </HydroWorkspaceButton>
             {user?.role === 'root' ? (
-              <Button component="a" href={hydroPublicUrl(`/homework/${encodeURIComponent(homework.id)}/edit`)} target="_blank" rel="noreferrer" size="small" startIcon={<Settings2 size={15} />}>
+              <HydroWorkspaceButton path={`/homework/${encodeURIComponent(homework.id)}/edit`} title="编辑作业" size="small" startIcon={<Settings2 size={15} />}>
                 编辑作业
-              </Button>
+              </HydroWorkspaceButton>
             ) : null}
           </>
         )}

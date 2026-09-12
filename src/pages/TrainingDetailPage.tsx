@@ -9,7 +9,7 @@ import { useAuth } from '../auth';
 import PageHeader from '../components/PageHeader';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
 import { difficultyColor } from '../lib/difficulty';
-import { hydroPublicUrl } from '../lib/endpoint';
+import HydroWorkspaceButton from '../components/HydroWorkspaceButton';
 import { postHydroForm, scrapeTrainingDetail } from '../lib/scrape';
 import { usePreferences } from '../prefs';
 import type { TrainingDetail } from '../types';
@@ -95,27 +95,23 @@ export default function TrainingDetailPage() {
                 {enrolling ? '加入中' : '加入训练'}
               </Button>
             ) : training.enrolled ? <Chip label="已加入" color="primary" variant="outlined" /> : null}
-            <Button
-              component="a"
-              href={hydroPublicUrl(`/training/${encodeURIComponent(training.id)}/file`)}
-              target="_blank"
-              rel="noreferrer"
+            <HydroWorkspaceButton
+              path={`/training/${encodeURIComponent(training.id)}/file`}
+              title="训练文件"
               size="small"
               startIcon={<FileText size={15} />}
             >
               训练文件
-            </Button>
+            </HydroWorkspaceButton>
             {user?.role === 'root' ? (
-              <Button
-                component="a"
-                href={hydroPublicUrl(`/training/${encodeURIComponent(training.id)}/edit`)}
-                target="_blank"
-                rel="noreferrer"
+              <HydroWorkspaceButton
+                path={`/training/${encodeURIComponent(training.id)}/edit`}
+                title="编辑训练"
                 size="small"
                 startIcon={<Settings2 size={15} />}
               >
                 编辑训练
-              </Button>
+              </HydroWorkspaceButton>
             ) : null}
           </>
         )}
