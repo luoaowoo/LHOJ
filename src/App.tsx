@@ -70,6 +70,7 @@ const ProblemStatsPage = lazyPage(() => import('./pages/ProblemStatsPage'));
 const ProblemFilesPage = lazyPage(() => import('./pages/ProblemFilesPage'));
 const ManagementPage = lazyPage(() => import('./pages/ManagementPage'));
 const HackPage = lazyPage(() => import('./pages/HackPage'));
+const HydroWorkspacePage = lazyPage(() => import('./pages/HydroWorkspacePage'));
 const StatusPage = lazyPage(() => import('./pages/StatusPage'));
 const MessagesPage = lazyPage(() => import('./pages/MessagesPage'));
 const SecurityPage = lazyPage(() => import('./pages/SecurityPage'));
@@ -101,6 +102,7 @@ function RoutesRoot() {
       ['/security', '安全设置'],
       ['/account-settings', '账户设置'],
       ['/about', '风格简介'],
+      ['/hydro', 'Hydro 功能'],
     ];
     const known = labels.find(([path]) => location.pathname.startsWith(path))?.[1];
     const label = known ?? (location.pathname === '/' ? '主页' : '页面不存在');
@@ -131,6 +133,7 @@ function RoutesRoot() {
           <Route path="/discuss/:id" element={<DiscussionDetailPage />} />
           <Route path="/ranking" element={<RankingPage />} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/hydro" element={<HydroWorkspacePage />} />
           <Route path="/user/:uname" element={<UserPage />} />
           <Route element={<Protected />}>
             <Route path="/problem/:id/submit" element={<SubmitPage />} />

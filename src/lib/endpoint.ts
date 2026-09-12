@@ -9,6 +9,18 @@ const storageKey = 'luoa-oj.endpoint';
 let resolvedEndpoint: ResolvedEndpoint | null = null;
 let pendingProbe: Promise<ResolvedEndpoint> | null = null;
 let avatarRevision = '';
+let serverClockOffset = 0;
+
+function recordServerTime(response: Response): void {
+  const value = response.headers.get('date');
+  if (!value) return;
+  const serverTime = Date.parse(value);
+  if (Number.isFinite(serverTime)) serverClockOffset = serverTime - Date.now();
+}
+
+export function serverNow(): number {
+  return Date.now() + serverClockOffset;
+}
 
 export function requestSignal(timeout = REQUEST_TIMEOUT_MS): AbortSignal {
   return AbortSignal.timeout(timeout);
@@ -20,6 +32,7 @@ export async function fetchRead(input: RequestInfo | URL, init: RequestInit = {}
   for (let attempt = 0; attempt <= 2; attempt += 1) {
     try {
       response = await fetch(input, { ...init, signal });
+      recordServerTime(response);
       if (response.status < 500 || attempt === 2) return response;
       await response.body?.cancel();
     } catch (cause) {
@@ -113,7 +126,10 @@ export function hydroUrl(path: string): string {
 
 export function hydroNativeUrl(path: string): string {
   const normalized = path.startsWith('/') ? path : `/${path}`;
-  return `/hydro-native${normalized}`;
+  const nativePath = normalized.startsWith('/hydro-native/')
+    ? normalized.slice('/hydro-native'.length)
+    : normalized;
+  return `/hydro-native${nativePath}`;
 }
 
 export function hydroWebSocketUrl(path: string): string {
