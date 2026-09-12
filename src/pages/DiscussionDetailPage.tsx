@@ -5,6 +5,7 @@ import {
 } from '@mui/material';
 import { ArrowLeft, LogIn, MessageSquare, Pencil, Send, Trash2 } from 'lucide-react';
 import { useAuth } from '../auth';
+import { isSuperUser } from '../lib/permissions';
 import ConfirmDialog from '../components/ConfirmDialog';
 import HydroWorkspaceButton from '../components/HydroWorkspaceButton';
 import Markdown from '../components/Markdown';
@@ -135,7 +136,7 @@ export default function DiscussionDetailPage() {
 
   if (loading && !discussion) return <FullPageLoader />;
   if (loadError || !discussion) return <ErrorBox message={loadError || '讨论不存在。'} onRetry={() => void load()} />;
-  const canManageDiscussion = Boolean(user && (user._id === discussion.ownerId || user.role === 'root'));
+  const canManageDiscussion = Boolean(user && (user._id === discussion.ownerId || isSuperUser(user)));
 
   return (
     <Box>
@@ -175,14 +176,14 @@ export default function DiscussionDetailPage() {
           <Paper key={item.id} variant="outlined" sx={{ p: { xs: 1.8, md: 2.2 } }}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
               <Typography variant="caption" color="text.secondary">#{index + 1} · {item.author || '未知用户'}</Typography>
-              {user && (user._id === item.ownerId || user.role === 'root') ? <Stack direction="row"><Button aria-label="编辑回复" color="inherit" disabled={posting} onClick={() => setEditingReply({ drid: item.id, content: item.content })}><Pencil size={14} /></Button><Button aria-label="删除回复" color="error" disabled={posting} onClick={() => setDeletingReply({ drid: item.id })}><Trash2 size={14} /></Button></Stack> : null}
+              {user && (user._id === item.ownerId || isSuperUser(user)) ? <Stack direction="row"><Button aria-label="编辑回复" color="inherit" disabled={posting} onClick={() => setEditingReply({ drid: item.id, content: item.content })}><Pencil size={14} /></Button><Button aria-label="删除回复" color="error" disabled={posting} onClick={() => setDeletingReply({ drid: item.id })}><Trash2 size={14} /></Button></Stack> : null}
             </Box>
             {editingReply?.drid === item.id && !editingReply.drrid ? <Box component="form" sx={{ mt: 1 }} onSubmit={(event) => { event.preventDefault(); void updateReply('edit_reply'); }}><TextField fullWidth multiline minRows={3} label="编辑回复" value={editingReply.content} onChange={(event) => setEditingReply({ ...editingReply, content: event.target.value })} autoFocus /><Stack direction="row" spacing={1} justifyContent="flex-end" sx={{ mt: 1 }}><Button color="inherit" onClick={() => setEditingReply(null)} disabled={posting}>取消</Button><Button type="submit" variant="contained" disabled={posting || !editingReply.content.trim()}>保存</Button></Stack></Box> : <Box sx={{ mt: 0.8 }}><Markdown content={item.content || '（空回复）'} /></Box>}
             {item.replies?.length ? (
               <Stack spacing={1} sx={{ mt: 1.5, pl: { xs: 1.5, sm: 3 }, borderLeft: 2, borderColor: 'divider' }}>
                 {item.replies.map((nested) => (
                   <Box key={nested.id}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}><Typography variant="caption" color="text.secondary">{nested.author || '未知用户'}</Typography>{user && (user._id === nested.ownerId || user.role === 'root') ? <Stack direction="row"><Button aria-label="编辑楼中楼回复" color="inherit" disabled={posting} onClick={() => setEditingReply({ drid: item.id, drrid: nested.id, content: nested.content })}><Pencil size={14} /></Button><Button aria-label="删除楼中楼回复" color="error" disabled={posting} onClick={() => setDeletingReply({ drid: item.id, drrid: nested.id })}><Trash2 size={14} /></Button></Stack> : null}</Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}><Typography variant="caption" color="text.secondary">{nested.author || '未知用户'}</Typography>{user && (user._id === nested.ownerId || isSuperUser(user)) ? <Stack direction="row"><Button aria-label="编辑楼中楼回复" color="inherit" disabled={posting} onClick={() => setEditingReply({ drid: item.id, drrid: nested.id, content: nested.content })}><Pencil size={14} /></Button><Button aria-label="删除楼中楼回复" color="error" disabled={posting} onClick={() => setDeletingReply({ drid: item.id, drrid: nested.id })}><Trash2 size={14} /></Button></Stack> : null}</Box>
                     {editingReply?.drid === item.id && editingReply.drrid === nested.id ? <Box component="form" onSubmit={(event) => { event.preventDefault(); void updateReply('edit_tail_reply'); }}><TextField fullWidth multiline minRows={3} label="编辑回复" value={editingReply.content} onChange={(event) => setEditingReply({ ...editingReply, content: event.target.value })} autoFocus /><Stack direction="row" spacing={1} justifyContent="flex-end" sx={{ mt: 1 }}><Button color="inherit" onClick={() => setEditingReply(null)} disabled={posting}>取消</Button><Button type="submit" variant="contained" disabled={posting || !editingReply.content.trim()}>保存</Button></Stack></Box> : <Markdown content={nested.content || '（空回复）'} />}
                   </Box>
                 ))}

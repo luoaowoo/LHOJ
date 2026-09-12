@@ -5,6 +5,7 @@ import {
   Settings2, ShieldCheck, TerminalSquare, Trophy, UserCog, Users, Wrench,
 } from 'lucide-react';
 import { useAuth } from '../auth';
+import { isSuperUser } from '../lib/permissions';
 import PageHeader from '../components/PageHeader';
 import { ErrorBox } from '../components/StateBox';
 import HydroAdminWorkspace from '../components/HydroAdminWorkspace';
@@ -57,7 +58,7 @@ export default function ManagementPage() {
   const { user } = useAuth();
   const [selected, setSelected] = useState(groups[0].items[0].label);
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
-  if (user?.role !== 'root') return <ErrorBox message="当前账号没有系统管理权限。" />;
+  if (!isSuperUser(user)) return <ErrorBox message="当前账号没有系统管理权限。" />;
 
   const selectedItem = groups.flatMap((group) => group.items).find((item) => item.label === selected);
   return (

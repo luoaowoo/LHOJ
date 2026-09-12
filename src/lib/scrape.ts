@@ -1518,9 +1518,8 @@ export async function submitHydroAdminForm(
   return submitHydro(path, fields, { method, enctype });
 }
 
-export async function scrapeProblemSolutions(pid: string, pageNumber = 1, tid?: string): Promise<ProblemSolutionsResult> {
-  const query = `?page=${pageNumber}${tid ? `&tid=${encodeURIComponent(tid)}` : ''}`;
-  const page = await readHydroPageResponse(`/p/${encodeURIComponent(pid)}/solution${query}`);
+export async function scrapeProblemSolutions(pid: string, pageNumber = 1): Promise<ProblemSolutionsResult> {
+  const page = await readHydroPageResponse(`/p/${encodeURIComponent(pid)}/solution?page=${pageNumber}`);
   if (!page.payload || !Array.isArray(page.payload.psdocs)) return { items: [], pageCount: 1, total: 0 };
   const items = page.payload.psdocs.flatMap((item) => {
     if (!isRecord(item)) return [];
@@ -1554,9 +1553,8 @@ export async function scrapeProblemSolutions(pid: string, pageNumber = 1, tid?: 
   };
 }
 
-export async function scrapeProblemStats(pid: string, tid?: string): Promise<ProblemStat[]> {
-  const query = tid ? `?tid=${encodeURIComponent(tid)}` : '';
-  const page = await readHydroPageResponse(`/p/${encodeURIComponent(pid)}/stat${query}`);
+export async function scrapeProblemStats(pid: string): Promise<ProblemStat[]> {
+  const page = await readHydroPageResponse(`/p/${encodeURIComponent(pid)}/stat`);
   if (!page.payload || !Array.isArray(page.payload.rsdocs)) return [];
   return page.payload.rsdocs.flatMap((item) => {
     if (!isRecord(item)) return [];
@@ -1567,9 +1565,8 @@ export async function scrapeProblemStats(pid: string, tid?: string): Promise<Pro
   });
 }
 
-export async function scrapeProblemFiles(pid: string, tid?: string): Promise<ProblemFile[]> {
-  const query = tid ? `?tid=${encodeURIComponent(tid)}` : '';
-  const page = await readHydroPageResponse(`/p/${encodeURIComponent(pid)}/files${query}`);
+export async function scrapeProblemFiles(pid: string): Promise<ProblemFile[]> {
+  const page = await readHydroPageResponse(`/p/${encodeURIComponent(pid)}/files`);
   if (!page.payload || !Array.isArray(page.payload.fragments)) return [];
   return page.payload.fragments.flatMap((fragment) => {
     if (!isRecord(fragment) || typeof fragment.html !== 'string') return [];

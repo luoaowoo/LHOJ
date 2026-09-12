@@ -3,6 +3,7 @@ import { Link as RouterLink, useParams } from 'react-router-dom';
 import { Accordion, AccordionDetails, AccordionSummary, Alert, Box, Button, Chip, CircularProgress, Divider, LinearProgress, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Stack, Tab, Tabs, TextField, Typography } from '@mui/material';
 import { Bell, CheckCircle2, ChevronDown, CircleUserRound, Globe2, Image, Search, Settings2, ShieldCheck, Trophy, Wrench } from 'lucide-react';
 import { useAuth } from '../auth';
+import { isSuperUser } from '../lib/permissions';
 import HydroWorkspaceButton from '../components/HydroWorkspaceButton';
 import PageHeader from '../components/PageHeader';
 import { ErrorBox, FullPageLoader } from '../components/StateBox';
@@ -299,7 +300,7 @@ export default function UserPage() {
                 )}
               </ListItem>
             ))}
-            {profile.role === 'root' ? (
+            {isSuperUser(profile) ? (
               <ListItem disablePadding>
                 <HydroWorkspaceButton
                   path="/manage"

@@ -6,6 +6,7 @@ import {
 } from '@mui/material';
 import { CalendarDays, Clock3, Plus, RefreshCw, Search, Trophy, Users } from 'lucide-react';
 import { useAuth } from '../auth';
+import { isSuperUser } from '../lib/permissions';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
 import HydroWorkspaceButton from '../components/HydroWorkspaceButton';
 import { contestRuleMeta } from '../lib/contestRule';
@@ -65,7 +66,7 @@ export default function ContestsPage() {
   return <Box>
     <Box sx={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap', mb: 2.4 }}>
       <Box><Typography variant="h4" sx={{ fontWeight: 800, display: 'flex', alignItems: 'center', gap: 1 }}><Trophy size={23} />比赛</Typography><Typography variant="body2" color="text.secondary" sx={{ mt: .45 }}>参加比赛，检验算法能力</Typography></Box>
-      <Stack direction="row" spacing={1}>{(user?.role === 'root' || user?.role === 'admin') ? <HydroWorkspaceButton path="/contest/create" title="创建比赛" variant="contained" startIcon={<Plus size={16} />}>创建比赛</HydroWorkspaceButton> : null}<Button variant="outlined" startIcon={<RefreshCw size={16} />} onClick={() => void load()}>刷新</Button></Stack>
+      <Stack direction="row" spacing={1}>{(isSuperUser(user)) ? <HydroWorkspaceButton path="/contest/create" title="创建比赛" variant="contained" startIcon={<Plus size={16} />}>创建比赛</HydroWorkspaceButton> : null}<Button variant="outlined" startIcon={<RefreshCw size={16} />} onClick={() => void load()}>刷新</Button></Stack>
     </Box>
     {error ? <Box sx={{ mb: 2 }}><ErrorBox message={error} onRetry={() => void load()} /></Box> : null}
     <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: 'minmax(0, 1fr) 300px' }, gap: 2 }}>
@@ -84,7 +85,7 @@ export default function ContestsPage() {
         </Stack> : <EmptyBox message="暂无匹配的比赛" />}
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ px: 2, py: 1.2 }}><Typography variant="caption" color="text.secondary">共 {filtered.length} 场</Typography><Pagination page={page} count={page + ((rows?.length ?? 0) >= 20 ? 1 : 0)} onChange={(_, nextPage) => update({ page: nextPage === 1 ? '' : String(nextPage) })} color="primary" size="small" /></Stack>
       </Paper>
-      <Stack spacing={2}><Paper variant="outlined" sx={{ p: 2.3 }}><Typography variant="h6" sx={{ fontWeight: 800 }}>比赛管理</Typography><Typography variant="body2" color="text.secondary" sx={{ mt: .5, mb: 2 }}>创建和管理你的竞赛活动。</Typography>{(user?.role === 'root' || user?.role === 'admin') ? <HydroWorkspaceButton fullWidth variant="contained" startIcon={<Plus size={17} />} path="/contest/create" title="创建比赛">创建比赛</HydroWorkspaceButton> : <Typography variant="body2" color="text.secondary">管理员可从这里创建比赛</Typography>}</Paper><Paper variant="outlined" sx={{ p: 2.3 }}><Typography variant="h6" sx={{ fontWeight: 800 }}>比赛提示</Typography><Stack spacing={1.1} sx={{ mt: 1.5 }}>{['赛前确认开始时间和赛制', '比赛中可在详情页查看榜单', '提交记录会实时同步评测'].map((item) => <Typography key={item} variant="body2" color="text.secondary">• {item}</Typography>)}</Stack></Paper></Stack>
+      <Stack spacing={2}><Paper variant="outlined" sx={{ p: 2.3 }}><Typography variant="h6" sx={{ fontWeight: 800 }}>比赛管理</Typography><Typography variant="body2" color="text.secondary" sx={{ mt: .5, mb: 2 }}>创建和管理你的竞赛活动。</Typography>{(isSuperUser(user)) ? <HydroWorkspaceButton fullWidth variant="contained" startIcon={<Plus size={17} />} path="/contest/create" title="创建比赛">创建比赛</HydroWorkspaceButton> : <Typography variant="body2" color="text.secondary">管理员可从这里创建比赛</Typography>}</Paper><Paper variant="outlined" sx={{ p: 2.3 }}><Typography variant="h6" sx={{ fontWeight: 800 }}>比赛提示</Typography><Stack spacing={1.1} sx={{ mt: 1.5 }}>{['赛前确认开始时间和赛制', '比赛中可在详情页查看榜单', '提交记录会实时同步评测'].map((item) => <Typography key={item} variant="body2" color="text.secondary">• {item}</Typography>)}</Stack></Paper></Stack>
     </Box>
   </Box>;
 }

@@ -6,6 +6,7 @@ import {
 } from '@mui/material';
 import { ArrowLeft, ChevronDown, ChevronRight, FileText, GraduationCap, Settings2 } from 'lucide-react';
 import { useAuth } from '../auth';
+import { isSuperUser } from '../lib/permissions';
 import PageHeader from '../components/PageHeader';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
 import { difficultyColor } from '../lib/difficulty';
@@ -103,7 +104,7 @@ export default function TrainingDetailPage() {
             >
               训练文件
             </HydroWorkspaceButton>
-            {user?.role === 'root' ? (
+            {isSuperUser(user) ? (
               <HydroWorkspaceButton
                 path={`/training/${encodeURIComponent(training.id)}/edit`}
                 title="编辑训练"

@@ -5,8 +5,8 @@ import {
   Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Tooltip,
   Typography,
 } from '@mui/material';
-import { ArrowLeft, RefreshCw, Save } from 'lucide-react';
-import { hydroPublicUrl } from '../lib/endpoint';
+import { ArrowLeft, ExternalLink, RefreshCw, Save } from 'lucide-react';
+import { hydroNativeUrl, hydroPublicUrl } from '../lib/endpoint';
 import { scrapeAdminPage, submitHydroAdminForm } from '../lib/scrape';
 import type {
   HydroAdminAction, HydroAdminField, HydroAdminForm, HydroAdminPage,
@@ -129,7 +129,10 @@ export default function HydroAdminWorkspace({ path, title }: { path: string; tit
         {history.length > 0 && <Tooltip title="返回"><IconButton size="small" onClick={goBack}><ArrowLeft size={18} /></IconButton></Tooltip>}
         <Box minWidth={0}><Typography variant="h6" fontWeight={700} noWrap>{page.title || title}</Typography><Typography variant="caption" color="text.secondary" noWrap>{currentPath}</Typography></Box>
       </Stack>
-      <Tooltip title="刷新"><IconButton onClick={() => void load()} disabled={loading}><RefreshCw size={18} /></IconButton></Tooltip>
+      <Stack direction="row" alignItems="center" spacing={1}>
+        <Button component="a" href={hydroNativeUrl(currentPath)} target="_blank" rel="noreferrer" size="small" color="inherit" endIcon={<ExternalLink size={15} />}>原生页面</Button>
+        <Tooltip title="刷新"><IconButton onClick={() => void load()} disabled={loading}><RefreshCw size={18} /></IconButton></Tooltip>
+      </Stack>
     </Stack>
     {loading && <Alert severity="info" sx={{ mb: 2 }}>正在刷新...</Alert>}
     {page.actions.length ? <Stack direction="row" flexWrap="wrap" gap={1} sx={{ mb: 2 }}>{page.actions.map((action: HydroAdminAction) => <Button key={action.label} size="small" variant="outlined" disabled={saving} onClick={() => void (async () => {

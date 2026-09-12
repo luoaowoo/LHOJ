@@ -5,8 +5,9 @@ import {
   LinearProgress, Paper, Stack, Switch, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
   Tabs, TextField, Typography,
 } from '@mui/material';
-import { Check, CircleDot, Clock3, Code2, ListChecks, MessageCircleQuestion, Printer, Settings2, Square, Trophy, Users } from 'lucide-react';
+import { Check, CircleDot, Clock3, Code2, ListChecks, Printer, Settings2, Square, Trophy, Users } from 'lucide-react';
 import { useAuth } from '../auth';
+import { isSuperUser } from '../lib/permissions';
 import ConfirmDialog from '../components/ConfirmDialog';
 import HydroAvatar from '../components/HydroAvatar';
 import HydroWorkspaceButton from '../components/HydroWorkspaceButton';
@@ -16,7 +17,7 @@ import ScoreboardTable from '../components/ScoreboardTable';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
 import { fetchContest, localizedContent } from '../lib/api';
 import { contestRuleMeta, contestSchedule, contestState, formatCountdown } from '../lib/contestRule';
-import { hydroAvatarUrl, serverNow } from '../lib/endpoint';
+import { hydroAvatarUrl, hydroNativeUrl, serverNow } from '../lib/endpoint';
 import { formatDate, postHydroForm, scrapeContestParticipants, scrapeContestParticipation, scrapeContestProblems, scrapeContestScoreboard } from '../lib/scrape';
 import type { ContestParticipant, ContestParticipation } from '../lib/scrape';
 import type { HydroContest, HydroProblem, ScoreboardRow } from '../types';
@@ -160,6 +161,27 @@ export default function ContestDetailPage() {
     return () => window.clearInterval(timer);
   }, [contest?.beginAt, contest?.endAt, load]);
 
+  useEffect(() => {
+    if (!contest || tab !== 'scoreboard' || !started) return;
+    let active = true;
+    const refresh = async () => {
+      if (document.visibilityState !== 'visible') return;
+      try {
+        const next = await scrapeContestScoreboard(contestId);
+        if (!active) return;
+        setScoreboard(next);
+        setScoreboardError('');
+      } catch {
+        // Keep the last good scoreboard during a transient refresh failure.
+      }
+    };
+    const timer = window.setInterval(() => void refresh(), 10_000);
+    return () => {
+      active = false;
+      window.clearInterval(timer);
+    };
+  }, [contest, contestId, started, tab]);
+
   if (loading && !contest) return <FullPageLoader />;
   if (error || !contest) return <ErrorBox message={error || '比赛不存在或无权访问。'} onRetry={id ? () => void load() : undefined} />;
 
@@ -173,7 +195,7 @@ export default function ContestDetailPage() {
   const endAt = Date.parse(contest.endAt);
   const canViewScoreboard = Boolean(scoreboard) && !scoreboardError;
   const globalEndAt = Date.parse(participation?.globalEndAt ?? contest.endAt);
-  const isAdmin = user?.role === 'root' || user?.role === 'admin';
+  const isAdmin = isSuperUser(user);
   const canViewCode = isAdmin || (Number.isFinite(globalEndAt) && now >= globalEndAt);
   const canManageContest = isAdmin || user?._id === contest.owner;
 
@@ -235,8 +257,7 @@ export default function ContestDetailPage() {
       {user && participation?.attended ? <FormControlLabel control={<Switch checked={participation.subscribed} disabled={acting} onChange={(_event, checked) => void setSubscribed(checked)} />} label="比赛通知" /> : null}
       {user && participation?.attended && !participation.ended && state.label === '进行中' ? <Button color="error" size="small" startIcon={<Square size={14} />} onClick={() => setEarlyEndOpen(true)} disabled={acting}>结束我的比赛</Button> : null}
       {started && canViewScoreboard ? <HydroWorkspaceButton path={`/contest/${encodeURIComponent(contestId)}/scoreboard`} title="比赛完整榜单" size="small">完整榜单</HydroWorkspaceButton> : null}
-      {canViewCode ? <HydroWorkspaceButton path={`/contest/${encodeURIComponent(contestId)}/code`} title="比赛代码" size="small" startIcon={<Code2 size={15} />}>比赛代码</HydroWorkspaceButton> : null}
-      {user && participation?.attended && started ? <HydroWorkspaceButton path={`/contest/${encodeURIComponent(contestId)}/clarification`} title="比赛答疑" size="small" startIcon={<MessageCircleQuestion size={15} />}>比赛答疑</HydroWorkspaceButton> : null}
+      {canViewCode ? <Button component="a" href={hydroNativeUrl(`/contest/${encodeURIComponent(contestId)}/code`)} size="small" startIcon={<Code2 size={15} />}>比赛代码</Button> : null}
       {user ? <Button onClick={() => setParticipantsOpen(true)} size="small" startIcon={<Users size={15} />}>参赛选手</Button> : null}
       {contest.allowPrint && started ? <HydroWorkspaceButton path={`/contest/${encodeURIComponent(contestId)}/print`} title="打印题面" size="small" startIcon={<Printer size={15} />}>打印题面</HydroWorkspaceButton> : null}
       {canManageContest ? <HydroWorkspaceButton path={`/contest/${encodeURIComponent(contestId)}/edit`} title="编辑比赛" size="small" startIcon={<Settings2 size={15} />}>编辑比赛</HydroWorkspaceButton> : null}

@@ -6,6 +6,7 @@ import {
 } from '@mui/material';
 import { ClipboardList, Plus, RefreshCw } from 'lucide-react';
 import { useAuth } from '../auth';
+import { isSuperUser } from '../lib/permissions';
 import PageHeader from '../components/PageHeader';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
 import HydroWorkspaceButton from '../components/HydroWorkspaceButton';
@@ -51,7 +52,7 @@ export default function HomeworkListPage() {
         subtitle="查看题目、截止时间和作业成绩。"
         actions={(
           <>
-            {user?.role === 'root' ? (
+            {isSuperUser(user) ? (
               <HydroWorkspaceButton path="/homework/create" title="创建作业" variant="contained" startIcon={<Plus size={16} />}>
                 创建作业
               </HydroWorkspaceButton>

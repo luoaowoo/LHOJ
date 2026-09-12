@@ -74,6 +74,7 @@ const userFields = `
   displayName
   mail
   role
+  priv
   loginat
   regat
   avatarUrl

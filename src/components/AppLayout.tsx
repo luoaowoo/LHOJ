@@ -14,6 +14,7 @@ import {
 import { useAuth } from '../auth';
 import { usePreferences } from '../prefs';
 import { hydroAvatarUrl } from '../lib/endpoint';
+import { isSuperUser } from '../lib/permissions';
 import { parseRp, ratingColor } from '../lib/rating';
 import { resolveChromeBg } from '../theme';
 import HydroAvatar from './HydroAvatar';
@@ -124,7 +125,7 @@ export default function AppLayout() {
             ? '站内消息'
           : '主页');
   const mobileNavValue = mobileNavItems.find((item) => active(item.to))?.to ?? 'more';
-  const visibleNavItems = user?.role === 'root'
+  const visibleNavItems = isSuperUser(user)
     ? [...navItems, { to: '/management', label: '管理中心', icon: Wrench }]
     : navItems;
 
