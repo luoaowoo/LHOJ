@@ -6,6 +6,7 @@ import {
   Typography,
 } from '@mui/material';
 import { ArrowLeft, RefreshCw, Save } from 'lucide-react';
+import { hydroPublicUrl } from '../lib/endpoint';
 import { scrapeAdminPage, submitHydroAdminForm } from '../lib/scrape';
 import type {
   HydroAdminAction, HydroAdminField, HydroAdminForm, HydroAdminPage,
@@ -82,10 +83,12 @@ export default function HydroAdminWorkspace({ path, title }: { path: string; tit
   const navigate = (href?: string) => {
     if (!href || href.startsWith('javascript:') || href.startsWith('#')) return;
     try {
-      const url = new URL(href, new URL(currentPath, window.location.origin));
-      if (url.origin !== window.location.origin) return;
+      const url = new URL(href, `http://hydro.local${currentPath}`);
+      const target = url.origin === 'http://hydro.local' ? `${url.pathname}${url.search}${url.hash}` : href;
+      const proxied = hydroPublicUrl(target);
+      if (!proxied.startsWith('/hydro-native/')) return;
       setHistory((old) => [...old, currentPath]);
-      setCurrentPath(`${url.pathname}${url.search}`);
+      setCurrentPath(proxied.slice('/hydro-native'.length) || '/');
     }
     catch { /* Ignore malformed links from upstream HTML. */ }
   };

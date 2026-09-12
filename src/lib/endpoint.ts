@@ -125,7 +125,16 @@ export function hydroUrl(path: string): string {
 }
 
 export function hydroNativeUrl(path: string): string {
-  const normalized = path.startsWith('/') ? path : `/${path}`;
+  let value = path;
+  try {
+    const url = new URL(path);
+    if (url.hostname === new URL(PUBLIC_HYDRO_BASE).hostname || url.host === new URL(FALLBACK_BASE).host) {
+      value = `${url.pathname}${url.search}${url.hash}`;
+    }
+  } catch {
+    // Relative paths are handled below.
+  }
+  const normalized = value.startsWith('/') ? value : `/${value}`;
   const nativePath = normalized.startsWith('/hydro-native/')
     ? normalized.slice('/hydro-native'.length)
     : normalized;
