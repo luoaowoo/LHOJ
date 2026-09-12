@@ -1236,7 +1236,7 @@ function actionFromElement(
     label: clean(element.textContent) || clean(element.getAttribute('aria-label')) || value || name || '操作',
     action,
     fields,
-    method: (element.getAttribute('formmethod') || form?.getAttribute('method') || 'POST').toUpperCase(),
+    method: (element.getAttribute('formmethod') || form?.getAttribute('method') || (href ? 'GET' : 'POST')).toUpperCase(),
     href,
   };
 }
