@@ -9,6 +9,8 @@ test('Hydro native URLs are always same-origin and idempotent', () => {
   assert.equal(hydroNativeUrl('/hydro-native/login'), '/hydro-native/login');
   assert.equal(hydroPublicUrl('/contest/1?view=all'), '/hydro-native/contest/1?view=all');
   assert.equal(hydroContentUrl('/hydro-native/file/1/a.zip'), '/hydro-native/file/1/a.zip');
+  assert.equal(hydroNativeUrl('http://64.90.0.223:801/contest/1?view=all'), '/hydro-native/contest/1?view=all');
+  assert.equal(hydroPublicUrl('https://oj.luoaowoo.cn/p/1/edit'), '/hydro-native/p/1/edit');
 });
 
 test('workspace targets reject external and protocol-relative paths', () => {
