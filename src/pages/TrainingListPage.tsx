@@ -6,6 +6,7 @@ import {
 } from '@mui/material';
 import { GraduationCap, Plus, RefreshCw, Search } from 'lucide-react';
 import { useAuth } from '../auth';
+import { isSuperUser } from '../lib/permissions';
 import PageHeader from '../components/PageHeader';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
 import HydroWorkspaceButton from '../components/HydroWorkspaceButton';
@@ -52,7 +53,7 @@ export default function TrainingListPage() {
         subtitle="按章节循序完成题目，记录自己的训练进度。"
         actions={(
           <>
-            {user?.role === 'root' ? (
+            {isSuperUser(user) ? (
               <HydroWorkspaceButton path="/training/create" title="创建训练" variant="contained" startIcon={<Plus size={16} />}>
                 创建训练
               </HydroWorkspaceButton>

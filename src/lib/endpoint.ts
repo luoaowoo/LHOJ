@@ -125,7 +125,16 @@ export function hydroUrl(path: string): string {
 }
 
 export function hydroNativeUrl(path: string): string {
-  const normalized = path.startsWith('/') ? path : `/${path}`;
+  let value = path;
+  try {
+    const url = new URL(path);
+    if (url.hostname === new URL(PUBLIC_HYDRO_BASE).hostname || url.host === new URL(FALLBACK_BASE).host) {
+      value = `${url.pathname}${url.search}${url.hash}`;
+    }
+  } catch {
+    // Relative paths are handled below.
+  }
+  const normalized = value.startsWith('/') ? value : `/${value}`;
   const nativePath = normalized.startsWith('/hydro-native/')
     ? normalized.slice('/hydro-native'.length)
     : normalized;
@@ -175,16 +184,16 @@ export function hydroAssetUrl(value?: string): string | undefined {
 }
 
 export function hydroAvatarUrl(value: string | undefined, userId: number): string {
-  // Same-origin so the browser doesn't block it as mixed content on HTTPS.
-  // /hydro-native is proxied to Hydro in both the Vite dev server and Caddy.
-  const uploaded = hydroNativeUrl(`/file/${encodeURIComponent(String(userId))}/.avatar.jpg`);
+  // Hydro avatars are served directly by the upstream instance. The public
+  // domain proxy can return stale signed URLs or gateway errors for storage.
+  const uploaded = `${FALLBACK_BASE}/file/${encodeURIComponent(String(userId))}/.avatar.jpg`;
   if (value) {
     try {
       const normalized = value.startsWith('url:') ? value.slice(4) : value;
       const url = new URL(normalized, PUBLIC_HYDRO_BASE);
       if (url.hostname === new URL(PUBLIC_HYDRO_BASE).hostname || url.host === new URL(FALLBACK_BASE).host) {
-        const proxied = hydroNativeUrl(`${url.pathname}${url.search}${url.hash}`);
-        return avatarRevision ? `${proxied}${proxied.includes('?') ? '&' : '?'}v=${avatarRevision}` : proxied;
+        const direct = `${FALLBACK_BASE}${url.pathname}${url.search}${url.hash}`;
+        return avatarRevision ? `${direct}${direct.includes('?') ? '&' : '?'}v=${avatarRevision}` : direct;
       }
       if (url.hostname === 'cn.gravatar.com') url.hostname = 'www.gravatar.com';
       if (url.protocol === 'http:' || url.protocol === 'https:') return url.toString();

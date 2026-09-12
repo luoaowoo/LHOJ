@@ -6,6 +6,9 @@ export interface HydroUser {
   displayName?: string;
   mail?: string;
   role?: string;
+  priv?: number | string;
+  perm?: string;
+  scope?: string;
   avatarUrl?: string;
   loginat?: string;
   regat?: string;

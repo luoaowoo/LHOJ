@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&amp;family=Roboto+Flex:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"on-secondary-fixed":"#131c2a","surface-container-lowest":"#0b0e11","surface":"#111417","outline":"#8d9199","verdict-re-container":"#4c0519","inverse-on-surface":"#2e3134","verdict-re":"#fb7185","surface-container":"#1d2024","tertiary":"#a3eefb","secondary-container":"#40495a","surface-bright":"#37393d","error-container":"#93000a","verdict-ac":"#4ade80","on-error":"#690005","verdict-ac-container":"#052e16","surface-variant":"#323538","primary-fixed":"#d4e3ff","on-tertiary-container":"#005b65","tertiary-fixed":"#a3effb","on-primary-fixed-variant":"#264872","outline-variant":"#43474e","surface-container-highest":"#323539","surface-dim":"#111417","on-tertiary":"#00363d","secondary":"#bec7db","on-surface":"#e1e2e7","verdict-tle":"#fb923c","surface-container-low":"#191c1f","verdict-tle-container":"#431407","on-secondary":"#283140","verdict-mle":"#c084fc","secondary-fixed-dim":"#bec7db","secondary-fixed":"#dae3f7","on-background":"#e1e2e7","primary":"#d3e3ff","on-tertiary-fixed-variant":"#004f57","tertiary-container":"#87d2de","verdict-ce":"#fbbf24","tertiary-fixed-dim":"#87d2de","on-secondary-container":"#b0b9cc","verdict-wa":"#f87171","on-primary-fixed":"#001c39","on-surface-variant":"#c3c6d0","on-primary":"#09315a","verdict-wa-container":"#450a0a","verdict-mle-container":"#3b0764","primary-fixed-dim":"#a8c8f9","primary-container":"#a8c8f9","surface-container-high":"#272a2e","on-primary-container":"#c1d9ff","on-tertiary-fixed":"#001f24","on-error-container":"#ffdad6","on-secondary-fixed-variant":"#3e4757","background":"#111417","inverse-surface":"#e1e2e7","verdict-pend-container":"#1e293b","surface-tint":"#a8c8f9","verdict-pend":"#94a3b8","inverse-primary":"#40608b","verdict-ce-container":"#451a03","error":"#ffb4ab"},"borderRadius":{"DEFAULT":"1rem","lg":"2rem","xl":"3rem","full":"9999px"},"spacing":{"rail-width":"5rem","spacing-64":"4rem","gutter-compact":"1rem","spacing-8":"0.5rem","spacing-32":"2rem","gutter-medium":"1.5rem","spacing-20":"1.25rem","spacing-16":"1rem","spacing-48":"3rem","spacing-12":"0.75rem","gutter-expanded":"1.5rem","spacing-4":"0.25rem","nav-bar-height":"5rem","spacing-24":"1.5rem"},"fontFamily":{"headline-sm":["Roboto Flex"],"body-lg":["Roboto Flex"],"headline-lg-mobile":["Roboto Flex"],"title-sm":["Roboto Flex"],"body-md":["Roboto Flex"],"display-lg":["Roboto Flex"],"body-sm":["Roboto Flex"],"label-lg":["JetBrains Mono"],"label-md":["JetBrains Mono"],"title-md":["Roboto Flex"],"label-sm":["JetBrains Mono"],"headline-md":["Roboto Flex"],"code-body":["JetBrains Mono"],"title-lg":["Roboto Flex"],"headline-lg":["Roboto Flex"]},"fontSize":{"headline-sm":["24px",{"lineHeight":"32px","letterSpacing":"0px","fontWeight":"500"}],"body-lg":["16px",{"lineHeight":"24px","letterSpacing":"0.5px","fontWeight":"400"}],"headline-lg-mobile":["26px",{"lineHeight":"32px","letterSpacing":"0px","fontWeight":"600"}],"title-sm":["14px",{"lineHeight":"20px","letterSpacing":"0.1px","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","letterSpacing":"0.25px","fontWeight":"400"}],"display-lg":["57px",{"lineHeight":"64px","letterSpacing":"-0.25px","fontWeight":"400"}],"body-sm":["12px",{"lineHeight":"16px","letterSpacing":"0.4px","fontWeight":"400"}],"label-lg":["14px",{"lineHeight":"20px","letterSpacing":"0.1px","fontWeight":"500"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.5px","fontWeight":"500"}],"title-md":["16px",{"lineHeight":"24px","letterSpacing":"0.15px","fontWeight":"600"}],"label-sm":["11px",{"lineHeight":"16px","letterSpacing":"0.5px","fontWeight":"600"}],"headline-md":["28px",{"lineHeight":"36px","letterSpacing":"0px","fontWeight":"600"}],"code-body":["13.5px",{"lineHeight":"22px","letterSpacing":"0px","fontWeight":"400"}],"title-lg":["22px",{"lineHeight":"28px","letterSpacing":"0px","fontWeight":"500"}],"headline-lg":["32px",{"lineHeight":"40px","letterSpacing":"0px","fontWeight":"600"}]}}}};</script></head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased min-h-screen flex flex-col"><header class="fixed top-0 left-0 right-0 z-50 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-20 max-w-7xl mx-auto px-gutter-expanded flex items-center justify-between gap-spacing-16"><div class="flex items-center gap-spacing-16 flex-shrink-0"><div class="flex items-center gap-spacing-8"><img alt="Brand logo. - Primary color: #3e5f8a
+- Font: robotoFlex
+- Mode: dark
+- Roundness: rounded-md
+" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1W4J57u3yE0IiUyrfyAN_guPsH4QWV3UQ5ZwsuGuXe8yRVlwMr-GugJdplAJQ2TfP-wS8_dIN3kkxzdHBuvAyH-fPNf51TDchBqMt4TdabfS0k-BnieATt6T2gJy9wcx3mDmsHMHBzn3CQyOKUVMgXuLT9V8MfqS9LB7SXlDEqvkodKFUFak8nLPeLvfgM4V3WI8ZLddvJe6f3OVNMrCgRreMtsG9n1SMz1BIhFzDkniLI6YZCFpFYqQSw"/><div class="flex flex-col"><span class="font-title-md text-title-md text-on-surface tracking-tight leading-none">AlgoMaterial OJ</span><span class="font-label-sm text-label-sm text-tertiary mt-spacing-4">Material 3 / Monet</span></div></div><div class="h-6 w-px bg-outline-variant hidden lg:block"></div><nav class="hidden xl:flex items-center gap-spacing-4" data-active-classes="bg-secondary-container text-on-secondary-container font-medium rounded-full"><a class="px-spacing-16 py-spacing-8 rounded-full font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-path="home" href="#">首页</a><a aria-current="page" class="px-spacing-16 py-spacing-8 transition-all bg-secondary-container text-on-secondary-container font-medium rounded-full" data-path="problemset" href="#">题库</a><a class="px-spacing-16 py-spacing-8 rounded-full font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-path="contests" href="#">比赛</a><a class="px-spacing-16 py-spacing-8 rounded-full font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-path="status" href="#">评测</a><a class="px-spacing-16 py-spacing-8 rounded-full font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-path="ranklist" href="#">排名</a><a class="px-spacing-16 py-spacing-8 rounded-full font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-path="discuss" href="#">讨论</a></nav></div><div class="hidden md:flex items-center flex-1 max-w-xs mx-spacing-12"><div class="w-full flex items-center justify-between px-spacing-16 py-spacing-8 bg-surface-container rounded-full text-on-surface-variant hover:bg-surface-container-high transition-colors cursor-pointer"><div class="flex items-center gap-spacing-8"><span class="material-symbols-outlined text-[18px] text-on-surface-variant">search</span><span class="font-body-sm text-body-sm text-on-surface-variant">快速检索题目 / 算法...</span></div><kbd class="px-spacing-8 py-0.5 rounded-full bg-surface-container-highest text-on-surface font-label-sm text-label-sm">Ctrl+K</kbd></div></div><div class="flex items-center gap-spacing-12 flex-shrink-0"><div class="hidden sm:flex items-center gap-spacing-4 px-spacing-8 py-1 rounded-full bg-surface-container"><button class="w-5 h-5 rounded-full bg-[#3B82F6] hover:scale-110 transition-transform" title="Classic M3 Blue" type="button"></button><button class="w-5 h-5 rounded-full bg-[#10B981] hover:scale-110 transition-transform" title="Emerald Green" type="button"></button><button class="w-5 h-5 rounded-full bg-[#8B5CF6] hover:scale-110 transition-transform" title="Purple" type="button"></button><button class="w-5 h-5 rounded-full bg-[#F43F5E] hover:scale-110 transition-transform" title="Coral Red" type="button"></button><button class="w-5 h-5 rounded-full bg-[#F59E0B] hover:scale-110 transition-transform" title="Amber" type="button"></button></div><button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">dark_mode</span></button><div class="relative"><button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">notifications</span></button><span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-error"></span></div><div class="flex items-center gap-spacing-8 pl-spacing-4"><div class="hidden lg:flex flex-col items-end"><span class="font-label-sm text-label-sm text-on-surface">tourist_m3</span><span class="font-label-sm text-label-sm text-verdict-ce font-semibold">1840 Master</span></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></div></header><main class="w-full pt-20 flex-1 bg-surface"><div class="flex flex-col w-full">
+<div class="max-w-7xl mx-auto w-full px-gutter-expanded py-spacing-32 flex flex-col gap-spacing-32">
+<!-- Top Action Bar -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-spacing-16">
+<div class="flex flex-col gap-spacing-4">
+<div class="flex items-center gap-spacing-8">
+<span class="px-spacing-8 py-spacing-4 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">SYSTEM CONFIG v3.4</span>
+<span class="flex h-2 w-2 rounded-full bg-tertiary"></span>
+<span class="font-label-sm text-label-sm text-tertiary">Monet Engine 4.1 Synchronized</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">首选项与外观控制台</h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">自定义 Material You 动态语义取色、代码编辑器集成与算法评测实验室交互体验，所有变动实时生效于当前工作区。</p>
+</div>
+<div class="flex items-center gap-spacing-12 flex-shrink-0">
+<button class="h-10 px-spacing-20 rounded-full bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-title-sm text-title-sm transition-all flex items-center gap-spacing-8 shadow-sm" id="btn-reset" type="button">
+<span class="material-symbols-outlined text-[18px]">restart_alt</span>
+<span>恢复默认</span>
+</button>
+<button class="h-10 px-spacing-24 rounded-full bg-primary hover:bg-primary-fixed text-on-primary font-title-sm text-title-sm transition-all flex items-center gap-spacing-8 shadow-md" id="btn-save" type="button">
+<span class="material-symbols-outlined text-[18px]">check</span>
+<span>应用并保存</span>
+</button>
+</div>
+</div>
+<!-- Main Layout Bento Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-spacing-24 items-start">
+<!-- Left Column: Detailed Settings (7 cols) -->
+<div class="lg:col-span-7 flex flex-col gap-spacing-24">
+<!-- Card: Monet Palette & Theme Engine -->
+<section class="rounded-3xl bg-surface-container p-spacing-24 flex flex-col gap-spacing-20 shadow-sm relative overflow-hidden">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-spacing-12">
+<div class="w-10 h-10 rounded-2xl bg-primary-container text-on-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-[22px]">palette</span>
+</div>
+<div class="flex flex-col">
+<h2 class="font-title-lg text-title-lg text-on-surface">Material You 动态色彩</h2>
+<span class="font-body-sm text-body-sm text-on-surface-variant">基于 Android 14 Monet 色彩衍生算法自动映射</span>
+</div>
+</div>
+<span class="px-spacing-12 py-1 rounded-full bg-surface-container-highest text-primary font-label-sm text-label-sm">Dynamic CAM16</span>
+</div>
+<!-- Color Presets -->
+<div class="flex flex-col gap-spacing-12">
+<span class="font-title-sm text-title-sm text-on-surface">种子调色板 (Seed Presets)</span>
+<div class="grid grid-cols-3 sm:grid-cols-6 gap-spacing-12" id="palette-selector">
+<button class="palette-swatch flex flex-col items-center gap-spacing-8 p-spacing-12 rounded-2xl bg-surface-container-high hover:bg-surface-container-highest transition-all group active-palette" data-color="#3B82F6" type="button">
+<div class="w-10 h-10 rounded-full bg-[#3B82F6] flex items-center justify-center shadow-inner">
+<span class="material-symbols-outlined text-white text-[18px] swatch-check">check</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface group-hover:text-primary">Google 蓝</span>
+</button>
+<button class="palette-swatch flex flex-col items-center gap-spacing-8 p-spacing-12 rounded-2xl bg-surface-container-high hover:bg-surface-container-highest transition-all group" data-color="#10B981" type="button">
+<div class="w-10 h-10 rounded-full bg-[#10B981] flex items-center justify-center shadow-inner">
+<span class="material-symbols-outlined text-white text-[18px] swatch-check hidden">check</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface group-hover:text-primary">翡翠绿</span>
+</button>
+<button class="palette-swatch flex flex-col items-center gap-spacing-8 p-spacing-12 rounded-2xl bg-surface-container-high hover:bg-surface-container-highest transition-all group" data-color="#06B6D4" type="button">
+<div class="w-10 h-10 rounded-full bg-[#06B6D4] flex items-center justify-center shadow-inner">
+<span class="material-symbols-outlined text-white text-[18px] swatch-check hidden">check</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface group-hover:text-primary">薄荷青</span>
+</button>
+<button class="palette-swatch flex flex-col items-center gap-spacing-8 p-spacing-12 rounded-2xl bg-surface-container-high hover:bg-surface-container-highest transition-all group" data-color="#8B5CF6" type="button">
+<div class="w-10 h-10 rounded-full bg-[#8B5CF6] flex items-center justify-center shadow-inner">
+<span class="material-symbols-outlined text-white text-[18px] swatch-check hidden">check</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface group-hover:text-primary">薰衣草</span>
+</button>
+<button class="palette-swatch flex flex-col items-center gap-spacing-8 p-spacing-12 rounded-2xl bg-surface-container-high hover:bg-surface-container-highest transition-all group" data-color="#F59E0B" type="button">
+<div class="w-10 h-10 rounded-full bg-[#F59E0B] flex items-center justify-center shadow-inner">
+<span class="material-symbols-outlined text-white text-[18px] swatch-check hidden">check</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface group-hover:text-primary">琥珀金</span>
+</button>
+<button class="palette-swatch flex flex-col items-center gap-spacing-8 p-spacing-12 rounded-2xl bg-surface-container-high hover:bg-surface-container-highest transition-all group" data-color="#F43F5E" type="button">
+<div class="w-10 h-10 rounded-full bg-[#F43F5E] flex items-center justify-center shadow-inner">
+<span class="material-symbols-outlined text-white text-[18px] swatch-check hidden">check</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface group-hover:text-primary">珊瑚红</span>
+</button>
+</div>
+</div>
+<!-- Color Sources: Wallpaper extraction & Hex Seed -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-spacing-12 pt-spacing-4">
+<div class="p-spacing-16 rounded-2xl bg-surface-container-low flex flex-col gap-spacing-12">
+<div class="flex items-center justify-between">
+<span class="font-title-sm text-title-sm text-on-surface">桌面壁纸色谱提取</span>
+<span class="material-symbols-outlined text-[20px] text-tertiary">wallpaper</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">从当前上传的背景图提取主色基底与高阶互补色阶。</p>
+<div class="flex items-center gap-spacing-8 mt-auto">
+<button class="h-9 px-spacing-16 rounded-full bg-secondary-container text-on-secondary-container font-title-sm text-title-sm hover:opacity-90 transition-all flex items-center gap-spacing-4" type="button">
+<span class="material-symbols-outlined text-[16px]">upload_file</span>
+<span>选择图片</span>
+</button>
+<span class="font-label-sm text-label-sm text-on-surface-variant truncate">wallpaper_matrix.png</span>
+</div>
+</div>
+<div class="p-spacing-16 rounded-2xl bg-surface-container-low flex flex-col gap-spacing-12">
+<div class="flex items-center justify-between">
+<span class="font-title-sm text-title-sm text-on-surface">自定义种子 HEX</span>
+<span class="material-symbols-outlined text-[20px] text-primary">colorize</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">输入自定义 Hex 原色实时计算 13 阶 Harmonized Tones。</p>
+<div class="flex items-center gap-spacing-8 mt-auto">
+<input class="w-full h-9 px-spacing-12 rounded-full bg-surface-container-highest text-on-surface font-label-md text-label-md outline-none focus:bg-surface-bright transition-colors" id="hex-seed-input" type="text" value="#3E5F8A"/>
+<button class="h-9 px-spacing-16 rounded-full bg-primary-container text-on-primary-container font-title-sm text-title-sm hover:opacity-90 flex-shrink-0" id="apply-hex" type="button">
+                  演算
+                </button>
+</div>
+</div>
+</div>
+<!-- Brightness and Contrast Controls -->
+<div class="pt-spacing-8 flex flex-col gap-spacing-16">
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-title-sm text-title-sm text-on-surface">界面光暗模式 (Theme Mode)</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Material 3 Tonal Surface 映射</span>
+</div>
+<!-- Segmented Button -->
+<div class="flex items-center p-1 rounded-full bg-surface-container-lowest">
+<button class="h-8 px-spacing-12 rounded-full text-on-surface-variant hover:text-on-surface font-label-md text-label-md transition-colors flex items-center gap-spacing-4" type="button">
+<span class="material-symbols-outlined text-[16px]">light_mode</span>
+<span>浅色</span>
+</button>
+<button class="h-8 px-spacing-16 rounded-full bg-secondary-container text-on-secondary-container font-label-md text-label-md transition-colors flex items-center gap-spacing-4 shadow-sm" type="button">
+<span class="material-symbols-outlined text-[16px]">dark_mode</span>
+<span>深色</span>
+</button>
+<button class="h-8 px-spacing-12 rounded-full text-on-surface-variant hover:text-on-surface font-label-md text-label-md transition-colors flex items-center gap-spacing-4" type="button">
+<span class="material-symbols-outlined text-[16px]">brightness_auto</span>
+<span>跟随系统</span>
+</button>
+</div>
+</div>
+<!-- WCAG High Contrast Toggle -->
+<div class="p-spacing-16 rounded-2xl bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-spacing-12">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-[20px]">contrast</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-spacing-8">
+<span class="font-title-sm text-title-sm text-on-surface">高对比度增强模式 (High Contrast)</span>
+<span class="px-spacing-8 py-0.5 rounded-full bg-tertiary-container text-on-tertiary-container font-label-sm text-label-sm">WCAG AAA</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">拉大背景 Surface 与前景文本亮度差，抑制视觉重叠并强化评测状态识别</span>
+</div>
+</div>
+<button class="w-12 h-6 rounded-full bg-secondary-container p-1 transition-colors relative flex items-center" id="toggle-contrast" type="button">
+<div class="w-4 h-4 rounded-full bg-on-secondary-container transition-transform"></div>
+</button>
+</div>
+</div>
+</section>
+<!-- Card: IDE & Judge Preferences -->
+<section class="rounded-3xl bg-surface-container p-spacing-24 flex flex-col gap-spacing-20 shadow-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-spacing-12">
+<div class="w-10 h-10 rounded-2xl bg-primary-container text-on-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-[22px]">code</span>
+</div>
+<div class="flex flex-col">
+<h2 class="font-title-lg text-title-lg text-on-surface">代码实验室与评测偏好</h2>
+<span class="font-body-sm text-body-sm text-on-surface-variant">针对算法竞赛与快速写题优化的 IDE 行为</span>
+</div>
+</div>
+<span class="px-spacing-12 py-1 rounded-full bg-surface-container-highest text-on-surface-variant font-label-sm text-label-sm">Monaco Core 0.44</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-spacing-16">
+<!-- Editor Theme -->
+<div class="flex flex-col gap-spacing-8">
+<label class="font-title-sm text-title-sm text-on-surface">编辑器配色主题</label>
+<div class="relative">
+<select class="w-full h-12 px-spacing-16 rounded-2xl bg-surface-container-highest text-on-surface font-body-md text-body-md outline-none appearance-none cursor-pointer">
+<option selected="">Material Oceanic Dark (推荐)</option>
+<option>Monokai Pro Algorithmic</option>
+<option>GitHub Dark Default</option>
+<option>Catppuccin Macchiato</option>
+<option>Monet Daylight Minimal</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-3 pointer-events-none text-on-surface-variant">expand_more</span>
+</div>
+</div>
+<!-- Default Language -->
+<div class="flex flex-col gap-spacing-8">
+<label class="font-title-sm text-title-sm text-on-surface">默认编程语言</label>
+<div class="relative">
+<select class="w-full h-12 px-spacing-16 rounded-2xl bg-surface-container-highest text-on-surface font-body-md text-body-md outline-none appearance-none cursor-pointer">
+<option selected="">C++20 (GCC 13.2 with O3)</option>
+<option>Rust 1.76 (2021 Edition)</option>
+<option>Python 3.12 (PyPy3 Standard)</option>
+<option>Java 21 (OpenJDK HotSpot)</option>
+<option>Go 1.22 FastIO</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-3 pointer-events-none text-on-surface-variant">expand_more</span>
+</div>
+</div>
+<!-- Font Family -->
+<div class="flex flex-col gap-spacing-8">
+<label class="font-title-sm text-title-sm text-on-surface">代码字体</label>
+<div class="relative">
+<select class="w-full h-12 px-spacing-16 rounded-2xl bg-surface-container-highest text-on-surface font-body-md text-body-md outline-none appearance-none cursor-pointer">
+<option selected="">JetBrains Mono (Ligatures Enabled)</option>
+<option>Fira Code Retina</option>
+<option>Roboto Mono Flex</option>
+<option>Cascadia Code PL</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-3 pointer-events-none text-on-surface-variant">expand_more</span>
+</div>
+</div>
+<!-- Tab Size & Indent -->
+<div class="flex flex-col gap-spacing-8">
+<label class="font-title-sm text-title-sm text-on-surface">Tab 缩进风格</label>
+<div class="flex items-center gap-spacing-8 h-12">
+<button class="flex-1 h-full rounded-2xl bg-secondary-container text-on-secondary-container font-label-md text-label-md flex items-center justify-center gap-spacing-4" type="button">
+<span>2 空格 (Google)</span>
+</button>
+<button class="flex-1 h-full rounded-2xl bg-surface-container-highest hover:bg-surface-bright text-on-surface-variant font-label-md text-label-md flex items-center justify-center gap-spacing-4 transition-colors" type="button">
+<span>4 空格 (K&amp;R)</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Judge Streaming & Feedback Protocol -->
+<div class="pt-spacing-8 flex flex-col gap-spacing-12">
+<span class="font-title-sm text-title-sm text-on-surface">评测实时推送引擎</span>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-spacing-12">
+<div class="p-spacing-16 rounded-2xl bg-surface-container-low flex items-start gap-spacing-12 cursor-pointer hover:bg-surface-container-high transition-all">
+<div class="mt-0.5 w-5 h-5 rounded-full bg-verdict-ac flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[14px] text-surface-container-lowest font-bold">check</span>
+</div>
+<div class="flex flex-col">
+<span class="font-title-sm text-title-sm text-on-surface">WebSocket 毫秒级流式推送</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-1">每个测试用例状态独立派发，支持逐个点亮 AC / WA 徽章</span>
+</div>
+</div>
+<div class="p-spacing-16 rounded-2xl bg-surface-container-low flex items-start gap-spacing-12 cursor-pointer hover:bg-surface-container-high transition-all">
+<div class="mt-0.5 w-5 h-5 rounded-full bg-surface-container-highest flex items-center justify-center flex-shrink-0"></div>
+<div class="flex flex-col">
+<span class="font-title-sm text-title-sm text-on-surface">HTTP2 SSE 长轮询回退</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-1">适用于校园内网或代理防火墙限制环境</span>
+</div>
+</div>
+</div>
+<!-- Toggles for Sounds & Ligatures -->
+<div class="flex flex-col sm:flex-row gap-spacing-12 pt-spacing-4">
+<div class="flex-1 p-spacing-12 rounded-2xl bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-spacing-8">
+<span class="material-symbols-outlined text-[20px] text-tertiary">volume_up</span>
+<span class="font-body-md text-body-md text-on-surface">评测完成声音提示 (Chime)</span>
+</div>
+<div class="w-10 h-5 rounded-full bg-primary-container p-0.5 flex items-center justify-end cursor-pointer">
+<div class="w-4 h-4 rounded-full bg-on-primary-container"></div>
+</div>
+</div>
+<div class="flex-1 p-spacing-12 rounded-2xl bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-spacing-8">
+<span class="material-symbols-outlined text-[20px] text-primary">font_download</span>
+<span class="font-body-md text-body-md text-on-surface">启用编程连字 (Ligatures)</span>
+</div>
+<div class="w-10 h-5 rounded-full bg-primary-container p-0.5 flex items-center justify-end cursor-pointer">
+<div class="w-4 h-4 rounded-full bg-on-primary-container"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Card: Privacy & Community Preferences -->
+<section class="rounded-3xl bg-surface-container p-spacing-24 flex flex-col gap-spacing-20 shadow-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-spacing-12">
+<div class="w-10 h-10 rounded-2xl bg-primary-container text-on-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-[22px]">security</span>
+</div>
+<div class="flex flex-col">
+<h2 class="font-title-lg text-title-lg text-on-surface">隐私与社交设置</h2>
+<span class="font-body-sm text-body-sm text-on-surface-variant">代码开源度、排行榜称谓与训练进度打卡</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline">verified_user</span>
+</div>
+<div class="flex flex-col gap-spacing-16">
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-spacing-8 p-spacing-16 rounded-2xl bg-surface-container-low">
+<div class="flex flex-col">
+<span class="font-title-sm text-title-sm text-on-surface">代码提交公开策略</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">控制其他用户是否能在状态列表查看你的完整源码</span>
+</div>
+<div class="flex items-center gap-spacing-8">
+<button class="h-8 px-spacing-12 rounded-full bg-secondary-container text-on-secondary-container font-label-md text-label-md" type="button">全部公开</button>
+<button class="h-8 px-spacing-12 rounded-full bg-surface-container-highest text-on-surface-variant hover:text-on-surface font-label-md text-label-md" type="button">仅关注者</button>
+<button class="h-8 px-spacing-12 rounded-full bg-surface-container-highest text-on-surface-variant hover:text-on-surface font-label-md text-label-md" type="button">完全私有</button>
+</div>
+</div>
+<div class="flex items-center justify-between p-spacing-16 rounded-2xl bg-surface-container-low">
+<div class="flex flex-col">
+<span class="font-title-sm text-title-sm text-on-surface">天梯排位赛匿名模式</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">在 ICPC / Codeforces 规则实时滚榜时使用随机选手编号隐蔽身份</span>
+</div>
+<div class="w-10 h-5 rounded-full bg-surface-container-highest p-0.5 flex items-center justify-start cursor-pointer">
+<div class="w-4 h-4 rounded-full bg-outline"></div>
+</div>
+</div>
+<div class="flex items-center justify-between p-spacing-16 rounded-2xl bg-surface-container-low">
+<div class="flex flex-col">
+<span class="font-title-sm text-title-sm text-on-surface">每日连续打卡提醒推送</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">每晚 21:00 未解出每日一题时通过 Webhook 发送提醒通知</span>
+</div>
+<div class="w-10 h-5 rounded-full bg-primary-container p-0.5 flex items-center justify-end cursor-pointer">
+<div class="w-4 h-4 rounded-full bg-on-primary-container"></div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Real-time Live Sandbox Card (5 cols sticky) -->
+<div class="lg:col-span-5 flex flex-col gap-spacing-24 sticky top-24">
+<div class="rounded-3xl bg-surface-container p-spacing-24 flex flex-col gap-spacing-20 shadow-lg">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-spacing-8">
+<span class="w-2.5 h-2.5 rounded-full bg-verdict-ac animate-ping"></span>
+<span class="font-title-md text-title-md text-on-surface">实时色彩沙箱 (Live Preview)</span>
+</div>
+<span class="font-label-sm text-label-sm text-tertiary">Token Visualizer</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            此区域由当前选取的种子色动态驱动，确保组件具有高对比度与 WCAG AA/AAA 合规性，杜绝文字混淆。
+          </p>
+<!-- Component Showcase: Buttons -->
+<div class="p-spacing-16 rounded-2xl bg-surface-container-low flex flex-col gap-spacing-12">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">交互按钮阶层</span>
+<div class="flex flex-wrap items-center gap-spacing-12">
+<button class="h-10 px-spacing-20 rounded-full bg-primary text-on-primary font-title-sm text-title-sm shadow-sm hover:opacity-95" type="button">
+                Primary Button
+              </button>
+<button class="h-10 px-spacing-20 rounded-full bg-secondary-container text-on-secondary-container font-title-sm text-title-sm hover:opacity-90" type="button">
+                Tonal Button
+              </button>
+<button class="h-10 px-spacing-16 rounded-full bg-surface-container-high text-primary font-title-sm text-title-sm flex items-center gap-spacing-4 hover:bg-surface-container-highest" type="button">
+<span class="material-symbols-outlined text-[18px]">terminal</span>
+<span>Run Tests</span>
+</button>
+</div>
+</div>
+<!-- Component Showcase: Verdict Chips -->
+<div class="p-spacing-16 rounded-2xl bg-surface-container-low flex flex-col gap-spacing-12">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">评测状态标签 (Judge Verdicts)</span>
+<div class="flex flex-wrap items-center gap-spacing-8">
+<span class="h-6 px-spacing-12 rounded-full bg-verdict-ac-container text-verdict-ac font-label-sm text-label-sm flex items-center gap-spacing-4 font-semibold">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+<span>Accepted (AC)</span>
+</span>
+<span class="h-6 px-spacing-12 rounded-full bg-verdict-wa-container text-verdict-wa font-label-sm text-label-sm flex items-center gap-spacing-4 font-semibold">
+<span class="material-symbols-outlined text-[14px]">cancel</span>
+<span>Wrong Answer</span>
+</span>
+<span class="h-6 px-spacing-12 rounded-full bg-verdict-tle-container text-verdict-tle font-label-sm text-label-sm flex items-center gap-spacing-4 font-semibold">
+<span class="material-symbols-outlined text-[14px]">timer</span>
+<span>TLE 1000ms</span>
+</span>
+<span class="h-6 px-spacing-12 rounded-full bg-verdict-ce-container text-verdict-ce font-label-sm text-label-sm flex items-center gap-spacing-4 font-semibold">
+<span class="material-symbols-outlined text-[14px]">error</span>
+<span>Compilation Err</span>
+</span>
+</div>
+</div>
+<!-- Mini Code Editor Preview Mockup -->
+<div class="rounded-2xl bg-surface-container-lowest overflow-hidden shadow-inner flex flex-col">
+<div class="px-spacing-16 py-spacing-8 bg-surface-container-high flex items-center justify-between">
+<div class="flex items-center gap-spacing-8">
+<span class="w-3 h-3 rounded-full bg-error/70"></span>
+<span class="w-3 h-3 rounded-full bg-verdict-ce/70"></span>
+<span class="w-3 h-3 rounded-full bg-verdict-ac/70"></span>
+<span class="font-label-sm text-label-sm text-on-surface ml-spacing-8 font-medium">P1024_TwoPointers.cpp</span>
+</div>
+<span class="font-label-sm text-label-sm text-tertiary">UTF-8 • LF • C++20</span>
+</div>
+<div class="p-spacing-16 font-code-body text-code-body text-on-surface flex flex-col gap-spacing-4 select-none leading-relaxed">
+<div class="flex items-center gap-spacing-16">
+<span class="text-outline select-none w-6 text-right font-label-sm text-label-sm">1</span>
+<span><span class="text-tertiary">#include</span> <span class="text-on-secondary-container">&lt;bits/stdc++.h&gt;</span></span>
+</div>
+<div class="flex items-center gap-spacing-16">
+<span class="text-outline select-none w-6 text-right font-label-sm text-label-sm">2</span>
+<span><span class="text-primary font-semibold">using namespace</span> std;</span>
+</div>
+<div class="flex items-center gap-spacing-16 bg-primary/10 rounded-lg px-2 -mx-2">
+<span class="text-primary select-none w-6 text-right font-label-sm text-label-sm font-bold">3</span>
+<span><span class="text-tertiary">int</span> main() {</span>
+</div>
+<div class="flex items-center gap-spacing-16">
+<span class="text-outline select-none w-6 text-right font-label-sm text-label-sm">4</span>
+<span class="pl-4">ios::<span class="text-tertiary">sync_with_stdio</span>(<span class="text-verdict-tle">false</span>);</span>
+</div>
+<div class="flex items-center gap-spacing-16">
+<span class="text-outline select-none w-6 text-right font-label-sm text-label-sm">5</span>
+<span class="pl-4"><span class="text-primary font-semibold">return</span> <span class="text-verdict-ce">0</span>;</span>
+</div>
+<div class="flex items-center gap-spacing-16">
+<span class="text-outline select-none w-6 text-right font-label-sm text-label-sm">6</span>
+<span>}</span>
+</div>
+</div>
+</div>
+<!-- High-Contrast Metric Gauge -->
+<div class="p-spacing-16 rounded-2xl bg-surface-container-low flex flex-col gap-spacing-12">
+<div class="flex items-center justify-between">
+<span class="font-title-sm text-title-sm text-on-surface">WCAG 可访问性评分</span>
+<span class="font-label-sm text-label-sm text-verdict-ac font-bold">14.8:1 (AAA Pass)</span>
+</div>
+<div class="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full w-[94%] transition-all"></div>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">高对比度环境经抗光晕校准，深浅色表面色彩差均大于 4.5:1</span>
+</div>
+<!-- Floating Action Notification -->
+<div class="p-spacing-16 rounded-2xl bg-secondary-container text-on-secondary-container flex items-center justify-between gap-spacing-12">
+<div class="flex items-center gap-spacing-8">
+<span class="material-symbols-outlined text-[20px]">sync</span>
+<span class="font-body-sm text-body-sm">偏好配置实时本地缓存</span>
+</div>
+<span class="font-label-sm text-label-sm px-spacing-8 py-0.5 rounded-full bg-surface/40 text-on-surface font-semibold">Ready</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+  (function() {
+    const swatches = document.querySelectorAll('.palette-swatch');
+    const hexInput = document.getElementById('hex-seed-input');
+    const applyHexBtn = document.getElementById('apply-hex');
+    const toggleContrast = document.getElementById('toggle-contrast');
+    const btnSave = document.getElementById('btn-save');
+    const btnReset = document.getElementById('btn-reset');
+
+    // Palette Swatch Switcher
+    swatches.forEach(swatch => {
+      swatch.addEventListener('click', () => {
+        swatches.forEach(s => {
+          s.classList.remove('active-palette');
+          const check = s.querySelector('.swatch-check');
+          if (check) check.classList.add('hidden');
+        });
+        swatch.classList.add('active-palette');
+        const check = swatch.querySelector('.swatch-check');
+        if (check) check.classList.remove('hidden');
+
+        const color = swatch.getAttribute('data-color');
+        if (hexInput) hexInput.value = color;
+      });
+    });
+
+    // Custom HEX Apply
+    if (applyHexBtn && hexInput) {
+      applyHexBtn.addEventListener('click', () => {
+        const val = hexInput.value.trim();
+        if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
+          swatches.forEach(s => {
+            s.classList.remove('active-palette');
+            const check = s.querySelector('.swatch-check');
+            if (check) check.classList.add('hidden');
+          });
+        }
+      });
+    }
+
+    // Toggle Contrast Mode Interaction
+    let highContrast = false;
+    if (toggleContrast) {
+      toggleContrast.addEventListener('click', () => {
+        highContrast = !highContrast;
+        const knob = toggleContrast.querySelector('div');
+        if (highContrast) {
+          toggleContrast.classList.remove('bg-secondary-container');
+          toggleContrast.classList.add('bg-primary');
+          if (knob) {
+            knob.classList.remove('bg-on-secondary-container');
+            knob.classList.add('bg-on-primary', 'translate-x-6');
+          }
+        } else {
+          toggleContrast.classList.add('bg-secondary-container');
+          toggleContrast.classList.remove('bg-primary');
+          if (knob) {
+            knob.classList.add('bg-on-secondary-container');
+            knob.classList.remove('bg-on-primary', 'translate-x-6');
+          }
+        }
+      });
+    }
+
+    // Save and Reset feedback
+    if (btnSave) {
+      btnSave.addEventListener('click', () => {
+        const originalText = btnSave.innerHTML;
+        btnSave.innerHTML = '<span class="material-symbols-outlined text-[18px]">done_all</span><span>已保存</span>';
+        setTimeout(() => {
+          btnSave.innerHTML = originalText;
+        }, 1500);
+      });
+    }
+
+    if (btnReset) {
+      btnReset.addEventListener('click', () => {
+        if (hexInput) hexInput.value = '#3B82F6';
+        if (swatches.length > 0) {
+          swatches[0].click();
+        }
+      });
+    }
+  })();
+</script></main><footer class="w-full bg-surface-container-low mt-auto"><div class="max-w-7xl mx-auto px-gutter-expanded py-spacing-24 flex flex-col md:flex-row items-center justify-between gap-spacing-16"><div class="flex flex-col sm:flex-row items-center gap-spacing-16"><div class="flex items-center gap-spacing-8 px-spacing-12 py-spacing-4 rounded-full bg-surface-container"><span class="w-2 h-2 rounded-full bg-verdict-ac animate-pulse"></span><span class="font-label-sm text-label-sm text-verdict-ac">Kernel Healthy</span><span class="text-outline-variant font-label-sm text-label-sm">•</span><span class="font-label-sm text-label-sm text-on-surface-variant">0 Waiting</span><span class="text-outline-variant font-label-sm text-label-sm">•</span><span class="font-label-sm text-label-sm text-tertiary">12ms Latency</span></div><span class="font-body-sm text-body-sm text-on-surface-variant">© 2024 AlgoMaterial OJ. Material Design 3 Sandbox.</span></div><div class="flex items-center gap-spacing-16"><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Hydro API</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Luogu Format</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">GitHub</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Docs</a></div></div></footer></body></html>

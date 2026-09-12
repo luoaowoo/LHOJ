@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&amp;family=Roboto+Flex:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"on-secondary-fixed":"#131c2a","surface-container-lowest":"#0b0e11","surface":"#111417","outline":"#8d9199","verdict-re-container":"#4c0519","inverse-on-surface":"#2e3134","verdict-re":"#fb7185","surface-container":"#1d2024","tertiary":"#a3eefb","secondary-container":"#40495a","surface-bright":"#37393d","error-container":"#93000a","verdict-ac":"#4ade80","on-error":"#690005","verdict-ac-container":"#052e16","surface-variant":"#323538","primary-fixed":"#d4e3ff","on-tertiary-container":"#005b65","tertiary-fixed":"#a3effb","on-primary-fixed-variant":"#264872","outline-variant":"#43474e","surface-container-highest":"#323539","surface-dim":"#111417","on-tertiary":"#00363d","secondary":"#bec7db","on-surface":"#e1e2e7","verdict-tle":"#fb923c","surface-container-low":"#191c1f","verdict-tle-container":"#431407","on-secondary":"#283140","verdict-mle":"#c084fc","secondary-fixed-dim":"#bec7db","secondary-fixed":"#dae3f7","on-background":"#e1e2e7","primary":"#d3e3ff","on-tertiary-fixed-variant":"#004f57","tertiary-container":"#87d2de","verdict-ce":"#fbbf24","tertiary-fixed-dim":"#87d2de","on-secondary-container":"#b0b9cc","verdict-wa":"#f87171","on-primary-fixed":"#001c39","on-surface-variant":"#c3c6d0","on-primary":"#09315a","verdict-wa-container":"#450a0a","verdict-mle-container":"#3b0764","primary-fixed-dim":"#a8c8f9","primary-container":"#a8c8f9","surface-container-high":"#272a2e","on-primary-container":"#c1d9ff","on-tertiary-fixed":"#001f24","on-error-container":"#ffdad6","on-secondary-fixed-variant":"#3e4757","background":"#111417","inverse-surface":"#e1e2e7","verdict-pend-container":"#1e293b","surface-tint":"#a8c8f9","verdict-pend":"#94a3b8","inverse-primary":"#40608b","verdict-ce-container":"#451a03","error":"#ffb4ab"},"borderRadius":{"DEFAULT":"1rem","lg":"2rem","xl":"3rem","full":"9999px"},"spacing":{"rail-width":"5rem","spacing-64":"4rem","gutter-compact":"1rem","spacing-8":"0.5rem","spacing-32":"2rem","gutter-medium":"1.5rem","spacing-20":"1.25rem","spacing-16":"1rem","spacing-48":"3rem","spacing-12":"0.75rem","gutter-expanded":"1.5rem","spacing-4":"0.25rem","nav-bar-height":"5rem","spacing-24":"1.5rem"},"fontFamily":{"headline-sm":["Roboto Flex"],"body-lg":["Roboto Flex"],"headline-lg-mobile":["Roboto Flex"],"title-sm":["Roboto Flex"],"body-md":["Roboto Flex"],"display-lg":["Roboto Flex"],"body-sm":["Roboto Flex"],"label-lg":["JetBrains Mono"],"label-md":["JetBrains Mono"],"title-md":["Roboto Flex"],"label-sm":["JetBrains Mono"],"headline-md":["Roboto Flex"],"code-body":["JetBrains Mono"],"title-lg":["Roboto Flex"],"headline-lg":["Roboto Flex"]},"fontSize":{"headline-sm":["24px",{"lineHeight":"32px","letterSpacing":"0px","fontWeight":"500"}],"body-lg":["16px",{"lineHeight":"24px","letterSpacing":"0.5px","fontWeight":"400"}],"headline-lg-mobile":["26px",{"lineHeight":"32px","letterSpacing":"0px","fontWeight":"600"}],"title-sm":["14px",{"lineHeight":"20px","letterSpacing":"0.1px","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","letterSpacing":"0.25px","fontWeight":"400"}],"display-lg":["57px",{"lineHeight":"64px","letterSpacing":"-0.25px","fontWeight":"400"}],"body-sm":["12px",{"lineHeight":"16px","letterSpacing":"0.4px","fontWeight":"400"}],"label-lg":["14px",{"lineHeight":"20px","letterSpacing":"0.1px","fontWeight":"500"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.5px","fontWeight":"500"}],"title-md":["16px",{"lineHeight":"24px","letterSpacing":"0.15px","fontWeight":"600"}],"label-sm":["11px",{"lineHeight":"16px","letterSpacing":"0.5px","fontWeight":"600"}],"headline-md":["28px",{"lineHeight":"36px","letterSpacing":"0px","fontWeight":"600"}],"code-body":["13.5px",{"lineHeight":"22px","letterSpacing":"0px","fontWeight":"400"}],"title-lg":["22px",{"lineHeight":"28px","letterSpacing":"0px","fontWeight":"500"}],"headline-lg":["32px",{"lineHeight":"40px","letterSpacing":"0px","fontWeight":"600"}]}}}};</script></head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased min-h-screen flex flex-col"><header class="fixed top-0 left-0 right-0 z-50 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-20 max-w-7xl mx-auto px-gutter-expanded flex items-center justify-between gap-spacing-16"><div class="flex items-center gap-spacing-16 flex-shrink-0"><div class="flex items-center gap-spacing-8"><img alt="Brand logo. - Primary color: #3e5f8a
+- Font: robotoFlex
+- Mode: dark
+- Roundness: rounded-md
+" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1W4J57u3yE0IiUyrfyAN_guPsH4QWV3UQ5ZwsuGuXe8yRVlwMr-GugJdplAJQ2TfP-wS8_dIN3kkxzdHBuvAyH-fPNf51TDchBqMt4TdabfS0k-BnieATt6T2gJy9wcx3mDmsHMHBzn3CQyOKUVMgXuLT9V8MfqS9LB7SXlDEqvkodKFUFak8nLPeLvfgM4V3WI8ZLddvJe6f3OVNMrCgRreMtsG9n1SMz1BIhFzDkniLI6YZCFpFYqQSw"/><div class="flex flex-col"><span class="font-title-md text-title-md text-on-surface tracking-tight leading-none">AlgoMaterial OJ</span><span class="font-label-sm text-label-sm text-tertiary mt-spacing-4">Material 3 / Monet</span></div></div><div class="h-6 w-px bg-outline-variant hidden lg:block"></div><nav class="hidden xl:flex items-center gap-spacing-4" data-active-classes="bg-secondary-container text-on-secondary-container font-medium rounded-full"><a class="px-spacing-16 py-spacing-8 rounded-full font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-path="home" href="#">首页</a><a aria-current="page" class="px-spacing-16 py-spacing-8 transition-all bg-secondary-container text-on-secondary-container font-medium rounded-full" data-path="problemset" href="#">题库</a><a class="px-spacing-16 py-spacing-8 rounded-full font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-path="contests" href="#">比赛</a><a class="px-spacing-16 py-spacing-8 rounded-full font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-path="status" href="#">评测</a><a class="px-spacing-16 py-spacing-8 rounded-full font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-path="ranklist" href="#">排名</a><a class="px-spacing-16 py-spacing-8 rounded-full font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-path="discuss" href="#">讨论</a></nav></div><div class="hidden md:flex items-center flex-1 max-w-xs mx-spacing-12"><div class="w-full flex items-center justify-between px-spacing-16 py-spacing-8 bg-surface-container rounded-full text-on-surface-variant hover:bg-surface-container-high transition-colors cursor-pointer"><div class="flex items-center gap-spacing-8"><span class="material-symbols-outlined text-[18px] text-on-surface-variant">search</span><span class="font-body-sm text-body-sm text-on-surface-variant">快速检索题目 / 算法...</span></div><kbd class="px-spacing-8 py-0.5 rounded-full bg-surface-container-highest text-on-surface font-label-sm text-label-sm">Ctrl+K</kbd></div></div><div class="flex items-center gap-spacing-12 flex-shrink-0"><div class="hidden sm:flex items-center gap-spacing-4 px-spacing-8 py-1 rounded-full bg-surface-container"><button class="w-5 h-5 rounded-full bg-[#3B82F6] hover:scale-110 transition-transform" title="Classic M3 Blue" type="button"></button><button class="w-5 h-5 rounded-full bg-[#10B981] hover:scale-110 transition-transform" title="Emerald Green" type="button"></button><button class="w-5 h-5 rounded-full bg-[#8B5CF6] hover:scale-110 transition-transform" title="Purple" type="button"></button><button class="w-5 h-5 rounded-full bg-[#F43F5E] hover:scale-110 transition-transform" title="Coral Red" type="button"></button><button class="w-5 h-5 rounded-full bg-[#F59E0B] hover:scale-110 transition-transform" title="Amber" type="button"></button></div><button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">dark_mode</span></button><div class="relative"><button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">notifications</span></button><span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-error"></span></div><div class="flex items-center gap-spacing-8 pl-spacing-4"><div class="hidden lg:flex flex-col items-end"><span class="font-label-sm text-label-sm text-on-surface">tourist_m3</span><span class="font-label-sm text-label-sm text-verdict-ce font-semibold">1840 Master</span></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></div></header><main class="w-full pt-20 flex-1 bg-surface"><div class="flex flex-col w-full">
+<div class="w-full max-w-[1720px] mx-auto px-gutter-compact md:px-gutter-medium lg:px-gutter-expanded py-spacing-16">
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-spacing-20 items-start">
+<!-- Left Column: Problem Specification (7 cols) -->
+<section class="xl:col-span-7 flex flex-col gap-spacing-16 bg-surface-container-low rounded-xl p-spacing-24 lg:p-spacing-32 shadow-sm">
+<!-- Breadcrumbs & Meta Tag -->
+<div class="flex flex-wrap items-center justify-between gap-spacing-8">
+<nav class="flex items-center gap-spacing-8 font-label-sm text-label-sm text-outline">
+<span>ARCHIVE</span>
+<span class="text-outline-variant">/</span>
+<span>NOIP 普及组经典</span>
+<span class="text-outline-variant">/</span>
+<span>P1048 动态规划</span>
+<span class="text-outline-variant">/</span>
+<span class="text-tertiary">0-1 背包</span>
+</nav>
+<button class="inline-flex items-center gap-spacing-4 px-spacing-12 py-1 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm transition-all" onclick="navigator.clipboard?.writeText('# P1048 [NOIP2005 普及组] 采药')" type="button">
+<span class="material-symbols-outlined text-[16px]">content_copy</span>
+<span>复制 Markdown</span>
+</button>
+</div>
+<!-- Problem Header -->
+<div class="flex flex-col gap-spacing-12">
+<div class="flex items-center gap-spacing-12 flex-wrap">
+<h1 class="font-headline-md text-headline-md text-on-surface tracking-tight">
+              P1048 [NOIP2005 普及组] 采药
+            </h1>
+<span class="px-spacing-12 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">
+              普及-
+            </span>
+</div>
+<!-- Meta chips ribbon -->
+<div class="flex flex-wrap items-center gap-spacing-8 pt-spacing-4">
+<div class="flex items-center gap-spacing-4 px-spacing-12 py-1 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px] text-tertiary">schedule</span>
+<span>时间限制: 1.00s</span>
+</div>
+<div class="flex items-center gap-spacing-4 px-spacing-12 py-1 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">memory</span>
+<span>空间限制: 128.00MB</span>
+</div>
+<div class="flex items-center gap-spacing-4 px-spacing-12 py-1 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px] text-verdict-ac">task_alt</span>
+<span>通过率: 54.3%</span>
+</div>
+<div class="flex items-center gap-spacing-4 px-spacing-12 py-1 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px] text-outline">analytics</span>
+<span>提交量: 142.5k</span>
+</div>
+</div>
+</div>
+<!-- Navigation Tabs -->
+<div class="flex items-center gap-spacing-8 p-1 bg-surface-container rounded-full w-fit">
+<button class="px-spacing-20 py-spacing-8 rounded-full bg-secondary-container text-on-secondary-container font-title-sm text-title-sm transition-colors shadow-sm" type="button">
+            题目描述
+          </button>
+<button class="px-spacing-20 py-spacing-8 rounded-full text-on-surface-variant hover:text-on-surface font-title-sm text-title-sm transition-colors" type="button">
+            题解 <span class="ml-1 font-label-sm text-label-sm text-outline">128</span>
+</button>
+<button class="px-spacing-20 py-spacing-8 rounded-full text-on-surface-variant hover:text-on-surface font-title-sm text-title-sm transition-colors" type="button">
+            讨论 <span class="ml-1 font-label-sm text-label-sm text-outline">45</span>
+</button>
+<button class="px-spacing-20 py-spacing-8 rounded-full text-on-surface-variant hover:text-on-surface font-title-sm text-title-sm transition-colors" type="button">
+            提交记录
+          </button>
+</div>
+<!-- Problem Body Sections -->
+<div class="flex flex-col gap-spacing-24 text-on-surface-variant font-body-md text-body-md pt-spacing-8">
+<!-- Section 1 -->
+<div class="flex flex-col gap-spacing-8">
+<h2 class="flex items-center gap-spacing-8 font-title-md text-title-md text-on-surface">
+<span class="w-1.5 h-4 rounded-full bg-primary"></span>
+              题目背景
+            </h2>
+<p class="leading-relaxed pl-spacing-16">
+              山神庙前有一座巨大的灵药山。辰辰是个天资聪颖的孩子，在神医华佗的门下研习炼丹之术。一日，师傅带他来到山脚下，交给他一个限时采集草药的任务，考验他在有限精力下获取最高医道价值的能力。
+            </p>
+</div>
+<!-- Section 2 -->
+<div class="flex flex-col gap-spacing-8">
+<h2 class="flex items-center gap-spacing-8 font-title-md text-title-md text-on-surface">
+<span class="w-1.5 h-4 rounded-full bg-primary"></span>
+              题目描述
+            </h2>
+<p class="leading-relaxed pl-spacing-16">
+              辰辰是个天资聪颖的孩子，他的梦想是成为世界上最伟大的医师。为此，他想拜附近最有威望的医师为师。医师为了检验他的资质，给他出了一个难题。医师把他带到一个到处都是草药的山洞里对他说：
+            </p>
+<blockquote class="my-spacing-8 pl-spacing-16 py-spacing-8 bg-surface-container rounded-r-lg border-l-2 border-primary text-on-surface italic">
+              “孩子，这个山洞里有一些不同的草药，采每一株都需要一些时间，每一株也有它自身的价值。我会给你一段时间，在这段时间里，你可以采到一些草药。如果你是一个聪明的孩子，你应该可以让采到的草药的总价值最大。”
+            </blockquote>
+<p class="leading-relaxed pl-spacing-16">
+              如果你是辰辰，你能完成这个任务吗？这是一个经典的模型，请你根据给定的总时间 \(T\) 和山洞里的草药数目 \(M\)，求出辰辰在规定时间内能采到的草药的最大总价值。
+            </p>
+</div>
+<!-- Section 3: IO Specifications -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-spacing-16">
+<div class="p-spacing-16 rounded-xl bg-surface-container flex flex-col gap-spacing-8">
+<h3 class="font-title-sm text-title-sm text-on-surface flex items-center gap-spacing-8">
+<span class="material-symbols-outlined text-[18px] text-tertiary">input</span>
+                输入格式
+              </h3>
+<p class="font-body-sm text-body-sm leading-relaxed text-on-surface-variant">
+                第一行有 \(2\) 个整数 \(T\)（\(1 \le T \le 1000\)）和 \(M\)（\(1 \le M \le 100\)），用一个空格隔开，\(T\) 代表总共能够用来采药的时间，\(M\) 代表山洞里的草药的数目。<br/><br/>
+                接下来的 \(M\) 行，每行包含两个在 \(1\) 到 \(100\) 之间（包括 \(1\) 和 \(100\)）的整数，分别表示采摘某株草药的时间和这株草药的价值。
+              </p>
+</div>
+<div class="p-spacing-16 rounded-xl bg-surface-container flex flex-col gap-spacing-8">
+<h3 class="font-title-sm text-title-sm text-on-surface flex items-center gap-spacing-8">
+<span class="material-symbols-outlined text-[18px] text-verdict-ac">output</span>
+                输出格式
+              </h3>
+<p class="font-body-sm text-body-sm leading-relaxed text-on-surface-variant">
+                输出一个整数，表示在规定的时间内可以采到的草药的最大总价值。
+              </p>
+</div>
+</div>
+<!-- Sample Section -->
+<div class="flex flex-col gap-spacing-12">
+<div class="flex items-center justify-between">
+<h2 class="flex items-center gap-spacing-8 font-title-md text-title-md text-on-surface">
+<span class="w-1.5 h-4 rounded-full bg-primary"></span>
+                输入输出样例 #1
+              </h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-spacing-16">
+<!-- Sample Input Card -->
+<div class="p-spacing-16 rounded-xl bg-surface-container-lowest flex flex-col gap-spacing-8">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-outline">输入样例 #1</span>
+<button class="text-primary hover:text-on-surface flex items-center gap-spacing-4 font-label-sm text-label-sm" onclick="navigator.clipboard?.writeText('70 3\n71 100\n69 1\n1 2')" type="button">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+                    复制
+                  </button>
+</div>
+<pre class="font-code-body text-code-body text-on-surface bg-surface-container-high/40 p-spacing-12 rounded-DEFAULT overflow-x-auto leading-relaxed"><code>70 3
+71 100
+69 1
+1 2</code></pre>
+</div>
+<!-- Sample Output Card -->
+<div class="p-spacing-16 rounded-xl bg-surface-container-lowest flex flex-col gap-spacing-8">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-outline">输出样例 #1</span>
+<button class="text-primary hover:text-on-surface flex items-center gap-spacing-4 font-label-sm text-label-sm" onclick="navigator.clipboard?.writeText('3')" type="button">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+                    复制
+                  </button>
+</div>
+<pre class="font-code-body text-code-body text-verdict-ac bg-surface-container-high/40 p-spacing-12 rounded-DEFAULT overflow-x-auto leading-relaxed"><code>3</code></pre>
+</div>
+</div>
+</div>
+<!-- Constraints Matrix -->
+<div class="flex flex-col gap-spacing-8">
+<h2 class="flex items-center gap-spacing-8 font-title-md text-title-md text-on-surface">
+<span class="w-1.5 h-4 rounded-full bg-primary"></span>
+              说明 / 提示与数据规模
+            </h2>
+<div class="overflow-x-auto rounded-DEFAULT bg-surface-container">
+<table class="w-full text-left font-label-sm text-label-sm text-on-surface">
+<thead class="bg-surface-container-high text-on-surface-variant font-medium">
+<tr>
+<th class="py-spacing-12 px-spacing-16">子任务编号</th>
+<th class="py-spacing-12 px-spacing-16">分值</th>
+<th class="py-spacing-12 px-spacing-16">时间限制 \(T\)</th>
+<th class="py-spacing-12 px-spacing-16">药草数目 \(M\)</th>
+<th class="py-spacing-12 px-spacing-16">特性约定</th>
+</tr>
+</thead>
+<tbody class="text-on-surface-variant">
+<tr class="bg-surface-container">
+<td class="py-spacing-12 px-spacing-16 text-on-surface font-semibold">#1 ~ #3</td>
+<td class="py-spacing-12 px-spacing-16">30</td>
+<td class="py-spacing-12 px-spacing-16">\(T \le 100\)</td>
+<td class="py-spacing-12 px-spacing-16">\(M \le 10\)</td>
+<td class="py-spacing-12 px-spacing-16">支持简单搜索 / 暴力递归</td>
+</tr>
+<tr class="bg-surface-container-low">
+<td class="py-spacing-12 px-spacing-16 text-on-surface font-semibold">#4 ~ #6</td>
+<td class="py-spacing-12 px-spacing-16">30</td>
+<td class="py-spacing-12 px-spacing-16">\(T \le 500\)</td>
+<td class="py-spacing-12 px-spacing-16">\(M \le 50\)</td>
+<td class="py-spacing-12 px-spacing-16">常规二维动态规划 \(O(TM)\)</td>
+</tr>
+<tr class="bg-surface-container">
+<td class="py-spacing-12 px-spacing-16 text-on-surface font-semibold">#7 ~ #10</td>
+<td class="py-spacing-12 px-spacing-16">40</td>
+<td class="py-spacing-12 px-spacing-16">\(T \le 1000\)</td>
+<td class="py-spacing-12 px-spacing-16">\(M \le 100\)</td>
+<td class="py-spacing-12 px-spacing-16">建议压缩至一维滚动数组</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<!-- Right Column: Code Studio & Judging Panel (5 cols) -->
+<section class="xl:col-span-5 flex flex-col gap-spacing-16 bg-surface-container-high rounded-xl p-spacing-20 lg:p-spacing-24 shadow-md">
+<!-- Editor Toolbar -->
+<div class="flex items-center justify-between flex-wrap gap-spacing-8">
+<div class="flex items-center gap-spacing-8">
+<div class="relative">
+<select class="appearance-none bg-surface-container-highest text-on-surface font-label-md text-label-md py-2 pl-spacing-16 pr- spacing-32 rounded-full cursor-pointer focus:outline-none focus:bg-surface-bright transition-all">
+<option selected="">C++20 (GCC 13.2 -O2)</option>
+<option>C++17 (Clang 16)</option>
+<option>Python 3.12 (CPython)</option>
+<option>PyPy 3.10</option>
+<option>Java 21 (OpenJDK)</option>
+<option>Rust 2021 Edition</option>
+<option>Go 1.22</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-2.5 text-[18px] text-outline pointer-events-none">expand_more</span>
+</div>
+<button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors" title="格式化代码" type="button">
+<span class="material-symbols-outlined text-[18px]">reorder</span>
+</button>
+<button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors" title="重置代码" type="button">
+<span class="material-symbols-outlined text-[18px]">restart_alt</span>
+</button>
+</div>
+<div class="flex items-center gap-spacing-8">
+<span class="font-label-sm text-label-sm text-tertiary flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-verdict-ac"></span>
+              Auto-saved
+            </span>
+<button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors" title="全屏工作区" type="button">
+<span class="material-symbols-outlined text-[18px]">fullscreen</span>
+</button>
+</div>
+</div>
+<!-- Code Workspace -->
+<div class="w-full bg-surface-container-lowest rounded-xl overflow-hidden shadow-inner flex">
+<!-- Line Numbers -->
+<div class="select-none py-spacing-16 px-spacing-12 bg-surface-container-lowest/80 text-outline text-right font-code-body text-code-body flex flex-col leading-[22px]">
+<span>1</span>
+<span>2</span>
+<span>3</span>
+<span>4</span>
+<span>5</span>
+<span>6</span>
+<span>7</span>
+<span>8</span>
+<span>9</span>
+<span>10</span>
+<span>11</span>
+<span>12</span>
+<span>13</span>
+<span>14</span>
+<span>15</span>
+<span>16</span>
+<span>17</span>
+<span>18</span>
+<span>19</span>
+<span>20</span>
+</div>
+<!-- Code Content -->
+<pre class="p-spacing-16 overflow-x-auto text-on-surface font-code-body text-code-body leading-[22px] flex-1"><code><span class="text-outline">#include &lt;iostream&gt;</span>
+<span class="text-outline">#include &lt;vector&gt;</span>
+<span class="text-outline">#include &lt;algorithm&gt;</span>
+
+<span class="text-secondary">using namespace</span> std;
+
+<span class="text-tertiary">int</span> <span class="text-primary font-semibold">main</span>() {
+    ios::sync_with_stdio(<span class="text-verdict-ce">false</span>);
+    cin.tie(<span class="text-verdict-ce">nullptr</span>);
+
+    <span class="text-tertiary">int</span> t, m;
+    <span class="text-secondary">if</span> (!(cin &gt;&gt; t &gt;&gt; m)) <span class="text-secondary">return</span> <span class="text-verdict-ce">0</span>;
+
+    vector&lt;<span class="text-tertiary">int</span>&gt; dp(t + <span class="text-verdict-ce">1</span>, <span class="text-verdict-ce">0</span>);
+    <span class="text-secondary">for</span> (<span class="text-tertiary">int</span> i = <span class="text-verdict-ce">0</span>; i &lt; m; ++i) {
+        <span class="text-tertiary">int</span> cost, val;
+        cin &gt;&gt; cost &gt;&gt; val;
+        <span class="text-secondary">for</span> (<span class="text-tertiary">int</span> j = t; j &gt;= cost; --j) {
+            dp[j] = max(dp[j], dp[j - cost] + val);
+        }
+    }
+    cout &lt;&lt; dp[t] &lt;&lt; <span class="text-verdict-ac">"\n"</span>;
+    <span class="text-secondary">return</span> <span class="text-verdict-ce">0</span>;
+}</code></pre>
+</div>
+<!-- Real-Time Judging Result Card (Accepted 100) -->
+<div class="flex flex-col gap-spacing-12 bg-surface-container rounded-xl p-spacing-16 shadow-sm">
+<!-- Banner -->
+<div class="flex items-center justify-between bg-verdict-ac-container text-verdict-ac px-spacing-16 py-spacing-12 rounded-DEFAULT">
+<div class="flex items-center gap-spacing-12">
+<span class="material-symbols-outlined text-[28px]">check_circle</span>
+<div class="flex flex-col">
+<span class="font-title-md text-title-md font-bold tracking-tight">Accepted (100分)</span>
+<span class="font-label-sm text-label-sm opacity-80">评测编号: #9842013 • 通过时间: 刚刚</span>
+</div>
+</div>
+<div class="flex items-center gap-spacing-16">
+<div class="text-right">
+<div class="font-label-md text-label-md font-semibold">12 ms</div>
+<div class="font-label-sm text-label-sm opacity-80">CPU 运行时间</div>
+</div>
+<div class="text-right">
+<div class="font-label-md text-label-md font-semibold">2.41 MB</div>
+<div class="font-label-sm text-label-sm opacity-80">峰值内存消耗</div>
+</div>
+</div>
+</div>
+<!-- Benchmark Percentile Visual -->
+<div class="p-spacing-12 rounded-DEFAULT bg-surface-container-low flex flex-col gap-spacing-8">
+<div class="flex items-center justify-between font-label-sm text-label-sm">
+<span class="text-on-surface-variant">性能击败曲线 (Benchmark)</span>
+<span class="text-verdict-ac font-semibold">超越全站 96.8% 的提交记录</span>
+</div>
+<div class="relative h-12 w-full bg-surface-container-highest/60 rounded overflow-hidden flex items-end">
+<!-- SVG Gaussian Speed Benchmark Curve -->
+<svg class="w-full h-full text-primary" fill="none" preserveaspectratio="none" viewbox="0 0 400 60">
+<path d="M 0 58 Q 60 55 120 40 Q 180 5 240 32 Q 320 52 400 58 L 400 60 L 0 60 Z" fill="currentColor" fill-opacity="0.18"></path>
+<path d="M 0 58 Q 60 55 120 40 Q 180 5 240 32 Q 320 52 400 58" stroke="currentColor" stroke-width="2"></path>
+<!-- You are here line at 12ms (fast quantile) -->
+<line stroke="#4ade80" stroke-dasharray="2,2" stroke-width="2" x1="95" x2="95" y1="0" y2="60"></line>
+</svg>
+<div class="absolute left-24 top-1.5 px-2 py-0.5 rounded-full bg-verdict-ac-container text-verdict-ac font-label-sm text-label-sm flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-verdict-ac animate-ping"></span>
+<span>你的耗时: 12ms</span>
+</div>
+</div>
+</div>
+<!-- 10 Subtasks Grid -->
+<div class="flex flex-col gap-spacing-8">
+<span class="font-label-sm text-label-sm text-outline">测试点详细结果 (10/10)</span>
+<div class="grid grid-cols-5 sm:grid-cols-10 gap-spacing-4">
+<div class="flex flex-col items-center justify-center p-1.5 rounded bg-verdict-ac-container text-verdict-ac font-label-sm text-label-sm">
+<span>#1</span>
+<span class="font-bold text-[10px]">1ms</span>
+</div>
+<div class="flex flex-col items-center justify-center p-1.5 rounded bg-verdict-ac-container text-verdict-ac font-label-sm text-label-sm">
+<span>#2</span>
+<span class="font-bold text-[10px]">2ms</span>
+</div>
+<div class="flex flex-col items-center justify-center p-1.5 rounded bg-verdict-ac-container text-verdict-ac font-label-sm text-label-sm">
+<span>#3</span>
+<span class="font-bold text-[10px]">1ms</span>
+</div>
+<div class="flex flex-col items-center justify-center p-1.5 rounded bg-verdict-ac-container text-verdict-ac font-label-sm text-label-sm">
+<span>#4</span>
+<span class="font-bold text-[10px]">2ms</span>
+</div>
+<div class="flex flex-col items-center justify-center p-1.5 rounded bg-verdict-ac-container text-verdict-ac font-label-sm text-label-sm">
+<span>#5</span>
+<span class="font-bold text-[10px]">1ms</span>
+</div>
+<div class="flex flex-col items-center justify-center p-1.5 rounded bg-verdict-ac-container text-verdict-ac font-label-sm text-label-sm">
+<span>#6</span>
+<span class="font-bold text-[10px]">3ms</span>
+</div>
+<div class="flex flex-col items-center justify-center p-1.5 rounded bg-verdict-ac-container text-verdict-ac font-label-sm text-label-sm">
+<span>#7</span>
+<span class="font-bold text-[10px]">2ms</span>
+</div>
+<div class="flex flex-col items-center justify-center p-1.5 rounded bg-verdict-ac-container text-verdict-ac font-label-sm text-label-sm">
+<span>#8</span>
+<span class="font-bold text-[10px]">1ms</span>
+</div>
+<div class="flex flex-col items-center justify-center p-1.5 rounded bg-verdict-ac-container text-verdict-ac font-label-sm text-label-sm">
+<span>#9</span>
+<span class="font-bold text-[10px]">3ms</span>
+</div>
+<div class="flex flex-col items-center justify-center p-1.5 rounded bg-verdict-ac-container text-verdict-ac font-label-sm text-label-sm">
+<span>#10</span>
+<span class="font-bold text-[10px]">2ms</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Custom Testbench Drawer & Action Bar -->
+<div class="flex flex-col gap-spacing-12 bg-surface-container rounded-xl p-spacing-16">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-spacing-8">
+<span class="material-symbols-outlined text-[20px] text-tertiary">terminal</span>
+<span class="font-title-sm text-title-sm text-on-surface">调试测试板 (Scratchpad)</span>
+</div>
+<div class="flex items-center gap-spacing-8 text-outline font-label-sm text-label-sm">
+<span>自定义输入</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-spacing-12">
+<div class="flex flex-col gap-spacing-4">
+<span class="font-label-sm text-label-sm text-outline">标准输入 (Stdin)</span>
+<textarea class="w-full bg-surface-container-lowest text-on-surface font-code-body text-code-body p-spacing-8 rounded-DEFAULT focus:outline-none focus:bg-surface-variant resize-none" placeholder="输入测试数据..." rows="3">70 3
+71 100
+69 1
+1 2</textarea>
+</div>
+<div class="flex flex-col gap-spacing-4">
+<span class="font-label-sm text-label-sm text-outline">实际运行结果 (Stdout)</span>
+<div class="h-[74px] bg-surface-container-lowest text-verdict-ac font-code-body text-code-body p-spacing-8 rounded-DEFAULT overflow-y-auto">
+                3
+                <div class="text-outline font-label-sm text-label-sm mt-1">Process finished with exit code 0 (0.012s)</div>
+</div>
+</div>
+</div>
+<!-- Bottom Actions Bar -->
+<div class="flex items-center justify-end gap-spacing-12 pt-spacing-8">
+<!-- Outlined Action Button -->
+<button class="h-10 px-spacing-24 rounded-full bg-transparent hover:bg-surface-container-highest text-primary font-title-sm text-title-sm flex items-center gap-spacing-8 transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+<span>自测运行</span>
+</button>
+<!-- Filled Action Button -->
+<button class="h-10 px-spacing-24 rounded-full bg-primary hover:bg-primary/90 text-on-primary font-title-sm text-title-sm flex items-center gap-spacing-8 transition-all shadow-sm active:scale-95" type="button">
+<span class="material-symbols-outlined text-[18px]">rocket_launch</span>
+<span>提交评测</span>
+</button>
+</div>
+</div>
+</section>
+</div>
+</div>
+</div></main><footer class="w-full bg-surface-container-low mt-auto"><div class="max-w-7xl mx-auto px-gutter-expanded py-spacing-24 flex flex-col md:flex-row items-center justify-between gap-spacing-16"><div class="flex flex-col sm:flex-row items-center gap-spacing-16"><div class="flex items-center gap-spacing-8 px-spacing-12 py-spacing-4 rounded-full bg-surface-container"><span class="w-2 h-2 rounded-full bg-verdict-ac animate-pulse"></span><span class="font-label-sm text-label-sm text-verdict-ac">Kernel Healthy</span><span class="text-outline-variant font-label-sm text-label-sm">•</span><span class="font-label-sm text-label-sm text-on-surface-variant">0 Waiting</span><span class="text-outline-variant font-label-sm text-label-sm">•</span><span class="font-label-sm text-label-sm text-tertiary">12ms Latency</span></div><span class="font-body-sm text-body-sm text-on-surface-variant">© 2024 AlgoMaterial OJ. Material Design 3 Sandbox.</span></div><div class="flex items-center gap-spacing-16"><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Hydro API</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Luogu Format</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">GitHub</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Docs</a></div></div></footer></body></html>

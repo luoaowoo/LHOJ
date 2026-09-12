@@ -4,6 +4,7 @@ import { Alert, Box, Button, Chip, Divider, LinearProgress, Paper, Stack, Tab, T
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { Clock3, Code2, Cpu, Download, HardDrive, ListChecks, RefreshCw, ShieldAlert, UserRound, XCircle } from 'lucide-react';
 import { useAuth } from '../auth';
+import { isSuperUser } from '../lib/permissions';
 import ConfirmDialog from '../components/ConfirmDialog';
 import StatusChip from '../components/StatusChip';
 import ConfettiCelebration from '../components/ConfettiCelebration';
@@ -208,7 +209,7 @@ export default function RecordDetailPage() {
               </Select>
             </FormControl>
           ) : null}
-          {user?.role === 'root' && !revision ? (
+          {isSuperUser(user) && !revision ? (
             <>
               <Button size="small" color="inherit" startIcon={<RefreshCw size={15} />} disabled={acting} onClick={() => void runOperation('rejudge')}>
                 重测

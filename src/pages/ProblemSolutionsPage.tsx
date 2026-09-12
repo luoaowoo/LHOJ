@@ -3,6 +3,7 @@ import { Link as RouterLink, useParams, useSearchParams } from 'react-router-dom
 import { Alert, Box, Button, Pagination, Paper, Stack, TextField, Typography } from '@mui/material';
 import { ArrowDown, ArrowLeft, ArrowUp, Lightbulb, MessageSquare, Pencil, Send, Trash2 } from 'lucide-react';
 import { useAuth } from '../auth';
+import { isSuperUser } from '../lib/permissions';
 import ConfirmDialog from '../components/ConfirmDialog';
 import Markdown from '../components/Markdown';
 import PageHeader from '../components/PageHeader';
@@ -16,7 +17,6 @@ export default function ProblemSolutionsPage() {
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const page = Math.max(1, Number.parseInt(searchParams.get('page') ?? '1', 10) || 1);
-  const tid = searchParams.get('tid') ?? '';
   const [result, setResult] = useState<ProblemSolutionsResult | null>(null);
   const [error, setError] = useState('');
   const [content, setContent] = useState('');
@@ -34,11 +34,11 @@ export default function ProblemSolutionsPage() {
   const load = useCallback(async () => {
     setError('');
     try {
-      setResult(await scrapeProblemSolutions(id, page, tid || undefined));
+      setResult(await scrapeProblemSolutions(id, page));
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : '题解加载失败。');
     }
-  }, [id, page, tid]);
+  }, [id, page]);
 
   useEffect(() => { void load(); }, [load]);
   if (!result && !error) return <FullPageLoader />;
@@ -49,7 +49,7 @@ export default function ProblemSolutionsPage() {
     setActing(true);
     setActionError('');
     try {
-      await postHydroForm(`/p/${encodeURIComponent(id)}/solution${tid ? `?tid=${encodeURIComponent(tid)}` : ''}`, {
+      await postHydroForm(`/p/${encodeURIComponent(id)}/solution`, {
         operation,
         ...(psid ? { psid } : {}),
         ...(psrid ? { psrid } : {}),
@@ -84,13 +84,13 @@ export default function ProblemSolutionsPage() {
   return (
     <Box>
       <Box sx={{ mb: 1.5 }}>
-        <Button component={RouterLink} to={`/problem/${encodeURIComponent(id)}${tid ? `?tid=${encodeURIComponent(tid)}` : ''}`} color="inherit" size="small" startIcon={<ArrowLeft size={16} />}>返回题目</Button>
+        <Button component={RouterLink} to={`/problem/${encodeURIComponent(id)}`} color="inherit" size="small" startIcon={<ArrowLeft size={16} />}>返回题目</Button>
       </Box>
       <PageHeader
         icon={<Lightbulb size={22} />}
         title="题解"
         actions={(
-          <Button component={RouterLink} to={hydroWorkspaceHref(`/p/${encodeURIComponent(id)}/solution${tid ? `?tid=${encodeURIComponent(tid)}` : ''}`, '发布或管理题解')} size="small">
+          <Button component={RouterLink} to={hydroWorkspaceHref(`/p/${encodeURIComponent(id)}/solution`, '发布或管理题解')} size="small">
             发布或管理题解
           </Button>
         )}
@@ -103,7 +103,7 @@ export default function ProblemSolutionsPage() {
               <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 1 }}>
                 <Box><Typography variant="h6" sx={{ fontWeight: 700 }}>{solution.title || '题解'}</Typography><Typography variant="caption" color="text.secondary">{solution.author || '未知作者'}</Typography></Box>
                 <Stack direction="row" alignItems="center" sx={{ flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-                  {user && (user._id === solution.ownerId || user.role === 'root') ? (
+                  {user && (user._id === solution.ownerId || isSuperUser(user)) ? (
                     <>
                       <Button color="inherit" aria-label="编辑题解" disabled={acting} onClick={() => { setEditing(solution.id); setEditContent(solution.content); }}><Pencil size={15} /></Button>
                       <Button color="error" aria-label="删除题解" disabled={acting} onClick={() => setDeleting(solution.id)}><Trash2 size={15} /></Button>
@@ -125,7 +125,7 @@ export default function ProblemSolutionsPage() {
                     <Box key={reply.id}>
                       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
                         <Typography variant="caption" color="text.secondary">{reply.author || '未知用户'}</Typography>
-                        {user && (user._id === reply.ownerId || user.role === 'root') ? (
+                        {user && (user._id === reply.ownerId || isSuperUser(user)) ? (
                           <Stack direction="row">
                             <Button color="inherit" aria-label="编辑回复" disabled={acting} onClick={() => { setEditingReply({ psid: solution.id, psrid: reply.id }); setEditReplyContent(reply.content); }}><Pencil size={14} /></Button>
                             <Button color="error" aria-label="删除回复" disabled={acting} onClick={() => setDeletingReply({ psid: solution.id, psrid: reply.id })}><Trash2 size={14} /></Button>

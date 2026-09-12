@@ -6,6 +6,7 @@ import {
 } from '@mui/material';
 import { CheckCircle2, Circle, Filter, Gauge, Plus, Search, Shuffle, Tags } from 'lucide-react';
 import { useAuth } from '../auth';
+import { isSuperUser } from '../lib/permissions';
 import PageHeader from '../components/PageHeader';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
 import { hydroWorkspaceHref } from '../lib/hydro-workspace';
@@ -82,7 +83,7 @@ export default function ProblemListPage() {
             <Button component={RouterLink} to={hydroWorkspaceHref('/problem/random', '随机一题')} color="inherit" startIcon={<Shuffle size={16} />}>
               随机一题
             </Button>
-            {user?.role === 'root' ? (
+            {isSuperUser(user) ? (
               <Button component={RouterLink} to={hydroWorkspaceHref('/problem/create', '创建题目')} variant="contained" startIcon={<Plus size={16} />}>
                 创建题目
               </Button>

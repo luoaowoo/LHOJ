@@ -5,7 +5,8 @@ import {
   Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Tooltip,
   Typography,
 } from '@mui/material';
-import { ArrowLeft, RefreshCw, Save } from 'lucide-react';
+import { ArrowLeft, ExternalLink, RefreshCw, Save } from 'lucide-react';
+import { hydroNativeUrl, hydroPublicUrl } from '../lib/endpoint';
 import { scrapeAdminPage, submitHydroAdminForm } from '../lib/scrape';
 import type {
   HydroAdminAction, HydroAdminField, HydroAdminForm, HydroAdminPage,
@@ -82,10 +83,12 @@ export default function HydroAdminWorkspace({ path, title }: { path: string; tit
   const navigate = (href?: string) => {
     if (!href || href.startsWith('javascript:') || href.startsWith('#')) return;
     try {
-      const url = new URL(href, new URL(currentPath, window.location.origin));
-      if (url.origin !== window.location.origin) return;
+      const url = new URL(href, `http://hydro.local${currentPath}`);
+      const target = url.origin === 'http://hydro.local' ? `${url.pathname}${url.search}${url.hash}` : href;
+      const proxied = hydroPublicUrl(target);
+      if (!proxied.startsWith('/hydro-native/')) return;
       setHistory((old) => [...old, currentPath]);
-      setCurrentPath(`${url.pathname}${url.search}`);
+      setCurrentPath(proxied.slice('/hydro-native'.length) || '/');
     }
     catch { /* Ignore malformed links from upstream HTML. */ }
   };
@@ -126,7 +129,10 @@ export default function HydroAdminWorkspace({ path, title }: { path: string; tit
         {history.length > 0 && <Tooltip title="返回"><IconButton size="small" onClick={goBack}><ArrowLeft size={18} /></IconButton></Tooltip>}
         <Box minWidth={0}><Typography variant="h6" fontWeight={700} noWrap>{page.title || title}</Typography><Typography variant="caption" color="text.secondary" noWrap>{currentPath}</Typography></Box>
       </Stack>
-      <Tooltip title="刷新"><IconButton onClick={() => void load()} disabled={loading}><RefreshCw size={18} /></IconButton></Tooltip>
+      <Stack direction="row" alignItems="center" spacing={1}>
+        <Button component="a" href={hydroNativeUrl(currentPath)} target="_blank" rel="noreferrer" size="small" color="inherit" endIcon={<ExternalLink size={15} />}>原生页面</Button>
+        <Tooltip title="刷新"><IconButton onClick={() => void load()} disabled={loading}><RefreshCw size={18} /></IconButton></Tooltip>
+      </Stack>
     </Stack>
     {loading && <Alert severity="info" sx={{ mb: 2 }}>正在刷新...</Alert>}
     {page.actions.length ? <Stack direction="row" flexWrap="wrap" gap={1} sx={{ mb: 2 }}>{page.actions.map((action: HydroAdminAction) => <Button key={action.label} size="small" variant="outlined" disabled={saving} onClick={() => void (async () => {
