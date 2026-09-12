@@ -10,9 +10,11 @@ import PageHeader from '../components/PageHeader';
 import { ErrorBox } from '../components/StateBox';
 import HydroAdminWorkspace from '../components/HydroAdminWorkspace';
 import CarouselAdminPanel from '../components/CarouselAdminPanel';
+import AdminUsersPanel from '../components/AdminUsersPanel';
 
 // Sentinel path: this entry opens our own panel instead of a scraped Hydro form.
 const carouselPath = 'lhoj:carousel';
+const usersPath = 'lhoj:users';
 
 const groups = [
   {
@@ -24,7 +26,7 @@ const groups = [
       { label: '系统配置', path: '/manage/config', icon: Settings2 },
       { label: '脚本管理', path: '/manage/script', icon: TerminalSquare },
       { label: '用户导入', path: '/manage/userimport', icon: Users },
-      { label: '用户权限', path: '/manage/userpriv', icon: UserCog },
+      { label: '用户管理', path: usersPath, icon: UserCog },
     ],
   },
   {
@@ -113,6 +115,8 @@ export default function ManagementPage() {
           <DialogContent dividers sx={{ p: { xs: 1.5, sm: 3 } }}>
             {selectedItem.path === carouselPath
               ? <CarouselAdminPanel />
+              : selectedItem.path === usersPath
+                ? <AdminUsersPanel />
               : <HydroAdminWorkspace path={selectedItem.path} title={selectedItem.label} />}
           </DialogContent>
         </Dialog>

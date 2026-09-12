@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&amp;family=Roboto+Flex:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"on-secondary-fixed":"#131c2a","surface-container-lowest":"#0b0e11","surface":"#111417","outline":"#8d9199","verdict-re-container":"#4c0519","inverse-on-surface":"#2e3134","verdict-re":"#fb7185","surface-container":"#1d2024","tertiary":"#a3eefb","secondary-container":"#40495a","surface-bright":"#37393d","error-container":"#93000a","verdict-ac":"#4ade80","on-error":"#690005","verdict-ac-container":"#052e16","surface-variant":"#323538","primary-fixed":"#d4e3ff","on-tertiary-container":"#005b65","tertiary-fixed":"#a3effb","on-primary-fixed-variant":"#264872","outline-variant":"#43474e","surface-container-highest":"#323539","surface-dim":"#111417","on-tertiary":"#00363d","secondary":"#bec7db","on-surface":"#e1e2e7","verdict-tle":"#fb923c","surface-container-low":"#191c1f","verdict-tle-container":"#431407","on-secondary":"#283140","verdict-mle":"#c084fc","secondary-fixed-dim":"#bec7db","secondary-fixed":"#dae3f7","on-background":"#e1e2e7","primary":"#d3e3ff","on-tertiary-fixed-variant":"#004f57","tertiary-container":"#87d2de","verdict-ce":"#fbbf24","tertiary-fixed-dim":"#87d2de","on-secondary-container":"#b0b9cc","verdict-wa":"#f87171","on-primary-fixed":"#001c39","on-surface-variant":"#c3c6d0","on-primary":"#09315a","verdict-wa-container":"#450a0a","verdict-mle-container":"#3b0764","primary-fixed-dim":"#a8c8f9","primary-container":"#a8c8f9","surface-container-high":"#272a2e","on-primary-container":"#c1d9ff","on-tertiary-fixed":"#001f24","on-error-container":"#ffdad6","on-secondary-fixed-variant":"#3e4757","background":"#111417","inverse-surface":"#e1e2e7","verdict-pend-container":"#1e293b","surface-tint":"#a8c8f9","verdict-pend":"#94a3b8","inverse-primary":"#40608b","verdict-ce-container":"#451a03","error":"#ffb4ab"},"borderRadius":{"DEFAULT":"1rem","lg":"2rem","xl":"3rem","full":"9999px"},"spacing":{"rail-width":"5rem","spacing-64":"4rem","gutter-compact":"1rem","spacing-8":"0.5rem","spacing-32":"2rem","gutter-medium":"1.5rem","spacing-20":"1.25rem","spacing-16":"1rem","spacing-48":"3rem","spacing-12":"0.75rem","gutter-expanded":"1.5rem","spacing-4":"0.25rem","nav-bar-height":"5rem","spacing-24":"1.5rem"},"fontFamily":{"headline-sm":["Roboto Flex"],"body-lg":["Roboto Flex"],"headline-lg-mobile":["Roboto Flex"],"title-sm":["Roboto Flex"],"body-md":["Roboto Flex"],"display-lg":["Roboto Flex"],"body-sm":["Roboto Flex"],"label-lg":["JetBrains Mono"],"label-md":["JetBrains Mono"],"title-md":["Roboto Flex"],"label-sm":["JetBrains Mono"],"headline-md":["Roboto Flex"],"code-body":["JetBrains Mono"],"title-lg":["Roboto Flex"],"headline-lg":["Roboto Flex"]},"fontSize":{"headline-sm":["24px",{"lineHeight":"32px","letterSpacing":"0px","fontWeight":"500"}],"body-lg":["16px",{"lineHeight":"24px","letterSpacing":"0.5px","fontWeight":"400"}],"headline-lg-mobile":["26px",{"lineHeight":"32px","letterSpacing":"0px","fontWeight":"600"}],"title-sm":["14px",{"lineHeight":"20px","letterSpacing":"0.1px","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","letterSpacing":"0.25px","fontWeight":"400"}],"display-lg":["57px",{"lineHeight":"64px","letterSpacing":"-0.25px","fontWeight":"400"}],"body-sm":["12px",{"lineHeight":"16px","letterSpacing":"0.4px","fontWeight":"400"}],"label-lg":["14px",{"lineHeight":"20px","letterSpacing":"0.1px","fontWeight":"500"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.5px","fontWeight":"500"}],"title-md":["16px",{"lineHeight":"24px","letterSpacing":"0.15px","fontWeight":"600"}],"label-sm":["11px",{"lineHeight":"16px","letterSpacing":"0.5px","fontWeight":"600"}],"headline-md":["28px",{"lineHeight":"36px","letterSpacing":"0px","fontWeight":"600"}],"code-body":["13.5px",{"lineHeight":"22px","letterSpacing":"0px","fontWeight":"400"}],"title-lg":["22px",{"lineHeight":"28px","letterSpacing":"0px","fontWeight":"500"}],"headline-lg":["32px",{"lineHeight":"40px","letterSpacing":"0px","fontWeight":"600"}]}}}};</script></head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased min-h-screen flex flex-col"><header class="fixed top-0 left-0 right-0 z-50 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-20 max-w-7xl mx-auto px-gutter-expanded flex items-center justify-between gap-spacing-16"><div class="flex items-center gap-spacing-16 flex-shrink-0"><div class="flex items-center gap-spacing-8"><img alt="Brand logo. - Primary color: #3e5f8a
+- Font: robotoFlex
+- Mode: dark
+- Roundness: rounded-md
+" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1W4J57u3yE0IiUyrfyAN_guPsH4QWV3UQ5ZwsuGuXe8yRVlwMr-GugJdplAJQ2TfP-wS8_dIN3kkxzdHBuvAyH-fPNf51TDchBqMt4TdabfS0k-BnieATt6T2gJy9wcx3mDmsHMHBzn3CQyOKUVMgXuLT9V8MfqS9LB7SXlDEqvkodKFUFak8nLPeLvfgM4V3WI8ZLddvJe6f3OVNMrCgRreMtsG9n1SMz1BIhFzDkniLI6YZCFpFYqQSw"/><div class="flex flex-col"><span class="font-title-md text-title-md text-on-surface tracking-tight leading-none">AlgoMaterial OJ</span><span class="font-label-sm text-label-sm text-tertiary mt-spacing-4">Material 3 / Monet</span></div></div><div class="h-6 w-px bg-outline-variant hidden lg:block"></div><nav class="hidden xl:flex items-center gap-spacing-4" data-active-classes="bg-secondary-container text-on-secondary-container font-medium rounded-full"><a class="px-spacing-16 py-spacing-8 rounded-full font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-path="home" href="#">首页</a><a aria-current="page" class="px-spacing-16 py-spacing-8 transition-all bg-secondary-container text-on-secondary-container font-medium rounded-full" data-path="problemset" href="#">题库</a><a class="px-spacing-16 py-spacing-8 rounded-full font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-path="contests" href="#">比赛</a><a class="px-spacing-16 py-spacing-8 rounded-full font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-path="status" href="#">评测</a><a class="px-spacing-16 py-spacing-8 rounded-full font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-path="ranklist" href="#">排名</a><a class="px-spacing-16 py-spacing-8 rounded-full font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-path="discuss" href="#">讨论</a></nav></div><div class="hidden md:flex items-center flex-1 max-w-xs mx-spacing-12"><div class="w-full flex items-center justify-between px-spacing-16 py-spacing-8 bg-surface-container rounded-full text-on-surface-variant hover:bg-surface-container-high transition-colors cursor-pointer"><div class="flex items-center gap-spacing-8"><span class="material-symbols-outlined text-[18px] text-on-surface-variant">search</span><span class="font-body-sm text-body-sm text-on-surface-variant">快速检索题目 / 算法...</span></div><kbd class="px-spacing-8 py-0.5 rounded-full bg-surface-container-highest text-on-surface font-label-sm text-label-sm">Ctrl+K</kbd></div></div><div class="flex items-center gap-spacing-12 flex-shrink-0"><div class="hidden sm:flex items-center gap-spacing-4 px-spacing-8 py-1 rounded-full bg-surface-container"><button class="w-5 h-5 rounded-full bg-[#3B82F6] hover:scale-110 transition-transform" title="Classic M3 Blue" type="button"></button><button class="w-5 h-5 rounded-full bg-[#10B981] hover:scale-110 transition-transform" title="Emerald Green" type="button"></button><button class="w-5 h-5 rounded-full bg-[#8B5CF6] hover:scale-110 transition-transform" title="Purple" type="button"></button><button class="w-5 h-5 rounded-full bg-[#F43F5E] hover:scale-110 transition-transform" title="Coral Red" type="button"></button><button class="w-5 h-5 rounded-full bg-[#F59E0B] hover:scale-110 transition-transform" title="Amber" type="button"></button></div><button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">dark_mode</span></button><div class="relative"><button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">notifications</span></button><span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-error"></span></div><div class="flex items-center gap-spacing-8 pl-spacing-4"><div class="hidden lg:flex flex-col items-end"><span class="font-label-sm text-label-sm text-on-surface">tourist_m3</span><span class="font-label-sm text-label-sm text-verdict-ce font-semibold">1840 Master</span></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></div></header><main class="w-full pt-20 flex-1 bg-surface"><div class="flex flex-col w-full">
+<!-- Subtle decorative ambient glow contained locally -->
+<div class="relative w-full max-w-7xl mx-auto px-gutter-expanded py-spacing-24">
+<div class="absolute top-10 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none -z-10"></div>
+<div class="absolute top-40 right-10 w-80 h-80 bg-tertiary/5 rounded-full blur-3xl pointer-events-none -z-10"></div>
+<!-- Top Action & Search Bar (M3 Level 2 Elevated Container) -->
+<div class="w-full bg-surface-container rounded-3xl p-spacing-16 shadow-md mb-spacing-24 flex flex-col lg:flex-row items-center justify-between gap-spacing-16">
+<!-- Search Input Box -->
+<div class="relative flex-1 w-full flex items-center bg-surface-container-highest rounded-full px-spacing-20 py-spacing-8">
+<span class="material-symbols-outlined text-outline text-[22px] mr-spacing-12">search</span>
+<input class="w-full bg-transparent border-none outline-none font-body-lg text-body-lg text-on-surface placeholder:text-outline focus:outline-none" placeholder="输入题号 (如 P1001)、题目名、算法关键词..." type="text"/>
+<button class="ml-spacing-8 flex items-center justify-center text-outline hover:text-primary transition-colors p-spacing-4 rounded-full" title="快捷过滤器" type="button">
+<span class="material-symbols-outlined text-[20px]">tune</span>
+</button>
+</div>
+<!-- Quick Action Buttons Group -->
+<div class="flex items-center gap-spacing-12 w-full lg:w-auto overflow-x-auto pb-spacing-4 lg:pb-0 scrollbar-none flex-shrink-0">
+<button class="flex items-center gap-spacing-8 px-spacing-20 py-spacing-12 rounded-full bg-primary text-on-primary font-title-sm text-title-sm shadow-sm hover:opacity-90 active:scale-95 transition-all flex-shrink-0" id="btn-random-pick" type="button">
+<span class="material-symbols-outlined text-[18px]">casino</span>
+<span>随机跳题</span>
+</button>
+<button class="flex items-center gap-spacing-8 px-spacing-16 py-spacing-12 rounded-full bg-secondary-container text-on-secondary-container font-title-sm text-title-sm hover:bg-surface-bright active:scale-95 transition-all flex-shrink-0" type="button">
+<span class="material-symbols-outlined text-[18px]">collections_bookmark</span>
+<span>题单广场</span>
+</button>
+<button class="flex items-center gap-spacing-8 px-spacing-16 py-spacing-12 rounded-full bg-surface-container-high text-primary hover:bg-surface-bright active:scale-95 transition-all flex-shrink-0" type="button">
+<span class="material-symbols-outlined text-[18px]">code_blocks</span>
+<span>自主提交</span>
+</button>
+</div>
+</div>
+<!-- M3 Filter Chips Section -->
+<div class="w-full bg-surface-container-low rounded-3xl p-spacing-20 shadow-sm mb-spacing-24 space-y-spacing-16">
+<!-- Row 1: Difficulty Filters -->
+<div class="flex flex-col sm:flex-row sm:items-center gap-spacing-8">
+<div class="flex items-center gap-spacing-4 text-on-surface-variant w-28 flex-shrink-0">
+<span class="material-symbols-outlined text-[16px] text-tertiary">signal_cellular_alt</span>
+<span class="font-title-sm text-title-sm text-on-surface-variant">难度梯度</span>
+</div>
+<div class="flex items-center gap-spacing-8 flex-wrap">
+<button class="difficulty-chip px-spacing-16 py-1 rounded-full font-label-md text-label-md bg-primary text-on-primary shadow-sm transition-all" data-diff="all" type="button">全部</button>
+<button class="difficulty-chip px-spacing-12 py-1 rounded-full font-label-md text-label-md bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-all" data-diff="none" type="button">暂无评定</button>
+<button class="difficulty-chip px-spacing-12 py-1 rounded-full font-label-md text-label-md bg-surface-container-high text-verdict-ac hover:bg-verdict-ac-container transition-all" data-diff="intro" type="button">入门</button>
+<button class="difficulty-chip px-spacing-12 py-1 rounded-full font-label-md text-label-md bg-surface-container-high text-verdict-ce hover:bg-verdict-ce-container transition-all" data-diff="pop-minus" type="button">普及-</button>
+<button class="difficulty-chip px-spacing-12 py-1 rounded-full font-label-md text-label-md bg-surface-container-high text-verdict-tle hover:bg-verdict-tle-container transition-all" data-diff="pop-mid" type="button">普及/提高-</button>
+<button class="difficulty-chip px-spacing-12 py-1 rounded-full font-label-md text-label-md bg-surface-container-high text-tertiary hover:bg-surface-bright transition-all" data-diff="prov-minus" type="button">提高+/省选-</button>
+<button class="difficulty-chip px-spacing-12 py-1 rounded-full font-label-md text-label-md bg-surface-container-high text-verdict-mle hover:bg-verdict-mle-container transition-all" data-diff="prov-adv" type="button">省选/NOI-</button>
+<button class="difficulty-chip px-spacing-12 py-1 rounded-full font-label-md text-label-md bg-surface-container-high text-verdict-wa hover:bg-verdict-wa-container transition-all" data-diff="noi" type="button">NOI+/CTSC</button>
+</div>
+</div>
+<!-- Row 2: Algorithm Category Chips -->
+<div class="flex flex-col sm:flex-row sm:items-center gap-spacing-8">
+<div class="flex items-center gap-spacing-4 text-on-surface-variant w-28 flex-shrink-0">
+<span class="material-symbols-outlined text-[16px] text-primary">category</span>
+<span class="font-title-sm text-title-sm text-on-surface-variant">算法标签</span>
+</div>
+<div class="flex items-center gap-spacing-8 flex-wrap">
+<button class="algo-chip px-spacing-12 py-1 rounded-full font-label-md text-label-md bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-all flex items-center gap-spacing-4" type="button">
+<span>动态规划</span>
+<span class="text-outline font-label-sm text-label-sm">431</span>
+</button>
+<button class="algo-chip px-spacing-12 py-1 rounded-full font-label-md text-label-md bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-all flex items-center gap-spacing-4" type="button">
+<span>贪心</span>
+<span class="text-outline font-label-sm text-label-sm">215</span>
+</button>
+<button class="algo-chip px-spacing-12 py-1 rounded-full font-label-md text-label-md bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-all flex items-center gap-spacing-4" type="button">
+<span>搜索/DFS/BFS</span>
+<span class="text-outline font-label-sm text-label-sm">302</span>
+</button>
+<button class="algo-chip px-spacing-12 py-1 rounded-full font-label-md text-label-md bg-secondary-container text-on-secondary-container transition-all flex items-center gap-spacing-4" type="button">
+<span>图论</span>
+<span class="text-outline font-label-sm text-label-sm">389</span>
+</button>
+<button class="algo-chip px-spacing-12 py-1 rounded-full font-label-md text-label-md bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-all flex items-center gap-spacing-4" type="button">
+<span>数论</span>
+<span class="text-outline font-label-sm text-label-sm">188</span>
+</button>
+<button class="algo-chip px-spacing-12 py-1 rounded-full font-label-md text-label-md bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-all flex items-center gap-spacing-4" type="button">
+<span>数据结构</span>
+<span class="text-outline font-label-sm text-label-sm">512</span>
+</button>
+<button class="algo-chip px-spacing-12 py-1 rounded-full font-label-md text-label-md bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-all flex items-center gap-spacing-4" type="button">
+<span>计算几何</span>
+<span class="text-outline font-label-sm text-label-sm">74</span>
+</button>
+<button class="algo-chip px-spacing-12 py-1 rounded-full font-label-md text-label-md bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-all flex items-center gap-spacing-4" type="button">
+<span>字符串</span>
+<span class="text-outline font-label-sm text-label-sm">163</span>
+</button>
+</div>
+</div>
+<!-- Row 3: Source Filter Chips -->
+<div class="flex flex-col sm:flex-row sm:items-center gap-spacing-8">
+<div class="flex items-center gap-spacing-4 text-on-surface-variant w-28 flex-shrink-0">
+<span class="material-symbols-outlined text-[16px] text-secondary">database</span>
+<span class="font-title-sm text-title-sm text-on-surface-variant">题库来源</span>
+</div>
+<div class="flex items-center gap-spacing-8 flex-wrap">
+<span class="px-spacing-12 py-1 rounded-full font-label-md text-label-md bg-surface-container-high text-primary hover:bg-surface-bright cursor-pointer transition-all">洛谷</span>
+<span class="px-spacing-12 py-1 rounded-full font-label-md text-label-md bg-surface-container-high text-on-surface-variant hover:text-on-surface cursor-pointer transition-all">TBOJ 原创</span>
+<span class="px-spacing-12 py-1 rounded-full font-label-md text-label-md bg-surface-container-high text-on-surface-variant hover:text-on-surface cursor-pointer transition-all">Codeforces</span>
+<span class="px-spacing-12 py-1 rounded-full font-label-md text-label-md bg-surface-container-high text-on-surface-variant hover:text-on-surface cursor-pointer transition-all">AtCoder</span>
+<span class="px-spacing-12 py-1 rounded-full font-label-md text-label-md bg-surface-container-high text-on-surface-variant hover:text-on-surface cursor-pointer transition-all">CSP-J/S</span>
+<span class="px-spacing-12 py-1 rounded-full font-label-md text-label-md bg-surface-container-high text-on-surface-variant hover:text-on-surface cursor-pointer transition-all">NOIP</span>
+</div>
+</div>
+</div>
+<!-- Main Content Area: 75% Table / 25% Sidebar -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-spacing-24">
+<!-- Left Column: Problem Table (9 cols / ~75%) -->
+<div class="lg:col-span-9 flex flex-col gap-spacing-16 min-w-0">
+<!-- Table Container Card -->
+<div class="bg-surface-container-low rounded-3xl shadow-sm overflow-hidden flex flex-col">
+<!-- Table Sub-Header Meta -->
+<div class="px-spacing-24 py-spacing-16 bg-surface-container flex items-center justify-between">
+<div class="flex items-center gap-spacing-8">
+<span class="font-title-md text-title-md text-on-surface">题库检索结果</span>
+<span class="px-spacing-8 py-0.5 rounded-full bg-surface-container-highest text-tertiary font-label-sm text-label-sm">共 3,842 道题目</span>
+</div>
+<div class="flex items-center gap-spacing-12">
+<span class="font-label-sm text-label-sm text-on-surface-variant">排序方式:</span>
+<button class="flex items-center gap-spacing-4 px-spacing-12 py-1 rounded-full bg-surface-container-high text-on-surface font-label-sm text-label-sm hover:bg-surface-bright transition-colors" type="button">
+<span>题号升序</span>
+<span class="material-symbols-outlined text-[14px]">arrow_downward</span>
+</button>
+</div>
+</div>
+<!-- Responsive Data Table -->
+<div class="w-full overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container/60 text-outline font-label-md text-label-md">
+<th class="py-spacing-12 px-spacing-16 text-center w-16">状态</th>
+<th class="py-spacing-12 px-spacing-16 w-24">题号</th>
+<th class="py-spacing-12 px-spacing-16 min-w-[200px]">题目名称</th>
+<th class="py-spacing-12 px-spacing-16">算法标签</th>
+<th class="py-spacing-12 px-spacing-16 w-32">难度</th>
+<th class="py-spacing-12 px-spacing-20 w-44">通过率</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md divide-y divide-transparent">
+<!-- Row 1: P1001 A+B Problem (AC) -->
+<tr class="hover:bg-surface-container/70 transition-colors group cursor-pointer">
+<td class="py-spacing-16 px-spacing-16 text-center">
+<span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-verdict-ac-container text-verdict-ac" title="Accepted">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+</span>
+</td>
+<td class="py-spacing-16 px-spacing-16 font-label-md text-label-md text-primary font-semibold">P1001</td>
+<td class="py-spacing-16 px-spacing-16">
+<div class="flex items-center gap-spacing-8">
+<span class="text-on-surface font-title-sm text-title-sm group-hover:text-primary transition-colors">A+B Problem</span>
+<span class="px-spacing-8 py-0.5 rounded-full bg-surface-container-highest text-outline font-label-sm text-label-sm">经典</span>
+</div>
+</td>
+<td class="py-spacing-16 px-spacing-16">
+<span class="inline-block px-spacing-8 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">基础语法</span>
+</td>
+<td class="py-spacing-16 px-spacing-16">
+<span class="inline-flex items-center gap-spacing-4 px-spacing-8 py-1 rounded-full bg-verdict-ac-container text-verdict-ac font-label-sm text-label-sm font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-verdict-ac"></span>
+<span>入门</span>
+</span>
+</td>
+<td class="py-spacing-16 px-spacing-20">
+<div class="flex flex-col gap-spacing-4">
+<div class="flex justify-between items-center font-label-sm text-label-sm">
+<span class="text-on-surface">92.4%</span>
+<span class="text-outline">1.2M 提交</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-verdict-ac rounded-full" style="width: 92.4%;"></div>
+</div>
+</div>
+</td>
+</tr>
+<!-- Row 2: P1002 过河卒 (AC) -->
+<tr class="hover:bg-surface-container/70 transition-colors group cursor-pointer bg-surface-container-low/40">
+<td class="py-spacing-16 px-spacing-16 text-center">
+<span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-verdict-ac-container text-verdict-ac" title="Accepted">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+</span>
+</td>
+<td class="py-spacing-16 px-spacing-16 font-label-md text-label-md text-primary font-semibold">P1002</td>
+<td class="py-spacing-16 px-spacing-16">
+<span class="text-on-surface font-title-sm text-title-sm group-hover:text-primary transition-colors">[NOIP2002 普及组] 过河卒</span>
+</td>
+<td class="py-spacing-16 px-spacing-16">
+<div class="flex gap-spacing-4">
+<span class="inline-block px-spacing-8 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">动态规划</span>
+</div>
+</td>
+<td class="py-spacing-16 px-spacing-16">
+<span class="inline-flex items-center gap-spacing-4 px-spacing-8 py-1 rounded-full bg-verdict-ce-container text-verdict-ce font-label-sm text-label-sm font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-verdict-ce"></span>
+<span>普及-</span>
+</span>
+</td>
+<td class="py-spacing-16 px-spacing-20">
+<div class="flex flex-col gap-spacing-4">
+<div class="flex justify-between items-center font-label-sm text-label-sm">
+<span class="text-on-surface">48.1%</span>
+<span class="text-outline">482k 提交</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-verdict-ce rounded-full" style="width: 48.1%;"></div>
+</div>
+</div>
+</td>
+</tr>
+<!-- Row 3: P1048 采药 (WA) -->
+<tr class="hover:bg-surface-container/70 transition-colors group cursor-pointer">
+<td class="py-spacing-16 px-spacing-16 text-center">
+<span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-verdict-wa-container text-verdict-wa" title="Wrong Answer">
+<span class="material-symbols-outlined text-[18px]">cancel</span>
+</span>
+</td>
+<td class="py-spacing-16 px-spacing-16 font-label-md text-label-md text-primary font-semibold">P1048</td>
+<td class="py-spacing-16 px-spacing-16">
+<div class="flex items-center gap-spacing-8">
+<span class="text-on-surface font-title-sm text-title-sm group-hover:text-primary transition-colors">[NOIP2005 普及组] 采药</span>
+<span class="px-spacing-8 py-0.5 rounded-full bg-verdict-wa-container text-verdict-wa font-label-sm text-label-sm">待重测</span>
+</div>
+</td>
+<td class="py-spacing-16 px-spacing-16">
+<div class="flex gap-spacing-4">
+<span class="inline-block px-spacing-8 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">0/1 背包</span>
+</div>
+</td>
+<td class="py-spacing-16 px-spacing-16">
+<span class="inline-flex items-center gap-spacing-4 px-spacing-8 py-1 rounded-full bg-verdict-ce-container text-verdict-ce font-label-sm text-label-sm font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-verdict-ce"></span>
+<span>普及-</span>
+</span>
+</td>
+<td class="py-spacing-16 px-spacing-20">
+<div class="flex flex-col gap-spacing-4">
+<div class="flex justify-between items-center font-label-sm text-label-sm">
+<span class="text-on-surface">54.3%</span>
+<span class="text-outline">390k 提交</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-verdict-ce rounded-full" style="width: 54.3%;"></div>
+</div>
+</div>
+</td>
+</tr>
+<!-- Row 4: P3372 线段树 1 (Todo) -->
+<tr class="hover:bg-surface-container/70 transition-colors group cursor-pointer bg-surface-container-low/40">
+<td class="py-spacing-16 px-spacing-16 text-center">
+<span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-surface-container text-outline" title="Not Attempted">
+<span class="material-symbols-outlined text-[18px]">radio_button_unchecked</span>
+</span>
+</td>
+<td class="py-spacing-16 px-spacing-16 font-label-md text-label-md text-primary font-semibold">P3372</td>
+<td class="py-spacing-16 px-spacing-16">
+<span class="text-on-surface font-title-sm text-title-sm group-hover:text-primary transition-colors">【模板】线段树 1</span>
+</td>
+<td class="py-spacing-16 px-spacing-16">
+<div class="flex gap-spacing-4 flex-wrap">
+<span class="inline-block px-spacing-8 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">数据结构</span>
+<span class="inline-block px-spacing-8 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">区间修改</span>
+</div>
+</td>
+<td class="py-spacing-16 px-spacing-16">
+<span class="inline-flex items-center gap-spacing-4 px-spacing-8 py-1 rounded-full bg-secondary-container text-tertiary font-label-sm text-label-sm font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+<span>提高+/省选-</span>
+</span>
+</td>
+<td class="py-spacing-16 px-spacing-20">
+<div class="flex flex-col gap-spacing-4">
+<div class="flex justify-between items-center font-label-sm text-label-sm">
+<span class="text-on-surface">36.8%</span>
+<span class="text-outline">284k 提交</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-tertiary rounded-full" style="width: 36.8%;"></div>
+</div>
+</div>
+</td>
+</tr>
+<!-- Row 5: P3379 最近公共祖先 LCA (AC) -->
+<tr class="hover:bg-surface-container/70 transition-colors group cursor-pointer">
+<td class="py-spacing-16 px-spacing-16 text-center">
+<span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-verdict-ac-container text-verdict-ac" title="Accepted">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+</span>
+</td>
+<td class="py-spacing-16 px-spacing-16 font-label-md text-label-md text-primary font-semibold">P3379</td>
+<td class="py-spacing-16 px-spacing-16">
+<span class="text-on-surface font-title-sm text-title-sm group-hover:text-primary transition-colors">【模板】最近公共祖先 (LCA)</span>
+</td>
+<td class="py-spacing-16 px-spacing-16">
+<div class="flex gap-spacing-4">
+<span class="inline-block px-spacing-8 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">树形结构</span>
+<span class="inline-block px-spacing-8 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">倍增</span>
+</div>
+</td>
+<td class="py-spacing-16 px-spacing-16">
+<span class="inline-flex items-center gap-spacing-4 px-spacing-8 py-1 rounded-full bg-secondary-container text-tertiary font-label-sm text-label-sm font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+<span>提高+/省选-</span>
+</span>
+</td>
+<td class="py-spacing-16 px-spacing-20">
+<div class="flex flex-col gap-spacing-4">
+<div class="flex justify-between items-center font-label-sm text-label-sm">
+<span class="text-on-surface">42.1%</span>
+<span class="text-outline">198k 提交</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-tertiary rounded-full" style="width: 42.1%;"></div>
+</div>
+</div>
+</td>
+</tr>
+<!-- Row 6: P4779 单源最短路径 Dijkstra (Todo) -->
+<tr class="hover:bg-surface-container/70 transition-colors group cursor-pointer bg-surface-container-low/40">
+<td class="py-spacing-16 px-spacing-16 text-center">
+<span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-surface-container text-outline" title="Not Attempted">
+<span class="material-symbols-outlined text-[18px]">radio_button_unchecked</span>
+</span>
+</td>
+<td class="py-spacing-16 px-spacing-16 font-label-md text-label-md text-primary font-semibold">P4779</td>
+<td class="py-spacing-16 px-spacing-16">
+<span class="text-on-surface font-title-sm text-title-sm group-hover:text-primary transition-colors">【模板】单源最短路径 (标准版)</span>
+</td>
+<td class="py-spacing-16 px-spacing-16">
+<div class="flex gap-spacing-4">
+<span class="inline-block px-spacing-8 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">图论</span>
+<span class="inline-block px-spacing-8 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">堆优化</span>
+</div>
+</td>
+<td class="py-spacing-16 px-spacing-16">
+<span class="inline-flex items-center gap-spacing-4 px-spacing-8 py-1 rounded-full bg-secondary-container text-tertiary font-label-sm text-label-sm font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+<span>提高+/省选-</span>
+</span>
+</td>
+<td class="py-spacing-16 px-spacing-20">
+<div class="flex flex-col gap-spacing-4">
+<div class="flex justify-between items-center font-label-sm text-label-sm">
+<span class="text-on-surface">44.5%</span>
+<span class="text-outline">152k 提交</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-tertiary rounded-full" style="width: 44.5%;"></div>
+</div>
+</div>
+</td>
+</tr>
+<!-- Row 7: P1144 最短路计数 (AC) -->
+<tr class="hover:bg-surface-container/70 transition-colors group cursor-pointer">
+<td class="py-spacing-16 px-spacing-16 text-center">
+<span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-verdict-ac-container text-verdict-ac" title="Accepted">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+</span>
+</td>
+<td class="py-spacing-16 px-spacing-16 font-label-md text-label-md text-primary font-semibold">P1144</td>
+<td class="py-spacing-16 px-spacing-16">
+<span class="text-on-surface font-title-sm text-title-sm group-hover:text-primary transition-colors">最短路计数</span>
+</td>
+<td class="py-spacing-16 px-spacing-16">
+<div class="flex gap-spacing-4">
+<span class="inline-block px-spacing-8 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">BFS</span>
+<span class="inline-block px-spacing-8 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">图论</span>
+</div>
+</td>
+<td class="py-spacing-16 px-spacing-16">
+<span class="inline-flex items-center gap-spacing-4 px-spacing-8 py-1 rounded-full bg-verdict-tle-container text-verdict-tle font-label-sm text-label-sm font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-verdict-tle"></span>
+<span>普及/提高-</span>
+</span>
+</td>
+<td class="py-spacing-16 px-spacing-20">
+<div class="flex flex-col gap-spacing-4">
+<div class="flex justify-between items-center font-label-sm text-label-sm">
+<span class="text-on-surface">41.2%</span>
+<span class="text-outline">67k 提交</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-verdict-tle rounded-full" style="width: 41.2%;"></div>
+</div>
+</div>
+</td>
+</tr>
+<!-- Row 8: P2617 Dynamic Rankings (Todo) -->
+<tr class="hover:bg-surface-container/70 transition-colors group cursor-pointer bg-surface-container-low/40">
+<td class="py-spacing-16 px-spacing-16 text-center">
+<span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-surface-container text-outline" title="Not Attempted">
+<span class="material-symbols-outlined text-[18px]">radio_button_unchecked</span>
+</span>
+</td>
+<td class="py-spacing-16 px-spacing-16 font-label-md text-label-md text-primary font-semibold">P2617</td>
+<td class="py-spacing-16 px-spacing-16">
+<span class="text-on-surface font-title-sm text-title-sm group-hover:text-primary transition-colors">Dynamic Rankings (带修主席树)</span>
+</td>
+<td class="py-spacing-16 px-spacing-16">
+<div class="flex gap-spacing-4 flex-wrap">
+<span class="inline-block px-spacing-8 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">树套树</span>
+<span class="inline-block px-spacing-8 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">高级结构</span>
+</div>
+</td>
+<td class="py-spacing-16 px-spacing-16">
+<span class="inline-flex items-center gap-spacing-4 px-spacing-8 py-1 rounded-full bg-verdict-mle-container text-verdict-mle font-label-sm text-label-sm font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-verdict-mle"></span>
+<span>省选/NOI-</span>
+</span>
+</td>
+<td class="py-spacing-16 px-spacing-20">
+<div class="flex flex-col gap-spacing-4">
+<div class="flex justify-between items-center font-label-sm text-label-sm">
+<span class="text-on-surface">28.5%</span>
+<span class="text-outline">41k 提交</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-verdict-mle rounded-full" style="width: 28.5%;"></div>
+</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- M3 Standard Pagination -->
+<div class="px-spacing-24 py-spacing-16 bg-surface-container flex flex-col sm:flex-row items-center justify-between gap-spacing-16">
+<span class="font-label-sm text-label-sm text-on-surface-variant">显示 1 至 8 条，共 3842 条数据</span>
+<div class="flex items-center gap-spacing-4">
+<button class="w-9 h-9 rounded-full flex items-center justify-center text-outline hover:bg-surface-container-highest hover:text-on-surface transition-colors" disabled="" type="button">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<button class="w-9 h-9 rounded-full bg-primary text-on-primary font-label-sm text-label-sm font-medium shadow-sm" type="button">1</button>
+<button class="w-9 h-9 rounded-full text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface font-label-sm text-label-sm transition-colors" type="button">2</button>
+<button class="w-9 h-9 rounded-full text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface font-label-sm text-label-sm transition-colors" type="button">3</button>
+<span class="w-6 text-center text-outline font-label-sm text-label-sm">...</span>
+<button class="w-9 h-9 rounded-full text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface font-label-sm text-label-sm transition-colors" type="button">77</button>
+<button class="w-9 h-9 rounded-full flex items-center justify-center text-on-surface hover:bg-surface-container-highest transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Analytics & Recommendations Sidebar (3 cols / ~25%) -->
+<div class="lg:col-span-3 flex flex-col gap-spacing-24">
+<!-- Card 1: User Solved Stats Gauge -->
+<div class="bg-surface-container-low rounded-3xl p-spacing-20 shadow-sm flex flex-col">
+<div class="flex items-center justify-between mb-spacing-16">
+<div class="flex items-center gap-spacing-8">
+<span class="material-symbols-outlined text-[20px] text-tertiary">donut_large</span>
+<span class="font-title-md text-title-md text-on-surface">解题进度</span>
+</div>
+<span class="px-spacing-8 py-0.5 rounded-full bg-surface-container-highest text-tertiary font-label-sm text-label-sm">Master</span>
+</div>
+<!-- Circular SVG Gauge -->
+<div class="relative flex items-center justify-center my-spacing-8">
+<svg class="w-36 h-36 transform -rotate-90" viewbox="0 0 120 120">
+<circle class="text-surface-container-highest" cx="60" cy="60" fill="transparent" r="50" stroke="currentColor" stroke-width="10"></circle>
+<!-- 11.1% of circumference: 2*PI*50 ≈ 314.16. Dash = 314.16 * 0.111 ≈ 34.87 -->
+<circle class="text-primary transition-all duration-1000 ease-out" cx="60" cy="60" fill="transparent" r="50" stroke="currentColor" stroke-dasharray="314.16" stroke-dashoffset="279.29" stroke-linecap="round" stroke-width="10"></circle>
+</svg>
+<div class="absolute flex flex-col items-center justify-center text-center">
+<span class="font-display-lg text-[28px] leading-tight font-semibold text-on-surface tracking-tight">428</span>
+<span class="font-label-sm text-label-sm text-outline">/ 3842 (11.1%)</span>
+</div>
+</div>
+<!-- Difficulty Breakdown Progress Bars -->
+<div class="space-y-spacing-12 mt-spacing-12">
+<div>
+<div class="flex justify-between font-label-sm text-label-sm mb-1">
+<span class="text-verdict-ac">入门 ~ 普及-</span>
+<span class="text-on-surface">264 / 620</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-verdict-ac rounded-full" style="width: 42.5%;"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between font-label-sm text-label-sm mb-1">
+<span class="text-tertiary">普及 ~ 提高+</span>
+<span class="text-on-surface">132 / 1280</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-tertiary rounded-full" style="width: 10.3%;"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between font-label-sm text-label-sm mb-1">
+<span class="text-verdict-mle">省选 ~ NOI+</span>
+<span class="text-on-surface">32 / 1942</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-verdict-mle rounded-full" style="width: 1.6%;"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 2: Algorithm Mastery Radar Chart -->
+<div class="bg-surface-container-low rounded-3xl p-spacing-20 shadow-sm flex flex-col">
+<div class="flex items-center justify-between mb-spacing-12">
+<div class="flex items-center gap-spacing-8">
+<span class="material-symbols-outlined text-[20px] text-primary">polyline</span>
+<span class="font-title-md text-title-md text-on-surface">算法能力雷达</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">动态雷达</span>
+</div>
+<!-- M3 Styled Inline SVG Polygon Radar -->
+<div class="w-full flex items-center justify-center py-spacing-8">
+<svg class="w-56 h-56" viewbox="0 0 200 200">
+<!-- Outer web layers -->
+<polygon class="text-surface-container-highest" fill="none" points="100,20 176,64 176,136 100,180 24,136 24,64" stroke="currentColor" stroke-width="1"></polygon>
+<polygon class="text-surface-container-highest" fill="none" points="100,45 152,75 152,125 100,155 48,125 48,75" stroke="currentColor" stroke-dasharray="2 2" stroke-width="1"></polygon>
+<polygon class="text-surface-container-highest" fill="none" points="100,70 128,86 128,114 100,130 72,114 72,86" stroke="currentColor" stroke-width="1"></polygon>
+<!-- Axis Lines -->
+<line class="text-surface-container-highest" stroke="currentColor" stroke-width="1" x1="100" x2="100" y1="100" y2="20"></line>
+<line class="text-surface-container-highest" stroke="currentColor" stroke-width="1" x1="100" x2="176" y1="100" y2="64"></line>
+<line class="text-surface-container-highest" stroke="currentColor" stroke-width="1" x1="100" x2="176" y1="100" y2="136"></line>
+<line class="text-surface-container-highest" stroke="currentColor" stroke-width="1" x1="100" x2="100" y1="100" y2="180"></line>
+<line class="text-surface-container-highest" stroke="currentColor" stroke-width="1" x1="100" x2="24" y1="100" y2="136"></line>
+<line class="text-surface-container-highest" stroke="currentColor" stroke-width="1" x1="100" x2="24" y1="100" y2="64"></line>
+<!-- Data Fill Area (Dynamic Programming, Greedy, DS, Graph, Math, String) -->
+<polygon class="fill-primary/25 stroke-primary" points="100,32 160,70 142,128 100,165 42,118 45,72" stroke-width="2"></polygon>
+<!-- Data Points -->
+<circle class="fill-primary" cx="100" cy="32" r="3"></circle>
+<circle class="fill-primary" cx="160" cy="70" r="3"></circle>
+<circle class="fill-primary" cx="142" cy="128" r="3"></circle>
+<circle class="fill-primary" cx="100" cy="165" r="3"></circle>
+<circle class="fill-primary" cx="42" cy="118" r="3"></circle>
+<circle class="fill-primary" cx="45" cy="72" r="3"></circle>
+<!-- Radar Labels -->
+<text class="fill-on-surface-variant font-label-sm text-[10px]" text-anchor="middle" x="100" y="14">DP</text>
+<text class="fill-on-surface-variant font-label-sm text-[10px]" text-anchor="start" x="185" y="66">贪心</text>
+<text class="fill-on-surface-variant font-label-sm text-[10px]" text-anchor="start" x="185" y="140">图论</text>
+<text class="fill-on-surface-variant font-label-sm text-[10px]" text-anchor="middle" x="100" y="196">数论</text>
+<text class="fill-on-surface-variant font-label-sm text-[10px]" text-anchor="end" x="14" y="140">结构</text>
+<text class="fill-on-surface-variant font-label-sm text-[10px]" text-anchor="end" x="14" y="66">几何</text>
+</svg>
+</div>
+<div class="mt-spacing-8 text-center">
+<span class="font-body-sm text-body-sm text-tertiary">强项领域：动态规划 (Lv.6) &amp; 图论 (Lv.5)</span>
+</div>
+</div>
+<!-- Card 3: 推荐经典题单 Card with Placeholder Artwork -->
+<div class="bg-surface-container-low rounded-3xl p-spacing-20 shadow-sm flex flex-col relative overflow-hidden group hover:bg-surface-container transition-colors cursor-pointer">
+<div class="absolute -right-6 -bottom-6 w-32 h-32 bg-secondary-container/40 rounded-full blur-xl pointer-events-none"></div>
+<div class="flex items-center gap-spacing-8 mb-spacing-12">
+<span class="px-spacing-8 py-0.5 rounded-full bg-verdict-ce-container text-verdict-ce font-label-sm text-label-sm font-semibold">HOT 推荐</span>
+<span class="font-label-sm text-label-sm text-outline">经典刷题计划</span>
+</div>
+<!-- Featured Problem Set Visual Cover -->
+<div class="relative w-full h-28 rounded-2xl overflow-hidden mb-spacing-12">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="An abstract algorithmic visualization representing competitive programming and algorithms, featuring glowing topological network graph nodes and glowing matrix numbers on a deep midnight blue background matching dark mode Material Design 3, futuristic aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAykxlNV9cEa0nFLMzPOYdKyKspxNEoQ-t1KWSzHOvHIPI8bS3mQqmoievPLSwECA8_XrWEsAMdYMRH8PMKkZFt3qxj1TNqdn4vYmgr-9NBWEfYtjuhLax8gilPDiuSDSW42BH1Fx-nq85SGmN0mQH5elCe7ZvtqEsT0sa6qsYcilfXQPcrycH6KgaBHYUZnA53URd24tlxWGW9cQZgC7pMcrlBaKtldSMAD9Gn4NTWKdvmHVMSIO7t"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-transparent to-transparent"></div>
+<span class="absolute bottom-2 left-3 font-label-sm text-label-sm text-primary-fixed bg-surface-container-lowest/80 px-spacing-8 py-0.5 rounded-md">40 题全解析</span>
+</div>
+<h3 class="font-title-md text-title-md text-on-surface mb-spacing-8 leading-snug">
+            CSP-J/S 2024 第二轮高频考点必刷 40 题
+          </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mb-spacing-16">
+            涵盖树状数组、二分答案、最短路及经典线性背包变式，历年真题改编与权威解析。
+          </p>
+<div class="flex items-center justify-between pt-spacing-12 border-t-0">
+<div class="flex items-center gap-spacing-4">
+<span class="material-symbols-outlined text-[16px] text-tertiary">groups</span>
+<span class="font-label-sm text-label-sm text-outline">8,419 人正在练</span>
+</div>
+<button class="px-spacing-16 py-1.5 rounded-full bg-secondary-container text-on-secondary-container font-title-sm text-title-sm hover:bg-surface-bright active:scale-95 transition-all" type="button">
+              立即开始
+            </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Client-side Micro-Interactions for Chips & Buttons -->
+<script>
+    (function() {
+      // Difficulty chips toggling
+      const diffChips = document.querySelectorAll('.difficulty-chip');
+      diffChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          diffChips.forEach(c => {
+            c.classList.remove('bg-primary', 'text-on-primary', 'shadow-sm');
+            c.classList.add('bg-surface-container-high', 'text-on-surface-variant');
+          });
+          chip.classList.remove('bg-surface-container-high', 'text-on-surface-variant');
+          chip.classList.add('bg-primary', 'text-on-primary', 'shadow-sm');
+        });
+      });
+
+      // Random pick button animation feedback
+      const randomBtn = document.getElementById('btn-random-pick');
+      if (randomBtn) {
+        randomBtn.addEventListener('click', () => {
+          const icon = randomBtn.querySelector('.material-symbols-outlined');
+          if (icon) {
+            icon.classList.add('animate-spin');
+            setTimeout(() => icon.classList.remove('animate-spin'), 600);
+          }
+        });
+      }
+    })();
+  </script>
+</div></main><footer class="w-full bg-surface-container-low mt-auto"><div class="max-w-7xl mx-auto px-gutter-expanded py-spacing-24 flex flex-col md:flex-row items-center justify-between gap-spacing-16"><div class="flex flex-col sm:flex-row items-center gap-spacing-16"><div class="flex items-center gap-spacing-8 px-spacing-12 py-spacing-4 rounded-full bg-surface-container"><span class="w-2 h-2 rounded-full bg-verdict-ac animate-pulse"></span><span class="font-label-sm text-label-sm text-verdict-ac">Kernel Healthy</span><span class="text-outline-variant font-label-sm text-label-sm">•</span><span class="font-label-sm text-label-sm text-on-surface-variant">0 Waiting</span><span class="text-outline-variant font-label-sm text-label-sm">•</span><span class="font-label-sm text-label-sm text-tertiary">12ms Latency</span></div><span class="font-body-sm text-body-sm text-on-surface-variant">© 2024 AlgoMaterial OJ. Material Design 3 Sandbox.</span></div><div class="flex items-center gap-spacing-16"><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Hydro API</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Luogu Format</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">GitHub</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Docs</a></div></div></footer></body></html>

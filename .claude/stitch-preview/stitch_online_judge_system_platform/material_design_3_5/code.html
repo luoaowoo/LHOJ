@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&amp;family=Roboto+Flex:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"on-secondary-fixed":"#131c2a","surface-container-lowest":"#0b0e11","surface":"#111417","outline":"#8d9199","verdict-re-container":"#4c0519","inverse-on-surface":"#2e3134","verdict-re":"#fb7185","surface-container":"#1d2024","tertiary":"#a3eefb","secondary-container":"#40495a","surface-bright":"#37393d","error-container":"#93000a","verdict-ac":"#4ade80","on-error":"#690005","verdict-ac-container":"#052e16","surface-variant":"#323538","primary-fixed":"#d4e3ff","on-tertiary-container":"#005b65","tertiary-fixed":"#a3effb","on-primary-fixed-variant":"#264872","outline-variant":"#43474e","surface-container-highest":"#323539","surface-dim":"#111417","on-tertiary":"#00363d","secondary":"#bec7db","on-surface":"#e1e2e7","verdict-tle":"#fb923c","surface-container-low":"#191c1f","verdict-tle-container":"#431407","on-secondary":"#283140","verdict-mle":"#c084fc","secondary-fixed-dim":"#bec7db","secondary-fixed":"#dae3f7","on-background":"#e1e2e7","primary":"#d3e3ff","on-tertiary-fixed-variant":"#004f57","tertiary-container":"#87d2de","verdict-ce":"#fbbf24","tertiary-fixed-dim":"#87d2de","on-secondary-container":"#b0b9cc","verdict-wa":"#f87171","on-primary-fixed":"#001c39","on-surface-variant":"#c3c6d0","on-primary":"#09315a","verdict-wa-container":"#450a0a","verdict-mle-container":"#3b0764","primary-fixed-dim":"#a8c8f9","primary-container":"#a8c8f9","surface-container-high":"#272a2e","on-primary-container":"#c1d9ff","on-tertiary-fixed":"#001f24","on-error-container":"#ffdad6","on-secondary-fixed-variant":"#3e4757","background":"#111417","inverse-surface":"#e1e2e7","verdict-pend-container":"#1e293b","surface-tint":"#a8c8f9","verdict-pend":"#94a3b8","inverse-primary":"#40608b","verdict-ce-container":"#451a03","error":"#ffb4ab"},"borderRadius":{"DEFAULT":"1rem","lg":"2rem","xl":"3rem","full":"9999px"},"spacing":{"rail-width":"5rem","spacing-64":"4rem","gutter-compact":"1rem","spacing-8":"0.5rem","spacing-32":"2rem","gutter-medium":"1.5rem","spacing-20":"1.25rem","spacing-16":"1rem","spacing-48":"3rem","spacing-12":"0.75rem","gutter-expanded":"1.5rem","spacing-4":"0.25rem","nav-bar-height":"5rem","spacing-24":"1.5rem"},"fontFamily":{"headline-sm":["Roboto Flex"],"body-lg":["Roboto Flex"],"headline-lg-mobile":["Roboto Flex"],"title-sm":["Roboto Flex"],"body-md":["Roboto Flex"],"display-lg":["Roboto Flex"],"body-sm":["Roboto Flex"],"label-lg":["JetBrains Mono"],"label-md":["JetBrains Mono"],"title-md":["Roboto Flex"],"label-sm":["JetBrains Mono"],"headline-md":["Roboto Flex"],"code-body":["JetBrains Mono"],"title-lg":["Roboto Flex"],"headline-lg":["Roboto Flex"]},"fontSize":{"headline-sm":["24px",{"lineHeight":"32px","letterSpacing":"0px","fontWeight":"500"}],"body-lg":["16px",{"lineHeight":"24px","letterSpacing":"0.5px","fontWeight":"400"}],"headline-lg-mobile":["26px",{"lineHeight":"32px","letterSpacing":"0px","fontWeight":"600"}],"title-sm":["14px",{"lineHeight":"20px","letterSpacing":"0.1px","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","letterSpacing":"0.25px","fontWeight":"400"}],"display-lg":["57px",{"lineHeight":"64px","letterSpacing":"-0.25px","fontWeight":"400"}],"body-sm":["12px",{"lineHeight":"16px","letterSpacing":"0.4px","fontWeight":"400"}],"label-lg":["14px",{"lineHeight":"20px","letterSpacing":"0.1px","fontWeight":"500"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.5px","fontWeight":"500"}],"title-md":["16px",{"lineHeight":"24px","letterSpacing":"0.15px","fontWeight":"600"}],"label-sm":["11px",{"lineHeight":"16px","letterSpacing":"0.5px","fontWeight":"600"}],"headline-md":["28px",{"lineHeight":"36px","letterSpacing":"0px","fontWeight":"600"}],"code-body":["13.5px",{"lineHeight":"22px","letterSpacing":"0px","fontWeight":"400"}],"title-lg":["22px",{"lineHeight":"28px","letterSpacing":"0px","fontWeight":"500"}],"headline-lg":["32px",{"lineHeight":"40px","letterSpacing":"0px","fontWeight":"600"}]}}}};</script></head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased min-h-screen flex flex-col"><header class="fixed top-0 left-0 right-0 z-50 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-20 max-w-7xl mx-auto px-gutter-expanded flex items-center justify-between gap-spacing-16"><div class="flex items-center gap-spacing-16 flex-shrink-0"><div class="flex items-center gap-spacing-8"><img alt="Brand logo. - Primary color: #3e5f8a
+- Font: robotoFlex
+- Mode: dark
+- Roundness: rounded-md
+" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1W4J57u3yE0IiUyrfyAN_guPsH4QWV3UQ5ZwsuGuXe8yRVlwMr-GugJdplAJQ2TfP-wS8_dIN3kkxzdHBuvAyH-fPNf51TDchBqMt4TdabfS0k-BnieATt6T2gJy9wcx3mDmsHMHBzn3CQyOKUVMgXuLT9V8MfqS9LB7SXlDEqvkodKFUFak8nLPeLvfgM4V3WI8ZLddvJe6f3OVNMrCgRreMtsG9n1SMz1BIhFzDkniLI6YZCFpFYqQSw"/><div class="flex flex-col"><span class="font-title-md text-title-md text-on-surface tracking-tight leading-none">AlgoMaterial OJ</span><span class="font-label-sm text-label-sm text-tertiary mt-spacing-4">Material 3 / Monet</span></div></div><div class="h-6 w-px bg-outline-variant hidden lg:block"></div><nav class="hidden xl:flex items-center gap-spacing-4" data-active-classes="bg-secondary-container text-on-secondary-container font-medium rounded-full"><a aria-current="page" class="px-spacing-16 py-spacing-8 transition-all bg-secondary-container text-on-secondary-container font-medium rounded-full" data-path="home" href="#">首页</a><a class="px-spacing-16 py-spacing-8 rounded-full font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-path="problemset" href="#">题库</a><a class="px-spacing-16 py-spacing-8 rounded-full font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-path="contests" href="#">比赛</a><a class="px-spacing-16 py-spacing-8 rounded-full font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-path="status" href="#">评测</a><a class="px-spacing-16 py-spacing-8 rounded-full font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-path="ranklist" href="#">排名</a><a class="px-spacing-16 py-spacing-8 rounded-full font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-path="discuss" href="#">讨论</a></nav></div><div class="hidden md:flex items-center flex-1 max-w-xs mx-spacing-12"><div class="w-full flex items-center justify-between px-spacing-16 py-spacing-8 bg-surface-container rounded-full text-on-surface-variant hover:bg-surface-container-high transition-colors cursor-pointer"><div class="flex items-center gap-spacing-8"><span class="material-symbols-outlined text-[18px] text-on-surface-variant">search</span><span class="font-body-sm text-body-sm text-on-surface-variant">快速检索题目 / 算法...</span></div><kbd class="px-spacing-8 py-0.5 rounded-full bg-surface-container-highest text-on-surface font-label-sm text-label-sm">Ctrl+K</kbd></div></div><div class="flex items-center gap-spacing-12 flex-shrink-0"><div class="hidden sm:flex items-center gap-spacing-4 px-spacing-8 py-1 rounded-full bg-surface-container"><button class="w-5 h-5 rounded-full bg-[#3B82F6] hover:scale-110 transition-transform" title="Classic M3 Blue" type="button"></button><button class="w-5 h-5 rounded-full bg-[#10B981] hover:scale-110 transition-transform" title="Emerald Green" type="button"></button><button class="w-5 h-5 rounded-full bg-[#8B5CF6] hover:scale-110 transition-transform" title="Purple" type="button"></button><button class="w-5 h-5 rounded-full bg-[#F43F5E] hover:scale-110 transition-transform" title="Coral Red" type="button"></button><button class="w-5 h-5 rounded-full bg-[#F59E0B] hover:scale-110 transition-transform" title="Amber" type="button"></button></div><button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">dark_mode</span></button><div class="relative"><button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">notifications</span></button><span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-error"></span></div><div class="flex items-center gap-spacing-8 pl-spacing-4"><div class="hidden lg:flex flex-col items-end"><span class="font-label-sm text-label-sm text-on-surface">tourist_m3</span><span class="font-label-sm text-label-sm text-verdict-ce font-semibold">1840 Master</span></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></div></header><main class="w-full pt-20 flex-1 bg-surface"><div class="flex flex-col w-full">
+<div class="w-full max-w-7xl mx-auto px-gutter-compact sm:px-gutter-medium lg:px-gutter-expanded py-spacing-24 space-y-spacing-24">
+<!-- Top Banner: User State & Material You Hero Panel -->
+<div class="relative overflow-hidden rounded-3xl bg-surface-container-low shadow-xl p-spacing-24 lg:p-spacing-32">
+<!-- Decorative ambient gradient bloom -->
+<div class="absolute -right-16 -top-16 w-96 h-96 rounded-full bg-primary/10 blur-3xl pointer-events-none"></div>
+<div class="absolute right-1/4 -bottom-20 w-80 h-80 rounded-full bg-tertiary/10 blur-3xl pointer-events-none"></div>
+<div class="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-spacing-24">
+<!-- Left: User Identity & EXP -->
+<div class="flex flex-col sm:flex-row items-start sm:items-center gap-spacing-20 flex-1 min-w-0">
+<div class="relative flex-shrink-0">
+<div class="w-20 h-20 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container shadow-md">
+<span class="material-symbols-outlined text-[44px]" style="font-variation-settings: 'FILL' 1;">terminal</span>
+</div>
+<span class="absolute -bottom-1 -right-1 px-spacing-8 py-0.5 rounded-full bg-primary text-on-primary font-label-sm text-label-sm shadow">Lv.9</span>
+</div>
+<div class="space-y-spacing-8 min-w-0 flex-1">
+<div class="flex flex-wrap items-center gap-spacing-8">
+<h1 class="font-headline-md text-headline-md text-on-surface font-semibold tracking-tight">早安，tourist_m3</h1>
+<span class="px-spacing-12 py-spacing-4 rounded-full bg-surface-container-highest text-tertiary font-label-sm text-label-sm flex items-center gap-spacing-4">
+<span class="material-symbols-outlined text-[14px]">military_tech</span>
+                算法哲人 AlgorithmMaster
+              </span>
+<span class="px-spacing-12 py-spacing-4 rounded-full bg-verdict-ce-container text-verdict-ce font-label-sm text-label-sm flex items-center gap-spacing-4">
+<span class="material-symbols-outlined text-[14px]">local_fire_department</span>
+                42 天连续打卡
+              </span>
+</div>
+<!-- EXP Bar -->
+<div class="max-w-xl space-y-spacing-4">
+<div class="flex items-center justify-between font-label-sm text-label-sm text-on-surface-variant">
+<span>经验值成长阶梯</span>
+<span class="text-on-surface">3,840 / 5,000 EXP (<span class="text-primary font-medium">76.8%</span>)</span>
+</div>
+<div class="w-full h-3 rounded-full bg-surface-container-highest overflow-hidden">
+<div class="h-full rounded-full bg-gradient-to-r from-primary to-tertiary transition-all duration-700" style="width: 76.8%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right: Primary Call to Action -->
+<div class="flex flex-row sm:flex-row lg:flex-col items-center lg:items-end gap-spacing-12 w-full lg:w-auto">
+<button class="w-full sm:w-auto px-spacing-24 py-spacing-12 rounded-full bg-primary text-on-primary hover:bg-primary/90 active:scale-95 transition-all shadow-md flex items-center justify-center gap-spacing-8 font-title-sm text-title-sm">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+            继续今日训练 (动态规划进阶)
+          </button>
+<div class="text-on-surface-variant font-label-sm text-label-sm flex items-center gap-spacing-8">
+<span class="w-2 h-2 rounded-full bg-verdict-ac"></span>
+            今日剩余可用复活卡 × 2
+          </div>
+</div>
+</div>
+</div>
+<!-- M3 4-Stats Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-spacing-16">
+<!-- Card 1: AC Total with Circular Indicator -->
+<div class="bg-surface-container rounded-2xl p-spacing-20 shadow-sm hover:shadow-md transition-shadow flex items-center justify-between">
+<div class="space-y-spacing-8">
+<span class="font-body-sm text-body-sm text-on-surface-variant">总通过题目</span>
+<div class="flex items-baseline gap-spacing-8">
+<span class="font-headline-md text-headline-md text-on-surface font-semibold">482</span>
+<span class="font-label-sm text-label-sm text-outline">/ 620</span>
+</div>
+<span class="font-label-sm text-label-sm text-verdict-ac flex items-center gap-spacing-4">
+<span class="material-symbols-outlined text-[14px]">arrow_upward</span>
+            周环比 +14 题
+          </span>
+</div>
+<!-- Circular SVG Meter (77.7%) -->
+<div class="relative w-16 h-16 flex-shrink-0 flex items-center justify-center">
+<svg class="w-16 h-16 -rotate-90" viewbox="0 0 48 48">
+<circle class="text-surface-container-highest" cx="24" cy="24" fill="none" r="20" stroke="currentColor" stroke-width="4"></circle>
+<circle class="text-verdict-ac" cx="24" cy="24" fill="none" r="20" stroke="currentColor" stroke-dasharray="125.6" stroke-dashoffset="28" stroke-linecap="round" stroke-width="4"></circle>
+</svg>
+<span class="absolute font-label-sm text-label-sm text-on-surface font-semibold">77.7%</span>
+</div>
+</div>
+<!-- Card 2: Contest Rating -->
+<div class="bg-surface-container rounded-2xl p-spacing-20 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between space-y-spacing-12">
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-on-surface-variant">天梯积分 Rating</span>
+<span class="px-spacing-8 py-0.5 rounded-full bg-verdict-ce-container text-verdict-ce font-label-sm text-label-sm">Master</span>
+</div>
+<div>
+<div class="font-headline-md text-headline-md text-verdict-ce font-semibold">1840</div>
+<div class="flex items-center justify-between mt-spacing-4 font-label-sm text-label-sm">
+<span class="text-on-surface-variant">校内排位 Top 3.2%</span>
+<span class="text-verdict-ac">+38 pts 本周</span>
+</div>
+</div>
+</div>
+<!-- Card 3: Daily Target Progress -->
+<div class="bg-surface-container rounded-2xl p-spacing-20 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between space-y-spacing-12">
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-on-surface-variant">今日打卡任务</span>
+<span class="w-7 h-7 rounded-full bg-surface-container-highest flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[16px]">task_alt</span>
+</span>
+</div>
+<div class="space-y-spacing-8">
+<div class="flex items-baseline justify-between">
+<span class="font-headline-md text-headline-md text-on-surface font-semibold">4 <span class="text-title-sm text-on-surface-variant">/ 5 目标</span></span>
+<span class="font-label-sm text-label-sm text-tertiary">+120 币</span>
+</div>
+<!-- Step indicator blocks -->
+<div class="grid grid-cols-5 gap-spacing-4">
+<div class="h-1.5 rounded-full bg-primary"></div>
+<div class="h-1.5 rounded-full bg-primary"></div>
+<div class="h-1.5 rounded-full bg-primary"></div>
+<div class="h-1.5 rounded-full bg-primary"></div>
+<div class="h-1.5 rounded-full bg-surface-container-highest"></div>
+</div>
+</div>
+</div>
+<!-- Card 4: Cluster Judge Load -->
+<div class="bg-surface-container rounded-2xl p-spacing-20 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between space-y-spacing-12">
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-on-surface-variant">评测集群实时状态</span>
+<span class="flex items-center gap-spacing-4 text-verdict-ac font-label-sm text-label-sm">
+<span class="w-2 h-2 rounded-full bg-verdict-ac animate-pulse"></span>
+            8/8 在线
+          </span>
+</div>
+<div>
+<div class="flex items-baseline gap-spacing-4">
+<span class="font-headline-md text-headline-md text-on-surface font-semibold">18</span>
+<span class="font-label-sm text-label-sm text-tertiary">ms 平均吞吐延迟</span>
+</div>
+<div class="flex items-center justify-between mt-spacing-4 font-label-sm text-label-sm text-on-surface-variant">
+<span>队列: 0 待处理</span>
+<span>负载 24.3%</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Middle Grid: Daily Challenge (Hero Card) & Annual Activity Punch Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-spacing-24">
+<!-- Daily Challenge Card (5 cols) -->
+<div class="lg:col-span-5 bg-surface-container rounded-3xl p-spacing-24 shadow-md flex flex-col justify-between space-y-spacing-20 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-36 h-36 bg-primary/5 rounded-bl-full pointer-events-none"></div>
+<div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-spacing-8">
+<span class="px-spacing-12 py-spacing-4 rounded-full bg-primary-container text-on-primary-container font-label-sm text-label-sm font-semibold tracking-wide uppercase">每日一题 · 6月20日</span>
+<span class="px-spacing-8 py-0.5 rounded-full bg-surface-container-highest text-tertiary font-label-sm text-label-sm">入门 / 普及-</span>
+</div>
+<span class="text-on-surface-variant font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-verdict-ac">check_circle</span> 64.2%
+            </span>
+</div>
+<div class="mt-spacing-16 space-y-spacing-8">
+<div class="flex items-baseline gap-spacing-8">
+<span class="font-label-lg text-label-lg text-primary font-bold">P1042</span>
+<h2 class="font-title-lg text-title-lg text-on-surface font-semibold hover:text-primary transition-colors cursor-pointer">[NOIP2003 普及组] 乒乓球</h2>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-3 leading-relaxed">
+              华华通过专业分析软件记录下了每场比赛的得失分序列。根据国际乒联新旧赛制规则（11分制与21分制），选手必须至少获得指定分数且领先对手至少2分方可赢得一局。请你帮他格式化输出两种赛制下的全部比分汇总...
+            </p>
+</div>
+<!-- M3 Tags -->
+<div class="flex flex-wrap gap-spacing-8 mt-spacing-16">
+<span class="px-spacing-12 py-1 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm">字符串模拟</span>
+<span class="px-spacing-12 py-1 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm">NOIP全国联赛</span>
+<span class="px-spacing-12 py-1 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm">时限 1.00s / 128MB</span>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex items-center gap-spacing-12 pt-spacing-8">
+<button class="flex-1 px-spacing-20 py-spacing-12 rounded-full bg-primary text-on-primary hover:bg-primary/90 font-title-sm text-title-sm font-semibold transition-transform active:scale-95 shadow-sm flex items-center justify-center gap-spacing-8">
+<span class="material-symbols-outlined text-[18px]">code</span>
+            立即挑战
+          </button>
+<button class="px-spacing-20 py-spacing-12 rounded-full bg-surface-container-highest text-on-surface hover:bg-surface-bright font-title-sm text-title-sm transition-colors flex items-center justify-center gap-spacing-4">
+<span class="material-symbols-outlined text-[18px]">shuffle</span>
+            换一题
+          </button>
+</div>
+</div>
+<!-- Activity Heatmap Container (7 cols) -->
+<div class="lg:col-span-7 bg-surface-container rounded-3xl p-spacing-24 shadow-md flex flex-col justify-between space-y-spacing-16">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-spacing-8">
+<div>
+<h3 class="font-title-md text-title-md text-on-surface font-semibold flex items-center gap-spacing-8">
+<span class="material-symbols-outlined text-primary text-[20px]">calendar_month</span>
+              年度编码热力图 (Activity Punch)
+            </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">过去 365 天内完成 1,289 次有效评测与代码提交</p>
+</div>
+<div class="flex items-center gap-spacing-8 text-on-surface-variant font-label-sm text-label-sm self-end sm:self-auto">
+<span>少</span>
+<div class="flex items-center gap-1">
+<span class="w-3 h-3 rounded-sm bg-surface-container-highest"></span>
+<span class="w-3 h-3 rounded-sm bg-verdict-ac/25"></span>
+<span class="w-3 h-3 rounded-sm bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-sm bg-verdict-ac/75"></span>
+<span class="w-3 h-3 rounded-sm bg-verdict-ac"></span>
+</div>
+<span>多</span>
+</div>
+</div>
+<!-- Heatmap Grid SVG / Blocks -->
+<div class="w-full overflow-x-auto pb-spacing-4">
+<div class="min-w-[620px] flex gap-1.5">
+<!-- Simulated 32 Columns of 7 rows -->
+<!-- Week blocks container -->
+<div class="grid grid-flow-col grid-rows-7 gap-1.5 w-full">
+<!-- Week 1 - 6: Sparse -->
+<span class="w-3 h-3 rounded-[3px] bg-surface-container-highest"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/25"></span>
+<span class="w-3 h-3 rounded-[3px] bg-surface-container-highest"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-surface-container-highest"></span>
+<span class="w-3 h-3 rounded-[3px] bg-surface-container-highest"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/25"></span>
+<span class="w-3 h-3 rounded-[3px] bg-surface-container-highest"></span>
+<span class="w-3 h-3 rounded-[3px] bg-surface-container-highest"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/75"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/25"></span>
+<span class="w-3 h-3 rounded-[3px] bg-surface-container-highest"></span>
+<span class="w-3 h-3 rounded-[3px] bg-surface-container-highest"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/25"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-surface-container-highest"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/25"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/25"></span>
+<span class="w-3 h-3 rounded-[3px] bg-surface-container-highest"></span>
+<span class="w-3 h-3 rounded-[3px] bg-surface-container-highest"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/25"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/75"></span>
+<span class="w-3 h-3 rounded-[3px] bg-surface-container-highest"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/25"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/75"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/25"></span>
+<span class="w-3 h-3 rounded-[3px] bg-surface-container-highest"></span>
+<span class="w-3 h-3 rounded-[3px] bg-surface-container-highest"></span>
+<span class="w-3 h-3 rounded-[3px] bg-surface-container-highest"></span>
+<!-- Dense sprint period -->
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/75"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/75"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/25"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/75"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/75"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/25"></span>
+<span class="w-3 h-3 rounded-[3px] bg-surface-container-highest"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/25"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/75"></span>
+<span class="w-3 h-3 rounded-[3px] bg-surface-container-highest"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/25"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/25"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/75"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/75"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/25"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/75"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/75"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-surface-container-highest"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/25"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/25"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/75"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/75"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-surface-container-highest"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/75"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/75"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/25"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/75"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/75"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/25"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/75"></span>
+<span class="w-3 h-3 rounded-[3px] bg-surface-container-highest"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/25"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/25"></span>
+<span class="w-3 h-3 rounded-[3px] bg-surface-container-highest"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/25"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/75"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/75"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/75"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/75"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/25"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/75"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/75"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-surface-container-highest"></span>
+<span class="w-3 h-3 rounded-[3px] bg-surface-container-highest"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/25"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/75"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/25"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/25"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/75"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/75"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/75"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/75"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/50"></span>
+<span class="w-3 h-3 rounded-[3px] bg-verdict-ac/25"></span>
+<span class="w-3 h-3 rounded-[3px] bg-surface-container-highest"></span>
+</div>
+</div>
+</div>
+<div class="flex flex-wrap items-center justify-between font-label-sm text-label-sm text-on-surface-variant pt-spacing-8">
+<div class="flex items-center gap-spacing-16">
+<span>最长连续签到：<strong class="text-on-surface">54 天</strong></span>
+<span>当前活跃周期：<strong class="text-primary">第 6 赛季</strong></span>
+</div>
+<span class="text-outline">最近更新：今天 10:24</span>
+</div>
+</div>
+</div>
+<!-- Multi-Column Bottom Section: Tracks & Feeds -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-spacing-24">
+<!-- LEFT COLUMN: Problem Lists & Upcoming Contests (7 cols) -->
+<div class="lg:col-span-7 space-y-spacing-24">
+<!-- Module 1: Curated Problem Lists -->
+<div class="bg-surface-container rounded-3xl p-spacing-24 shadow-sm space-y-spacing-20">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-spacing-12">
+<div>
+<h3 class="font-title-md text-title-md text-on-surface font-semibold">推荐精选题单</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">依据你的当前天梯评级定向推送算法专项</p>
+</div>
+<!-- Segmented Control Button Pill -->
+<div class="inline-flex p-1 rounded-full bg-surface-container-highest text-on-surface-variant self-start sm:self-auto font-label-sm text-label-sm">
+<button class="px-spacing-12 py-1 rounded-full bg-secondary-container text-on-secondary-container font-medium transition-colors">基础算法</button>
+<button class="px-spacing-12 py-1 rounded-full hover:text-on-surface transition-colors">数据结构</button>
+<button class="px-spacing-12 py-1 rounded-full hover:text-on-surface transition-colors">图论进阶</button>
+</div>
+</div>
+<!-- Problem List Cards -->
+<div class="space-y-spacing-12">
+<!-- Item 1 -->
+<div class="p-spacing-16 rounded-2xl bg-surface-container-low hover:bg-surface-container-high transition-colors cursor-pointer group space-y-spacing-12">
+<div class="flex items-start justify-between">
+<div class="space-y-spacing-4">
+<div class="flex items-center gap-spacing-8">
+<h4 class="font-title-sm text-title-sm text-on-surface font-semibold group-hover:text-primary transition-colors">动态规划专题 · 背包九讲精粹</h4>
+<span class="px-spacing-8 py-0.5 rounded-full bg-primary-container text-on-primary-container font-label-sm text-label-sm">官方推荐</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">涵盖 0/1 背包、完全背包、多重背包及单调队列优化全模型</p>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+<div class="space-y-spacing-4">
+<div class="flex justify-between font-label-sm text-label-sm text-on-surface-variant">
+<span>进度：18 / 24 题通过</span>
+<span class="text-primary font-medium">75%</span>
+</div>
+<div class="w-full h-2 rounded-full bg-surface-container-highest overflow-hidden">
+<div class="h-full rounded-full bg-primary" style="width: 75%"></div>
+</div>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="p-spacing-16 rounded-2xl bg-surface-container-low hover:bg-surface-container-high transition-colors cursor-pointer group space-y-spacing-12">
+<div class="flex items-start justify-between">
+<div class="space-y-spacing-4">
+<div class="flex items-center gap-spacing-8">
+<h4 class="font-title-sm text-title-sm text-on-surface font-semibold group-hover:text-primary transition-colors">树状数组与线段树从入门到离线查询</h4>
+<span class="px-spacing-8 py-0.5 rounded-full bg-tertiary-container text-on-tertiary-container font-label-sm text-label-sm">高阶</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">区间最值修改、历史版本维护、扫描线与可持久化扩展</p>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+<div class="space-y-spacing-4">
+<div class="flex justify-between font-label-sm text-label-sm text-on-surface-variant">
+<span>进度：9 / 30 题通过</span>
+<span class="text-tertiary font-medium">30%</span>
+</div>
+<div class="w-full h-2 rounded-full bg-surface-container-highest overflow-hidden">
+<div class="h-full rounded-full bg-tertiary" style="width: 30%"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Module 2: Upcoming Contests -->
+<div class="bg-surface-container rounded-3xl p-spacing-24 shadow-sm space-y-spacing-16">
+<div class="flex items-center justify-between">
+<h3 class="font-title-md text-title-md text-on-surface font-semibold flex items-center gap-spacing-8">
+<span class="material-symbols-outlined text-verdict-tle text-[20px]">timer</span>
+              近期正在进行 &amp; 即将开始的比赛
+            </h3>
+<a class="font-label-sm text-label-sm text-primary hover:underline" href="#">查看完整赛历 →</a>
+</div>
+<div class="space-y-spacing-12">
+<!-- Active Contest Card -->
+<div class="p-spacing-16 rounded-2xl bg-surface-container-low flex flex-col sm:flex-row sm:items-center justify-between gap-spacing-16">
+<div class="space-y-spacing-4">
+<div class="flex items-center gap-spacing-8">
+<span class="px-spacing-8 py-0.5 rounded-full bg-verdict-ac-container text-verdict-ac font-label-sm text-label-sm flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-verdict-ac animate-ping"></span>
+                    进行中
+                  </span>
+<span class="px-spacing-8 py-0.5 rounded-full bg-surface-container-highest text-on-surface-variant font-label-sm text-label-sm">ACM / ICPC 规则</span>
+</div>
+<h4 class="font-title-sm text-title-sm text-on-surface font-semibold">AlgoMaterial 全球月赛 #18 (Div.1 + Div.2)</h4>
+<div class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-spacing-12">
+<span>已参赛: 3,412 人</span>
+<span>•</span>
+<span class="text-verdict-tle font-label-sm text-label-sm font-medium">倒计时: 01:24:19</span>
+</div>
+</div>
+<button class="px-spacing-20 py-spacing-8 rounded-full bg-primary text-on-primary hover:bg-primary/90 font-title-sm text-title-sm font-medium self-start sm:self-center flex-shrink-0 transition-transform active:scale-95">
+                进入比赛
+              </button>
+</div>
+<!-- Upcoming Contest Card -->
+<div class="p-spacing-16 rounded-2xl bg-surface-container-low flex flex-col sm:flex-row sm:items-center justify-between gap-spacing-16">
+<div class="space-y-spacing-4">
+<div class="flex items-center gap-spacing-8">
+<span class="px-spacing-8 py-0.5 rounded-full bg-surface-container-highest text-tertiary font-label-sm text-label-sm">未开始</span>
+<span class="px-spacing-8 py-0.5 rounded-full bg-surface-container-highest text-on-surface-variant font-label-sm text-label-sm">OI 赛制 · Rated</span>
+</div>
+<h4 class="font-title-sm text-title-sm text-on-surface font-semibold">2024 年高校夏季算法夏令营选拔赛</h4>
+<div class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-spacing-12">
+<span>6月22日 14:00 - 18:00 (4小时)</span>
+<span>•</span>
+<span>已有 892 人报名</span>
+</div>
+</div>
+<button class="px-spacing-20 py-spacing-8 rounded-full bg-secondary-container text-on-secondary-container hover:bg-secondary-container/80 font-title-sm text-title-sm font-medium self-start sm:self-center flex-shrink-0 transition-colors">
+                预约报名
+              </button>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN: Realtime Judge Feed & Top 5 Leaderboard (5 cols) -->
+<div class="lg:col-span-5 space-y-spacing-24">
+<!-- Module 3: Live Submissions Feed -->
+<div class="bg-surface-container rounded-3xl p-spacing-24 shadow-sm space-y-spacing-16">
+<div class="flex items-center justify-between">
+<h3 class="font-title-md text-title-md text-on-surface font-semibold flex items-center gap-spacing-8">
+<span class="material-symbols-outlined text-primary text-[20px]">bolt</span>
+              全站实时评测动态
+            </h3>
+<span class="w-2 h-2 rounded-full bg-verdict-ac animate-pulse"></span>
+</div>
+<!-- Feed Stream -->
+<div class="space-y-spacing-8">
+<!-- Row 1: AC -->
+<div class="flex items-center justify-between p-spacing-12 rounded-xl bg-surface-container-low hover:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-spacing-12 min-w-0">
+<span class="px-spacing-8 py-0.5 rounded-full bg-verdict-ac-container text-verdict-ac font-label-sm text-label-sm font-semibold flex-shrink-0">
+                  Accepted
+                </span>
+<div class="min-w-0">
+<div class="font-label-sm text-label-sm text-on-surface truncate">P3372 【模板】线段树 1</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant">by CodeSamurai · C++20</div>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-outline flex-shrink-0 pl-spacing-8">2s 前</span>
+</div>
+<!-- Row 2: WA -->
+<div class="flex items-center justify-between p-spacing-12 rounded-xl bg-surface-container-low hover:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-spacing-12 min-w-0">
+<span class="px-spacing-8 py-0.5 rounded-full bg-verdict-wa-container text-verdict-wa font-label-sm text-label-sm font-semibold flex-shrink-0">
+                  Wrong Ans
+                </span>
+<div class="min-w-0">
+<div class="font-label-sm text-label-sm text-on-surface truncate">P1002 过河卒 (动态规划)</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant">by bit_crusher · Python3</div>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-outline flex-shrink-0 pl-spacing-8">14s 前</span>
+</div>
+<!-- Row 3: TLE -->
+<div class="flex items-center justify-between p-spacing-12 rounded-xl bg-surface-container-low hover:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-spacing-12 min-w-0">
+<span class="px-spacing-8 py-0.5 rounded-full bg-verdict-tle-container text-verdict-tle font-label-sm text-label-sm font-semibold flex-shrink-0">
+                  Time Limit
+                </span>
+<div class="min-w-0">
+<div class="font-label-sm text-label-sm text-on-surface truncate">P1144 最短路计数</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant">by nocturne · Java 17</div>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-outline flex-shrink-0 pl-spacing-8">41s 前</span>
+</div>
+<!-- Row 4: AC -->
+<div class="flex items-center justify-between p-spacing-12 rounded-xl bg-surface-container-low hover:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-spacing-12 min-w-0">
+<span class="px-spacing-8 py-0.5 rounded-full bg-verdict-ac-container text-verdict-ac font-label-sm text-label-sm font-semibold flex-shrink-0">
+                  Accepted
+                </span>
+<div class="min-w-0">
+<div class="font-label-sm text-label-sm text-on-surface truncate">CF1500A Going Home</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant">by tourist_m3 · Rust</div>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-outline flex-shrink-0 pl-spacing-8">1m 前</span>
+</div>
+</div>
+</div>
+<!-- Module 4: Leaderboard Top 5 -->
+<div class="bg-surface-container rounded-3xl p-spacing-24 shadow-sm space-y-spacing-16">
+<div class="flex items-center justify-between">
+<h3 class="font-title-md text-title-md text-on-surface font-semibold flex items-center gap-spacing-8">
+<span class="material-symbols-outlined text-verdict-ce text-[20px]">emoji_events</span>
+              全站天梯排行榜 Top 5
+            </h3>
+<a class="font-label-sm text-label-sm text-primary hover:underline" href="#">天梯总榜 →</a>
+</div>
+<div class="space-y-spacing-8">
+<!-- Rank 1: Gold -->
+<div class="flex items-center justify-between p-spacing-12 rounded-xl bg-surface-container-low">
+<div class="flex items-center gap-spacing-12">
+<span class="w-6 h-6 rounded-full bg-verdict-ce text-surface font-label-sm text-label-sm font-bold flex items-center justify-center">1</span>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center font-label-sm text-label-sm text-on-surface font-semibold">
+                  ET
+                </div>
+<div>
+<div class="font-label-sm text-label-sm text-on-surface font-semibold">Egor_T</div>
+<div class="font-label-sm text-label-sm text-outline">Legendary Grandmaster</div>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-verdict-ce font-bold">3,542 pts</span>
+</div>
+<!-- Rank 2: Silver -->
+<div class="flex items-center justify-between p-spacing-12 rounded-xl bg-surface-container-low">
+<div class="flex items-center gap-spacing-12">
+<span class="w-6 h-6 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-bold flex items-center justify-center">2</span>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center font-label-sm text-label-sm text-on-surface font-semibold">
+                  PL
+                </div>
+<div>
+<div class="font-label-sm text-label-sm text-on-surface font-semibold">Petr_M</div>
+<div class="font-label-sm text-label-sm text-outline">International GM</div>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface font-bold">3,310 pts</span>
+</div>
+<!-- Rank 3: Bronze -->
+<div class="flex items-center justify-between p-spacing-12 rounded-xl bg-surface-container-low">
+<div class="flex items-center gap-spacing-12">
+<span class="w-6 h-6 rounded-full bg-verdict-tle-container text-verdict-tle font-label-sm text-label-sm font-bold flex items-center justify-center">3</span>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center font-label-sm text-label-sm text-on-surface font-semibold">
+                  RD
+                </div>
+<div>
+<div class="font-label-sm text-label-sm text-on-surface font-semibold">Radewoosh</div>
+<div class="font-label-sm text-label-sm text-outline">Grandmaster</div>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface font-bold">3,198 pts</span>
+</div>
+<!-- Rank 4 -->
+<div class="flex items-center justify-between p-spacing-12 rounded-xl bg-surface-container-low">
+<div class="flex items-center gap-spacing-12">
+<span class="w-6 h-6 text-outline font-label-sm text-label-sm font-bold flex items-center justify-center">4</span>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center font-label-sm text-label-sm text-on-surface font-semibold">
+                  MK
+                </div>
+<div>
+<div class="font-label-sm text-label-sm text-on-surface font-semibold">maroon_rk</div>
+<div class="font-label-sm text-label-sm text-outline">Grandmaster</div>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-medium">3,045 pts</span>
+</div>
+<!-- Rank 5 -->
+<div class="flex items-center justify-between p-spacing-12 rounded-xl bg-surface-container-low">
+<div class="flex items-center gap-spacing-12">
+<span class="w-6 h-6 text-outline font-label-sm text-label-sm font-bold flex items-center justify-center">5</span>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center font-label-sm text-label-sm text-on-surface font-semibold">
+                  BC
+                </div>
+<div>
+<div class="font-label-sm text-label-sm text-on-surface font-semibold">Benq_Red</div>
+<div class="font-label-sm text-label-sm text-outline">Grandmaster</div>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-medium">2,990 pts</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></main><footer class="w-full bg-surface-container-low mt-auto"><div class="max-w-7xl mx-auto px-gutter-expanded py-spacing-24 flex flex-col md:flex-row items-center justify-between gap-spacing-16"><div class="flex flex-col sm:flex-row items-center gap-spacing-16"><div class="flex items-center gap-spacing-8 px-spacing-12 py-spacing-4 rounded-full bg-surface-container"><span class="w-2 h-2 rounded-full bg-verdict-ac animate-pulse"></span><span class="font-label-sm text-label-sm text-verdict-ac">Kernel Healthy</span><span class="text-outline-variant font-label-sm text-label-sm">•</span><span class="font-label-sm text-label-sm text-on-surface-variant">0 Waiting</span><span class="text-outline-variant font-label-sm text-label-sm">•</span><span class="font-label-sm text-label-sm text-tertiary">12ms Latency</span></div><span class="font-body-sm text-body-sm text-on-surface-variant">© 2024 AlgoMaterial OJ. Material Design 3 Sandbox.</span></div><div class="flex items-center gap-spacing-16"><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Hydro API</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Luogu Format</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">GitHub</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Docs</a></div></div></footer></body></html>

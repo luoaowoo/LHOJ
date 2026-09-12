@@ -2,9 +2,9 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { matchRoutes } from 'react-router-dom';
 
-import { hydroContentUrl, hydroNativeUrl, hydroPublicUrl } from '../src/lib/endpoint.ts';
+import { hydroAvatarUrl, hydroContentUrl, hydroNativeUrl, hydroPublicUrl } from '../src/lib/endpoint.ts';
 import { hydroWorkspaceHref, normalizeHydroPath, parseHydroWorkspaceTarget } from '../src/lib/hydro-workspace.ts';
-import { isSuperUser } from '../src/lib/permissions.ts';
+import { isSuperUser, privilegeNames } from '../src/lib/permissions.ts';
 
 test('Hydro native URLs are always same-origin and idempotent', () => {
   assert.equal(hydroNativeUrl('/login'), '/hydro-native/login');
@@ -15,6 +15,27 @@ test('Hydro native URLs are always same-origin and idempotent', () => {
   assert.equal(hydroPublicUrl('https://oj.luoaowoo.cn/p/1/edit'), '/hydro-native/p/1/edit');
 });
 
+test('Hydro avatars use the upstream IP origin', () => {
+  assert.equal(
+    hydroAvatarUrl(undefined, 232),
+    'http://64.90.0.223:801/file/232/.avatar.jpg',
+  );
+  assert.equal(
+    hydroAvatarUrl('/fs/storage?target=user%2F232%2F.avatar.jpg', 232),
+    'http://64.90.0.223:801/fs/storage?target=user%2F232%2F.avatar.jpg',
+  );
+  assert.equal(
+    hydroAvatarUrl('https://www.gravatar.com/avatar/test', 232),
+    'https://www.gravatar.com/avatar/test',
+  );
+});
+
+test('record code downloads stay behind the same-origin Hydro proxy', () => {
+  assert.equal(
+    hydroPublicUrl('/record/abc123?download=true'),
+    '/hydro-native/record/abc123?download=true',
+  );
+});
 test('workspace targets reject external and protocol-relative paths', () => {
   assert.equal(normalizeHydroPath('https://example.com/'), null);
   assert.equal(normalizeHydroPath('//example.com/'), null);
@@ -73,4 +94,11 @@ test('superuser detection covers su, root, admin and priv=-1', () => {
   assert.equal(isSuperUser({ role: 'user', priv: '-1' }), true);
   assert.equal(isSuperUser({ role: 'user', priv: 0 }), false);
   assert.equal(isSuperUser(null), false);
+});
+
+test('privilege labels decode Hydro bit masks', () => {
+  assert.deepEqual(privilegeNames(-1), ['全部权限']);
+  assert.deepEqual(privilegeNames(0), ['已封禁']);
+  assert.deepEqual(privilegeNames((1 << 0) | (1 << 2)), ['编辑系统', '用户资料']);
+  assert.deepEqual(privilegeNames('invalid'), []);
 });

@@ -108,6 +108,15 @@ export async function fetchUserByIdentifier(identifier: string): Promise<HydroUs
   return fetchUserByUname(value);
 }
 
+export async function fetchUsersByIds(ids: number[]): Promise<HydroUser[]> {
+  if (!ids.length) return [];
+  const data = await gql<{ users: HydroUser[] | null }>(
+    `query UsersByIds($ids: [Int]) { users(ids: $ids) { ${userFields} } }`,
+    { ids },
+  );
+  return data.users ?? [];
+}
+
 export async function login(uname: string, password: string, remember: boolean, tfa = ''): Promise<void> {
   await ensureEndpoint();
   const body = new URLSearchParams({
