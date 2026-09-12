@@ -3,13 +3,13 @@ import { Link as RouterLink, useNavigate, useParams, useSearchParams } from 'rea
 import {
   Alert, Box, Button, CircularProgress, Pagination, Paper, Stack, TextField, Typography,
 } from '@mui/material';
-import { ArrowLeft, ExternalLink, LogIn, MessageSquare, Pencil, Send, Trash2 } from 'lucide-react';
+import { ArrowLeft, LogIn, MessageSquare, Pencil, Send, Trash2 } from 'lucide-react';
 import { useAuth } from '../auth';
 import ConfirmDialog from '../components/ConfirmDialog';
+import HydroWorkspaceButton from '../components/HydroWorkspaceButton';
 import Markdown from '../components/Markdown';
 import PageHeader from '../components/PageHeader';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
-import { hydroPublicUrl } from '../lib/endpoint';
 import { postHydroForm, scrapeDiscussionDetail } from '../lib/scrape';
 import type { DiscussionDetail } from '../types';
 
@@ -153,9 +153,9 @@ export default function DiscussionDetailPage() {
           <>
             {canManageDiscussion ? <Button size="small" startIcon={<Pencil size={15} />} onClick={() => { setEditTitle(discussion.title); setEditContent(discussion.content); setEditingDiscussion(true); }}>编辑</Button> : null}
             {canManageDiscussion ? <Button size="small" color="error" startIcon={<Trash2 size={15} />} onClick={() => setDeletingDiscussion(true)}>删除</Button> : null}
-            <Button component="a" href={hydroPublicUrl(`/discuss/${encodeURIComponent(id)}`)} target="_blank" rel="noreferrer" size="small" endIcon={<ExternalLink size={15} />}>
-              Hydro 原始页面
-            </Button>
+            <HydroWorkspaceButton path={`/discuss/${encodeURIComponent(id)}`} title={`${discussion.title} · 讨论工作区`} size="small">
+              讨论工作区
+            </HydroWorkspaceButton>
           </>
         }
       />

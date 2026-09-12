@@ -5,10 +5,10 @@ import {
   Alert, Box, Button, Checkbox, CircularProgress, Divider, FormControlLabel, IconButton, InputAdornment,
   Paper, TextField, Tooltip, Typography,
 } from '@mui/material';
-import { ExternalLink, Eye, EyeOff, LogIn, RefreshCw } from 'lucide-react';
+import { Eye, EyeOff, LogIn, RefreshCw } from 'lucide-react';
 import { useAuth } from '../auth';
 import { LoginShell } from '../components/AppLayout';
-import { hydroPublicUrl } from '../lib/endpoint';
+import HydroWorkspaceButton from '../components/HydroWorkspaceButton';
 
 export default function LoginPage() {
   const { user, loading, error: connectionError, login, refresh } = useAuth();
@@ -150,18 +150,9 @@ export default function LoginPage() {
         </Button>
         <Divider sx={{ color: 'text.secondary', fontSize: 13 }}>账户帮助</Divider>
         <Box sx={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 0.5 }}>
-          <Button component="a" href={hydroPublicUrl('/register')} target="_blank" rel="noreferrer" size="small" endIcon={<ExternalLink size={14} />}>注册账号</Button>
-          <Button
-            component="a"
-            href={hydroPublicUrl('/lostpass')}
-            target="_blank"
-            rel="noreferrer"
-            size="small"
-            endIcon={<ExternalLink size={14} />}
-          >
-            找回密码
-          </Button>
-          <Button component="a" href={hydroPublicUrl('/login')} target="_blank" rel="noreferrer" size="small" endIcon={<ExternalLink size={14} />}>其他登录方式</Button>
+          <HydroWorkspaceButton path="/register" title="注册账号" size="small">注册账号</HydroWorkspaceButton>
+          <HydroWorkspaceButton path="/lostpass" title="找回密码" size="small">找回密码</HydroWorkspaceButton>
+          <HydroWorkspaceButton path="/login" title="其他登录方式" size="small">其他登录方式</HydroWorkspaceButton>
         </Box>
       </Paper>
     </LoginShell>
