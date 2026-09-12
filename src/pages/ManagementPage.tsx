@@ -93,7 +93,7 @@ export default function ManagementPage() {
           </Paper>
         ))}
       </Box>
-      {selectedItem && selectedItem.path !== '/manage' ? (
+      {selectedItem ? (
         <Dialog
           open={workspaceOpen}
           onClose={() => setWorkspaceOpen(false)}

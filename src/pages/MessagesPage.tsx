@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, Avatar, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Paper, Stack, TextField, Tooltip, Typography } from '@mui/material';
+import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Paper, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import { Bell, MoreHorizontal, Plus, Send, Trash2, X } from 'lucide-react';
 import ConfirmDialog from '../components/ConfirmDialog';
 import PageHeader from '../components/PageHeader';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
 import { hydroAvatarUrl } from '../lib/endpoint';
+import HydroAvatar from '../components/HydroAvatar';
 import { postHydroForm, scrapeUserMessages } from '../lib/scrape';
 import type { UserMessage } from '../types';
 import { useAuth } from '../auth';
@@ -39,7 +40,7 @@ export default function MessagesPage() {
       <Box sx={{ borderRight: { md: '1px solid' }, borderBottom: { xs: '1px solid', md: 0 }, borderColor: 'divider', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
         <Box sx={{ px: 2, py: 1.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}><Typography sx={{ fontWeight: 700 }}>会话</Typography><Tooltip title="新建会话"><IconButton aria-label="新建会话" onClick={() => setNewConversationOpen(true)}><Plus size={18} /></IconButton></Tooltip></Box>
         <Divider />
-        <Box sx={{ overflowY: 'auto', flex: 1 }}>{conversations.length ? conversations.map((conversation) => { const message = conversation.latest; const name = message.sender || `用户 ${conversation.id}`; return <Box key={conversation.id} onClick={() => setSelectedId(conversation.id)} sx={{ px: 2, py: 1.5, display: 'flex', gap: 1.2, cursor: 'pointer', bgcolor: activeId === conversation.id ? 'action.selected' : 'transparent', '&:hover': { bgcolor: 'action.hover' } }}><Avatar src={hydroAvatarUrl(undefined, conversation.id)} sx={{ width: 40, height: 40, bgcolor: 'primary.main', flex: '0 0 auto' }}>{name.slice(0, 1)}</Avatar><Box sx={{ minWidth: 0, flex: 1 }}><Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1 }}><Typography noWrap sx={{ fontWeight: 650 }}>{name}</Typography><Typography variant="caption" color="text.secondary" noWrap>{timeLabel(message.sentAt)}</Typography></Box><Typography variant="body2" color="text.secondary" noWrap>{message.content}</Typography></Box></Box>; }) : <EmptyBox message="暂无会话" />}</Box>
+        <Box sx={{ overflowY: 'auto', flex: 1 }}>{conversations.length ? conversations.map((conversation) => { const message = conversation.latest; const name = message.sender || `用户 ${conversation.id}`; return <Box key={conversation.id} onClick={() => setSelectedId(conversation.id)} sx={{ px: 2, py: 1.5, display: 'flex', gap: 1.2, cursor: 'pointer', bgcolor: activeId === conversation.id ? 'action.selected' : 'transparent', '&:hover': { bgcolor: 'action.hover' } }}><HydroAvatar src={hydroAvatarUrl(undefined, conversation.id)} name={name} userId={conversation.id} size={40} /><Box sx={{ minWidth: 0, flex: 1 }}><Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1 }}><Typography noWrap sx={{ fontWeight: 650 }}>{name}</Typography><Typography variant="caption" color="text.secondary" noWrap>{timeLabel(message.sentAt)}</Typography></Box><Typography variant="body2" color="text.secondary" noWrap>{message.content}</Typography></Box></Box>; }) : <EmptyBox message="暂无会话" />}</Box>
       </Box>
       <Box sx={{ minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
         <Box sx={{ px: { xs: 2, md: 2.5 }, py: 1.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}><Box><Typography sx={{ fontWeight: 700 }}>{activeName}</Typography><Typography variant="caption" color="text.secondary">站内消息</Typography></Box><MoreHorizontal size={20} opacity={0.55} /></Box>

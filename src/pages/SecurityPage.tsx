@@ -5,9 +5,9 @@ import { useAuth } from '../auth';
 import { confirmSudo, formatDate, postHydroForm, scrapeSecurity } from '../lib/scrape';
 import type { UserSession } from '../types';
 import ConfirmDialog from '../components/ConfirmDialog';
+import HydroWorkspaceButton from '../components/HydroWorkspaceButton';
 import PageHeader from '../components/PageHeader';
 import { ErrorBox, FullPageLoader } from '../components/StateBox';
-import { hydroPublicUrl } from '../lib/endpoint';
 
 export default function SecurityPage() {
   const { logout: clearAuth } = useAuth();
@@ -95,7 +95,7 @@ export default function SecurityPage() {
         <Button type="submit" variant="contained" disabled={busy || !currentPassword || !newPassword || newPassword !== verifyPassword} sx={{ alignSelf: 'flex-start' }}>修改密码</Button>
       </Stack>
     </Paper>
-    <Button component="a" href={hydroPublicUrl('/home/security')} target="_blank" rel="noreferrer" size="small" sx={{ mt: 1.5 }}>打开 Hydro 完整安全设置</Button>
+    <HydroWorkspaceButton path="/home/security" title="完整安全设置" size="small" sx={{ mt: 1.5 }}>打开完整安全设置</HydroWorkspaceButton>
     <Dialog open={sudoOpen} onClose={() => { if (!busy) setSudoOpen(false); }} fullWidth maxWidth="xs">
       <DialogTitle>验证身份</DialogTitle>
       <DialogContent><Stack spacing={1.5} sx={{ pt: 1 }}><TextField label="密码" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoFocus /><TextField label="两步验证码（可选）" value={tfa} onChange={(e) => setTfa(e.target.value)} inputMode="numeric" /></Stack></DialogContent>

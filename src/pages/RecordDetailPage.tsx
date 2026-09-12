@@ -1,22 +1,44 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link as RouterLink, useParams, useSearchParams } from 'react-router-dom';
 import { Alert, Box, Button, Chip, Divider, LinearProgress, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
-import { Clock3, Code2, Cpu, Download, ExternalLink, HardDrive, ListChecks, RefreshCw, ShieldAlert, UserRound, XCircle } from 'lucide-react';
+import { Clock3, Code2, Cpu, Download, HardDrive, ListChecks, RefreshCw, ShieldAlert, UserRound, XCircle } from 'lucide-react';
 import { useAuth } from '../auth';
 import ConfirmDialog from '../components/ConfirmDialog';
 import StatusChip from '../components/StatusChip';
+import ConfettiCelebration from '../components/ConfettiCelebration';
+import CodeEditor from '../components/CodeEditor';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
 import { postHydroForm, scrapeRecordDetail } from '../lib/scrape';
 import { hydroPublicUrl, hydroWebSocketUrl } from '../lib/endpoint';
+import { hydroWorkspaceHref } from '../lib/hydro-workspace';
 import type { RecordDetail } from '../types';
+import { usePreferences } from '../prefs';
 
 function detailValue(items: RecordDetail['detail'], patterns: RegExp[]) {
   return items.find((item) => patterns.some((pattern) => pattern.test(item.label)))?.value || '';
 }
 
+function recordEditorLanguage(language?: string): string {
+  const value = (language ?? '').toLowerCase();
+  if (value.includes('c++') || value.includes('cpp') || value === 'cc') return 'cpp';
+  if (value === 'c') return 'c';
+  if (value.includes('python') || value === 'py') return 'python';
+  if (value.includes('java')) return 'java';
+  if (value.includes('javascript') || value === 'js' || value.includes('node')) return 'javascript';
+  if (value.includes('typescript') || value === 'ts') return 'typescript';
+  if (value.includes('rust') || value === 'rs') return 'rust';
+  if (value.includes('go')) return 'go';
+  if (value.includes('kotlin') || value === 'kt') return 'kotlin';
+  if (value.includes('php')) return 'php';
+  if (value.includes('ruby') || value === 'rb') return 'ruby';
+  if (value.includes('c#') || value.includes('csharp') || value === 'cs') return 'csharp';
+  return 'plaintext';
+}
+
 export default function RecordDetailPage() {
   const { user } = useAuth();
+  const { confettiEmojis } = usePreferences();
   const { rid } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const revision = searchParams.get('rev') ?? '';
@@ -29,6 +51,9 @@ export default function RecordDetailPage() {
   const [cancelOpen, setCancelOpen] = useState(false);
   const [actionError, setActionError] = useState('');
   const [tab, setTab] = useState<'result' | 'code'>('result');
+  const [celebrating, setCelebrating] = useState(false);
+  const previousStatus = useRef<string | null>(null);
+  const celebrate = useCallback(() => setCelebrating(true), []);
 
   useEffect(() => {
     if (!rid) {
@@ -42,6 +67,14 @@ export default function RecordDetailPage() {
     scrapeRecordDetail(rid, revision || undefined)
       .then((data) => {
         if (cancelled) return;
+        const wasPending = /Waiting|Running|Compiling|Fetched|Pending|Queued|Judging|等待|运行|编译|排队|评测/i.test(previousStatus.current ?? '');
+        const accepted = /Accepted|通过|\bAC\b/i.test(data?.status ?? '');
+        const marker = `lh-oj.confetti-shown.${rid}`;
+        if (!revision && accepted && !localStorage.getItem(marker) && (wasPending || !previousStatus.current)) {
+          localStorage.setItem(marker, '1');
+          celebrate();
+        }
+        previousStatus.current = data?.status ?? null;
         setDetail(data);
       })
       .catch((err: unknown) => {
@@ -54,7 +87,7 @@ export default function RecordDetailPage() {
     return () => {
       cancelled = true;
     };
-  }, [rid, reloadKey, revision]);
+  }, [celebrate, rid, reloadKey, revision]);
 
   useEffect(() => {
     if (revision || !rid || !detail?.domainId || !/Waiting|Running|Compiling|Fetched|Pending|Queued|Judging|等待|运行|编译|排队|评测/i.test(detail.status ?? '')) return;
@@ -139,6 +172,7 @@ export default function RecordDetailPage() {
 
   return (
     <Box sx={{ display: 'grid', gap: 2 }}>
+      {celebrating ? <ConfettiCelebration emojis={confettiEmojis} onDone={() => setCelebrating(false)} /> : null}
       {loading ? <LinearProgress aria-label="正在更新评测状态" /> : null}
       {error ? (
         <Alert severity="warning" action={<Button color="inherit" size="small" onClick={() => setReloadKey((value) => value + 1)}>重试</Button>}>
@@ -204,14 +238,11 @@ export default function RecordDetailPage() {
             下载代码
           </Button>
           <Button
-            component="a"
-            href={hydroPublicUrl(`/record/${rid}`)}
-            target="_blank"
-            rel="noreferrer"
+            component={RouterLink}
+            to={hydroWorkspaceHref(`/record/${rid}`, 'Hydro 评测详情')}
             size="small"
-            endIcon={<ExternalLink size={15} />}
           >
-            Hydro 原始页面
+            完整评测工作区
           </Button>
         </Box>
 
@@ -234,7 +265,7 @@ export default function RecordDetailPage() {
             </Paper>)}
             </Box>
           </Box> : <EmptyBox message="暂无测试点数据" />
-        ) : detail.code ? <Box component="pre" sx={{ m: 0, mt: 2, p: 2, overflow: 'auto', bgcolor: 'action.hover', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 13, lineHeight: 1.55 }}>{detail.code}</Box> : <EmptyBox message="暂无代码" />}
+        ) : detail.code ? <Box sx={{ mt: 2 }}><CodeEditor value={detail.code} onChange={() => undefined} language={recordEditorLanguage(detail.language)} readOnly minHeight={520} /></Box> : <EmptyBox message="暂无代码" />}
       </Paper>
       <Paper component="aside" variant="outlined" sx={{ p: 2 }}>
         <Typography variant="h6" sx={{ mb: 1.5 }}>评测 #{detail.rid}</Typography>

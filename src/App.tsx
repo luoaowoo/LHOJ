@@ -1,4 +1,5 @@
-import { lazy, Suspense, useEffect, useMemo } from 'react';
+import { Component, lazy, Suspense, useEffect, useMemo } from 'react';
+import type { ComponentType, ErrorInfo, ReactNode } from 'react';
 import {
   BrowserRouter, Navigate, Outlet, Route, Routes, useLocation,
 } from 'react-router-dom';
@@ -9,35 +10,72 @@ import { ErrorBox, FullPageLoader } from './components/StateBox';
 import { usePreferences } from './prefs';
 import { buildTheme } from './theme';
 
-const ContestDetailPage = lazy(() => import('./pages/ContestDetailPage'));
-const ContestsPage = lazy(() => import('./pages/ContestsPage'));
-const HomePage = lazy(() => import('./pages/HomePage'));
-const LoginPage = lazy(() => import('./pages/LoginPage'));
-const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
-const ProblemListPage = lazy(() => import('./pages/ProblemListPage'));
-const ProblemPage = lazy(() => import('./pages/ProblemPage'));
-const RankingPage = lazy(() => import('./pages/RankingPage'));
-const RecordDetailPage = lazy(() => import('./pages/RecordDetailPage'));
-const RecordsPage = lazy(() => import('./pages/RecordsPage'));
-const SettingsPage = lazy(() => import('./pages/SettingsPage'));
-const SubmitPage = lazy(() => import('./pages/SubmitPage'));
-const UserPage = lazy(() => import('./pages/UserPage'));
-const TrainingListPage = lazy(() => import('./pages/TrainingListPage'));
-const TrainingDetailPage = lazy(() => import('./pages/TrainingDetailPage'));
-const HomeworkListPage = lazy(() => import('./pages/HomeworkListPage'));
-const HomeworkDetailPage = lazy(() => import('./pages/HomeworkDetailPage'));
-const DiscussionListPage = lazy(() => import('./pages/DiscussionListPage'));
-const DiscussionDetailPage = lazy(() => import('./pages/DiscussionDetailPage'));
-const ProblemSolutionsPage = lazy(() => import('./pages/ProblemSolutionsPage'));
-const ProblemStatsPage = lazy(() => import('./pages/ProblemStatsPage'));
-const ProblemFilesPage = lazy(() => import('./pages/ProblemFilesPage'));
-const ManagementPage = lazy(() => import('./pages/ManagementPage'));
-const HackPage = lazy(() => import('./pages/HackPage'));
-const StatusPage = lazy(() => import('./pages/StatusPage'));
-const MessagesPage = lazy(() => import('./pages/MessagesPage'));
-const SecurityPage = lazy(() => import('./pages/SecurityPage'));
-const AccountSettingsPage = lazy(() => import('./pages/AccountSettingsPage'));
-const AboutPage = lazy(() => import('./pages/AboutPage'));
+class RouteErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
+  state = { error: null as Error | null };
+
+  static getDerivedStateFromError(error: Error) { return { error }; }
+
+  componentDidCatch(_error: Error, _info: ErrorInfo) {}
+
+  render() {
+    if (!this.state.error) return this.props.children;
+    return <ErrorBox message="页面加载失败，可能是网络或资源更新导致的。" onRetry={() => window.location.reload()} />;
+  }
+}
+
+function lazyPage<T extends { default: ComponentType }>(load: () => Promise<T>) {
+  let retried = false;
+  return lazy(async () => {
+    try {
+      const module = await load();
+      try { sessionStorage.removeItem('lh-oj.chunk-reload'); } catch { /* best effort */ }
+      return module;
+    } catch (error) {
+      if (retried) throw error;
+      retried = true;
+      try {
+        const key = 'lh-oj.chunk-reload';
+        if (sessionStorage.getItem(key) === window.location.pathname) throw error;
+        sessionStorage.setItem(key, window.location.pathname);
+      } catch {
+        // Continue with the normal error boundary when storage is unavailable.
+      }
+      window.location.reload();
+      return new Promise<T>(() => {});
+    }
+  });
+}
+
+const ContestDetailPage = lazyPage(() => import('./pages/ContestDetailPage'));
+const ContestsPage = lazyPage(() => import('./pages/ContestsPage'));
+const HomePage = lazyPage(() => import('./pages/HomePage'));
+const LoginPage = lazyPage(() => import('./pages/LoginPage'));
+const NotFoundPage = lazyPage(() => import('./pages/NotFoundPage'));
+const ProblemListPage = lazyPage(() => import('./pages/ProblemListPage'));
+const ProblemPage = lazyPage(() => import('./pages/ProblemPage'));
+const RankingPage = lazyPage(() => import('./pages/RankingPage'));
+const RecordDetailPage = lazyPage(() => import('./pages/RecordDetailPage'));
+const RecordsPage = lazyPage(() => import('./pages/RecordsPage'));
+const SettingsPage = lazyPage(() => import('./pages/SettingsPage'));
+const SubmitPage = lazyPage(() => import('./pages/SubmitPage'));
+const UserPage = lazyPage(() => import('./pages/UserPage'));
+const TrainingListPage = lazyPage(() => import('./pages/TrainingListPage'));
+const TrainingDetailPage = lazyPage(() => import('./pages/TrainingDetailPage'));
+const HomeworkListPage = lazyPage(() => import('./pages/HomeworkListPage'));
+const HomeworkDetailPage = lazyPage(() => import('./pages/HomeworkDetailPage'));
+const DiscussionListPage = lazyPage(() => import('./pages/DiscussionListPage'));
+const DiscussionDetailPage = lazyPage(() => import('./pages/DiscussionDetailPage'));
+const ProblemSolutionsPage = lazyPage(() => import('./pages/ProblemSolutionsPage'));
+const ProblemStatsPage = lazyPage(() => import('./pages/ProblemStatsPage'));
+const ProblemFilesPage = lazyPage(() => import('./pages/ProblemFilesPage'));
+const ManagementPage = lazyPage(() => import('./pages/ManagementPage'));
+const HackPage = lazyPage(() => import('./pages/HackPage'));
+const HydroWorkspacePage = lazyPage(() => import('./pages/HydroWorkspacePage'));
+const StatusPage = lazyPage(() => import('./pages/StatusPage'));
+const MessagesPage = lazyPage(() => import('./pages/MessagesPage'));
+const SecurityPage = lazyPage(() => import('./pages/SecurityPage'));
+const AccountSettingsPage = lazyPage(() => import('./pages/AccountSettingsPage'));
+const AboutPage = lazyPage(() => import('./pages/AboutPage'));
 
 function Protected() {
   const { user, loading, error, refresh } = useAuth();
@@ -64,6 +102,7 @@ function RoutesRoot() {
       ['/security', '安全设置'],
       ['/account-settings', '账户设置'],
       ['/about', '风格简介'],
+      ['/hydro', 'Hydro 功能'],
     ];
     const known = labels.find(([path]) => location.pathname.startsWith(path))?.[1];
     const label = known ?? (location.pathname === '/' ? '主页' : '页面不存在');
@@ -71,6 +110,7 @@ function RoutesRoot() {
   }, [location.pathname]);
 
   return (
+    <RouteErrorBoundary>
     <Suspense fallback={<FullPageLoader />}>
     <Routes>
       <Route path="/login" element={<LoginPage />} />
@@ -93,6 +133,7 @@ function RoutesRoot() {
           <Route path="/discuss/:id" element={<DiscussionDetailPage />} />
           <Route path="/ranking" element={<RankingPage />} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/hydro" element={<HydroWorkspacePage />} />
           <Route path="/user/:uname" element={<UserPage />} />
           <Route element={<Protected />}>
             <Route path="/problem/:id/submit" element={<SubmitPage />} />
@@ -103,12 +144,14 @@ function RoutesRoot() {
             <Route path="/status" element={<StatusPage />} />
             <Route path="/messages" element={<MessagesPage />} />
             <Route path="/security" element={<SecurityPage />} />
+            <Route path="/account-settings" element={<Navigate to="/account-settings/account" replace />} />
             <Route path="/account-settings/:category" element={<AccountSettingsPage />} />
           </Route>
           <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
     </Suspense>
+    </RouteErrorBoundary>
   );
 }
 
@@ -118,13 +161,15 @@ export default function App() {
     bgColor: customBgColor || undefined,
   }), [mode, accent, resolvedMode, customBgColor]);
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <AuthProvider>
-        <BrowserRouter>
-          <RoutesRoot />
-        </BrowserRouter>
-      </AuthProvider>
-    </ThemeProvider>
+    <RouteErrorBoundary>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <AuthProvider>
+          <BrowserRouter>
+            <RoutesRoot />
+          </BrowserRouter>
+        </AuthProvider>
+      </ThemeProvider>
+    </RouteErrorBoundary>
   );
 }

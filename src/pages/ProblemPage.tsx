@@ -20,10 +20,10 @@ import {
 import { BarChart3, CheckCircle2, Files, Gauge, Hash, MessageSquare, Send, Settings2, SlidersHorizontal, Star } from 'lucide-react';
 import { useAuth } from '../auth';
 import Markdown from '../components/Markdown';
+import HydroWorkspaceButton from '../components/HydroWorkspaceButton';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
 import { fetchProblem, localizedContent } from '../lib/api';
 import { difficultyColor } from '../lib/difficulty';
-import { hydroPublicUrl } from '../lib/endpoint';
 import { postHydroForm, scrapeProblemStar } from '../lib/scrape';
 import type { HydroProblem } from '../types';
 
@@ -57,7 +57,7 @@ export default function ProblemPage() {
     setLoading(true);
     setError('');
     Promise.all([
-      fetchProblem(id),
+      fetchProblem(id, tid || undefined),
       user ? scrapeProblemStar(id).catch(() => false) : Promise.resolve(false),
     ])
       .then(([nextProblem, nextStarred]) => {
@@ -75,7 +75,7 @@ export default function ProblemPage() {
     return () => {
       active = false;
     };
-  }, [id, user?._id]);
+  }, [id, tid, user?._id]);
 
   useEffect(() => {
     if (submitted) setSnackbarOpen(true);
@@ -88,7 +88,8 @@ export default function ProblemPage() {
   const pid = problem.pid ?? String(problem.docId);
   const content = localizedContent(problem.content);
   const tags = problem.tag ?? [];
-  const discussionHref = `/problem/${encodeURIComponent(pid)}/solutions`;
+  const contextSuffix = tid ? `?tid=${encodeURIComponent(tid)}` : '';
+  const discussionHref = `/problem/${encodeURIComponent(pid)}/solutions${contextSuffix}`;
   const submitHref = `/problem/${encodeURIComponent(id)}/submit${
     tid ? `?tid=${encodeURIComponent(tid)}` : ''
   }`;
@@ -179,13 +180,13 @@ export default function ProblemPage() {
             ) : null}
             {actionError ? <Alert severity="error" onClose={() => setActionError('')}>{actionError}</Alert> : null}
             <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0.8 }}>
-              <Button component={RouterLink} to={`/problem/${encodeURIComponent(pid)}/stats`} size="small" color="inherit" startIcon={<BarChart3 size={15} />}>统计</Button>
-              <Button component={RouterLink} to={`/problem/${encodeURIComponent(pid)}/files`} size="small" color="inherit" startIcon={<Files size={15} />}>文件</Button>
+              <Button component={RouterLink} to={`/problem/${encodeURIComponent(pid)}/stats${contextSuffix}`} size="small" color="inherit" startIcon={<BarChart3 size={15} />}>统计</Button>
+              <Button component={RouterLink} to={`/problem/${encodeURIComponent(pid)}/files${contextSuffix}`} size="small" color="inherit" startIcon={<Files size={15} />}>文件</Button>
             </Box>
-            {user?.role === 'root' ? (
+            {(user?.role === 'root' || user?.role === 'admin') ? (
               <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0.8 }}>
-                <Button component="a" href={hydroPublicUrl(`/p/${encodeURIComponent(pid)}/edit`)} target="_blank" rel="noreferrer" size="small" color="inherit" startIcon={<Settings2 size={15} />}>编辑题目</Button>
-                <Button component="a" href={hydroPublicUrl(`/p/${encodeURIComponent(pid)}/config`)} target="_blank" rel="noreferrer" size="small" color="inherit" startIcon={<SlidersHorizontal size={15} />}>数据配置</Button>
+                <HydroWorkspaceButton path={`/p/${encodeURIComponent(pid)}/edit`} title="编辑题目" size="small" color="inherit" startIcon={<Settings2 size={15} />}>编辑题目</HydroWorkspaceButton>
+                <HydroWorkspaceButton path={`/p/${encodeURIComponent(pid)}/config`} title="题目数据配置" size="small" color="inherit" startIcon={<SlidersHorizontal size={15} />}>数据配置</HydroWorkspaceButton>
               </Box>
             ) : null}
             <Divider />

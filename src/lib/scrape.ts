@@ -1,11 +1,12 @@
+import { contestProblems } from './contestRule';
 import type {
   ContestRow, DiscussionDetail, DiscussionReply, DiscussionRow, HomeworkDetail,
-  HomeworkProblem, HomeworkRow, ProblemFile, ProblemRow, ProblemStat,
+  HomeworkProblem, HomeworkRow, HydroProblem, ProblemFile, ProblemRow, ProblemStat,
   ProblemSolutionsResult, RankingRow, RecordDetail, RecordRow, ScoreboardRow,
   HydroSetting, TrainingDetail, TrainingNode, TrainingProblem, TrainingRow, UnsolvedProblem, UserMessage, UserSession,
 } from '../types';
 import { ApiError, sessionExpiredError } from './errors';
-import { ensureEndpoint, fetchRead, hydroNativeUrl, requestSignal } from './endpoint';
+import { ensureEndpoint, fetchRead, hydroNativeUrl, requestSignal, serverNow } from './endpoint';
 
 interface HydroPageResult {
   doc: Document;
@@ -39,6 +40,14 @@ function dictEntry(dict: unknown, key: unknown): Record<string, unknown> | null 
   if (!isRecord(dict)) return null;
   const entry = dict[textValue(key)];
   return isRecord(entry) ? entry : null;
+}
+
+function settingValue(source: Record<string, unknown>, key: string): unknown {
+  if (Object.hasOwn(source, key) && source[key] != null) return source[key];
+  const nested = key.split('.').reduce<unknown>((value, part) => (
+    isRecord(value) ? value[part] : undefined
+  ), source);
+  return nested ?? source[key];
 }
 
 async function readHydroPageResponse(path: string, pjax = true): Promise<HydroPageResult> {
@@ -563,6 +572,9 @@ export async function confirmSudo(password: string, tfa = ''): Promise<void> {
 export async function scrapeAccountSettings(category: 'preference' | 'account' | 'domain'): Promise<HydroSetting[]> {
   const page = await readHydroPageResponse(`/home/settings/${category}`);
   const current = isRecord(page.payload?.current) ? page.payload.current : {};
+  const controls = new Map(Array.from(page.doc.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('[name]'))
+    .filter((control) => !control.getAttribute('name')?.startsWith('booleanKeys.'))
+    .map((control) => [control.getAttribute('name') || '', control]));
   return Array.isArray(page.payload?.settings) ? page.payload.settings.flatMap((value) => {
     if (!isRecord(value)) return [];
     const key = textValue(value.key);
@@ -573,6 +585,10 @@ export async function scrapeAccountSettings(category: 'preference' | 'account' |
       : Array.isArray(value.range)
         ? value.range.filter((item): item is [unknown, unknown] => Array.isArray(item) && item.length >= 2).map(([option, label]) => [textValue(option), textValue(label)] as [string, string])
         : undefined;
+    const control = controls.get(key);
+    const htmlValue = control instanceof HTMLInputElement && control.type === 'checkbox'
+      ? control.checked
+      : control?.value;
     return [{
       key,
       family: textValue(value.family) || '账户设置',
@@ -580,7 +596,7 @@ export async function scrapeAccountSettings(category: 'preference' | 'account' |
       description: textValue(value.desc) || undefined,
       type: textValue(value.type) || 'text',
       value: value.value,
-      currentValue: current[key],
+      currentValue: settingValue(current, key) ?? htmlValue,
       range,
       hidden: Boolean(flags & 1),
       disabled: Boolean(flags & 2),
@@ -733,19 +749,61 @@ export interface ContestParticipation {
   requiresCode: boolean;
   ended: boolean;
   rule?: string;
+  beginAt?: string;
+  endAt?: string;
+  globalEndAt?: string;
+  allowPrint?: boolean;
+}
+
+export interface ContestParticipant {
+  uid: number;
+  name: string;
+  avatar?: string;
 }
 
 export async function scrapeContestParticipation(id: string): Promise<ContestParticipation> {
   const page = await readHydroPageResponse(`/contest/${encodeURIComponent(id)}`);
   const status = isRecord(page.payload?.tsdoc) ? page.payload.tsdoc : null;
   const contest = isRecord(page.payload?.tdoc) ? page.payload.tdoc : null;
+  const endAt = rawString(status?.endAt) ?? rawString(contest?.endAt);
   return {
     attended: status?.attend === 1 || status?.attend === true,
     subscribed: status?.subscribe === 1 || status?.subscribe === true,
     requiresCode: Boolean(contest?._code),
-    ended: Boolean(status?.endAt),
+    ended: Boolean(endAt && Date.parse(endAt) <= serverNow()),
     rule: textValue(contest?.rule) || undefined,
+    beginAt: rawString(contest?.beginAt),
+    endAt,
+    globalEndAt: rawString(contest?.endAt),
+    allowPrint: contest?.allowPrint === true,
   };
+}
+
+export interface ContestProblemList {
+  problems: HydroProblem[];
+  endAt?: string;
+}
+
+// Hydro initializes an attended user's personal start timer on this route.
+// Direct hidden-problem requests fail until this endpoint has been visited.
+export async function scrapeContestProblems(id: string, pids: number[] = []): Promise<ContestProblemList> {
+  const page = await readHydroPageResponse(`/contest/${encodeURIComponent(id)}/problems`);
+  const status = isRecord(page.payload?.tsdoc) ? page.payload.tsdoc : null;
+  const payload = isRecord(page.payload) ? page.payload : {};
+  return {
+    problems: contestProblems(payload, pids),
+    endAt: rawString(status?.endAt) ?? undefined,
+  };
+}
+
+export async function scrapeContestParticipants(id: string): Promise<ContestParticipant[]> {
+  const doc = (await readHydroPageResponse(`/contest/${encodeURIComponent(id)}/user`, false)).doc;
+  return Array.from(doc.querySelectorAll<HTMLTableRowElement>('tr[data-uid]')).flatMap((row) => {
+    const uid = Number(row.dataset.uid);
+    const name = clean(row.querySelector<HTMLElement>('.col--user a')?.textContent);
+    if (!Number.isInteger(uid) || !name) return [];
+    return [{ uid, name, avatar: row.querySelector<HTMLImageElement>('.col--user img')?.getAttribute('src') ?? undefined }];
+  });
 }
 
 export async function scrapeHomeworkScoreboard(id: string): Promise<{ headers: string[]; rows: ScoreboardRow[] }> {
@@ -881,20 +939,99 @@ export async function scrapeDiscussionDetail(id: string, pageNumber = 1): Promis
   };
 }
 
-export async function postHydroForm(
+export type HydroFormValue = string | Blob | null | undefined;
+export type HydroFormFields = Record<string, HydroFormValue | HydroFormValue[]>;
+export type HydroFormInput = HydroFormFields | FormData | URLSearchParams | HTMLFormElement;
+
+export interface HydroSubmitResult {
+  status: number;
+  ok: boolean;
+  redirected: boolean;
+  redirectUrl?: string;
+  refresh: boolean;
+  payload: Record<string, unknown> | null;
+}
+
+function formValueToString(value: HydroFormValue): string {
+  if (value instanceof Blob) {
+    const name = 'name' in value && typeof value.name === 'string' ? value.name : '';
+    return name || '[blob]';
+  }
+  return value == null ? '' : String(value);
+}
+
+function formEntries(input: HydroFormInput): Array<[string, HydroFormValue]> {
+  if (input instanceof FormData || input instanceof URLSearchParams) {
+    return Array.from(input.entries()).map(([name, value]) => [name, value]);
+  }
+  if (typeof HTMLFormElement !== 'undefined' && input instanceof HTMLFormElement) {
+    return Array.from(new FormData(input).entries()).map(([name, value]) => [name, value]);
+  }
+  return Object.entries(input).flatMap(([name, value]) => (
+    (Array.isArray(value) ? value : [value]).map((item) => [name, item] as [string, HydroFormValue])
+  ));
+}
+
+function toHydroFormData(input: HydroFormInput): FormData {
+  const data = new FormData();
+  for (const [name, value] of formEntries(input)) {
+    if (value instanceof Blob) data.append(name, value);
+    else data.append(name, formValueToString(value));
+  }
+  return data;
+}
+
+function toHydroSearchParams(input: HydroFormInput): URLSearchParams {
+  const params = new URLSearchParams();
+  for (const [name, value] of formEntries(input)) params.append(name, formValueToString(value));
+  return params;
+}
+
+function hasBinaryEntries(input: HydroFormInput): boolean {
+  return formEntries(input).some(([, value]) => value instanceof Blob);
+}
+
+function parseResponsePayload(text: string, contentType: string): Record<string, unknown> | null {
+  if (!contentType.includes('json') && !/^\s*[{[]/.test(text)) return null;
+  try {
+    const value: unknown = JSON.parse(text);
+    return isRecord(value) ? value : null;
+  } catch {
+    return null;
+  }
+}
+
+function responseRefreshes(response: Response, text: string, payload: Record<string, unknown> | null): boolean {
+  return response.redirected
+    || response.status >= 300 && response.status < 400
+    || typeof payload?.url === 'string'
+    || /<meta[^>]+http-equiv=["']?refresh|window\.location(?:\.href)?\s*=|location\.replace\s*\(/i.test(text);
+}
+
+export async function submitHydro(
   path: string,
-  fields: Record<string, string>,
-): Promise<void> {
+  fields: HydroFormInput = {},
+  options: { method?: string; enctype?: string } = {},
+): Promise<HydroSubmitResult> {
   await ensureEndpoint();
+  const method = (options.method || 'POST').toUpperCase() === 'GET' ? 'GET' : 'POST';
+  const enctype = (options.enctype || '').toLowerCase();
+  const params = toHydroSearchParams(fields);
+  const query = params.toString();
+  const url = method === 'GET' && query
+    ? `${hydroNativeUrl(path)}${path.includes('?') ? '&' : '?'}${query}`
+    : hydroNativeUrl(path);
+  const multipart = method === 'POST' && (enctype.includes('multipart/form-data') || hasBinaryEntries(fields));
+  const body = method === 'GET' ? undefined : multipart ? toHydroFormData(fields) : params;
   let response: Response;
   try {
-    response = await fetch(hydroNativeUrl(path), {
-      method: 'POST',
+    response = await fetch(url, {
+      method,
       headers: {
         Accept: 'text/html, application/json',
-        'Content-Type': 'application/x-www-form-urlencoded',
+        ...(method === 'POST' && !multipart ? { 'Content-Type': 'application/x-www-form-urlencoded' } : {}),
       },
-      body: new URLSearchParams(fields),
+      body,
       credentials: 'include',
       redirect: 'manual',
       signal: requestSignal(),
@@ -903,63 +1040,487 @@ export async function postHydroForm(
     throw new ApiError('操作失败：无法连接 Hydro 服务。');
   }
   const text = await response.text().catch(() => '');
+  const payload = parseResponsePayload(text, response.headers.get('content-type') || '');
+  const location = response.headers.get('location') || (typeof payload?.url === 'string' ? payload.url : '');
+  if (/\/login(?:[/?#]|$)/i.test(location) || /href=["']?\/login(?:[/?#]|["'])/i.test(text)) {
+    throw sessionExpiredError();
+  }
   if (response.status >= 300 && response.status < 400) {
-    const location = response.headers.get('location') ?? '';
-    if (/\/login(?:[/?#]|$)/i.test(location)) throw sessionExpiredError();
-    return;
+    return {
+      status: response.status,
+      ok: true,
+      redirected: true,
+      redirectUrl: location || undefined,
+      refresh: true,
+      payload,
+    };
   }
   if (response.ok) {
-    try {
-      const payload = JSON.parse(text) as Record<string, unknown>;
-      if (typeof payload.url === 'string' && /^\/login(?:[/?#]|$)/.test(payload.url)) {
-        throw sessionExpiredError();
-      }
-    } catch (cause) {
-      if (cause instanceof ApiError) throw cause;
-    }
-    if (/href=["']?\/login(?:[/?#]|["'])/i.test(text)) throw sessionExpiredError();
-    return;
+    return {
+      status: response.status,
+      ok: true,
+      redirected: response.redirected,
+      redirectUrl: location || undefined,
+      refresh: responseRefreshes(response, text, payload),
+      payload,
+    };
   }
   const message = text.match(/<p[^>]*>([^<]+)<\/p>/i)?.[1]?.trim();
   throw new ApiError(message || `操作失败（HTTP ${response.status}）。`);
 }
 
+export async function postHydroForm(
+  path: string,
+  fields: HydroFormInput,
+  options: { enctype?: string } = {},
+): Promise<HydroSubmitResult> {
+  return submitHydro(path, fields, { ...options, method: 'POST' });
+}
+
 export interface HydroAdminField {
+  id: string;
   name: string;
   type: string;
   label: string;
   value: string;
   checked: boolean;
   disabled: boolean;
+  required?: boolean;
+  placeholder?: string;
+  helpText?: string;
+  accept?: string;
+  multiple?: boolean;
   options?: Array<{ value: string; label: string; selected: boolean }>;
 }
 
-export interface HydroAdminForm {
+export interface HydroAdminSubmit {
+  id?: string;
+  name?: string;
+  value?: string;
+  label: string;
+  action?: string;
+  method?: string;
+  enctype?: string;
+}
+
+export interface HydroAdminLink {
+  id: string;
+  label: string;
+  href: string;
+}
+
+export interface HydroAdminTableCell {
+  text: string;
+  href?: string;
+}
+
+export interface HydroAdminTableRow {
+  id: string;
+  cells: HydroAdminTableCell[];
+  attributes: Record<string, string>;
+}
+
+export interface HydroAdminTable {
+  id: string;
+  title: string;
+  headers: string[];
+  rows: HydroAdminTableRow[];
+}
+
+export interface HydroAdminAction {
+  id: string;
+  label: string;
   action: string;
+  fields: Array<{ name: string; value: string }>;
+  method?: string;
+  href?: string;
+}
+
+export interface HydroAdminForm {
+  id: string;
+  action: string;
+  method?: string;
+  enctype?: string;
   title: string;
   fields: HydroAdminField[];
+  submits?: HydroAdminSubmit[];
+  links?: HydroAdminLink[];
+}
+
+export interface HydroAdminPage {
+  id: string;
+  title: string;
+  forms: HydroAdminForm[];
+  tables: HydroAdminTable[];
+  actions: HydroAdminAction[];
+  links: HydroAdminLink[];
+  path: string;
+}
+
+function uniqueAdminId(used: Set<string>, preferred: string, fallback: string): string {
+  const base = preferred || fallback;
+  let value = base;
+  let index = 2;
+  while (used.has(value)) value = `${base}-${index++}`;
+  used.add(value);
+  return value;
+}
+
+function routePath(path: string): string {
+  try {
+    return new URL(path, 'http://hydro.local').pathname;
+  } catch {
+    return path.split('?')[0];
+  }
+}
+
+function internalPath(value: string | null | undefined, fallback: string): string {
+  if (!value) return fallback;
+  try {
+    const url = new URL(value, 'http://hydro.local');
+    return url.origin === 'http://hydro.local' ? `${url.pathname}${url.search}${url.hash}` : value;
+  } catch {
+    return value;
+  }
+}
+
+function elementLabel(element: Element, doc: Document): string {
+  const id = element.getAttribute('id');
+  const label = id ? doc.querySelector<HTMLLabelElement>(`label[for="${CSS.escape(id)}"]`) : element.closest('label');
+  return clean(label?.textContent)
+    || clean(element.getAttribute('aria-label'))
+    || clean(element.getAttribute('placeholder'))
+    || element.getAttribute('name')
+    || '';
+}
+
+function headingFor(element: Element, fallback: string): string {
+  return clean(element.querySelector('h1, h2, h3, h4, legend, [data-heading], .section__title')?.textContent) || fallback;
+}
+
+function formControls(form: HTMLFormElement): Array<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement> {
+  return Array.from(form.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(
+    'input[name], select[name], textarea[name]',
+  )).filter((element) => !(element instanceof HTMLInputElement && ['submit', 'button', 'reset', 'image'].includes(element.type)));
+}
+
+function formActionFields(form: HTMLFormElement): Array<{ name: string; value: string }> {
+  const fields: Array<{ name: string; value: string }> = [];
+  for (const control of formControls(form)) {
+    if (control.disabled) continue;
+    if (control instanceof HTMLInputElement && ['checkbox', 'radio'].includes(control.type) && !control.checked) continue;
+    if (control instanceof HTMLSelectElement && control.multiple) {
+      for (const option of Array.from(control.selectedOptions)) fields.push({ name: control.name, value: option.value });
+    } else if (control.type !== 'file') {
+      fields.push({ name: control.name, value: control.value });
+    }
+  }
+  return fields;
+}
+
+function actionFromElement(
+  element: HTMLButtonElement | HTMLInputElement | HTMLAnchorElement,
+  used: Set<string>,
+  index: number,
+  form?: HTMLFormElement,
+): HydroAdminAction {
+  const name = element.getAttribute('name');
+  const value = element instanceof HTMLInputElement ? element.value : element.getAttribute('value') || '';
+  const href = element instanceof HTMLAnchorElement ? element.getAttribute('href') || undefined : undefined;
+  const formAction = internalPath(element.getAttribute('formaction'), form?.getAttribute('action') || '');
+  const action = href && !href.startsWith('javascript:') ? href : formAction || '';
+  const fields = form ? formActionFields(form) : [];
+  if (name) fields.push({ name, value });
+  return {
+    id: uniqueAdminId(used, element.id, `action-${index + 1}`),
+    label: clean(element.textContent) || clean(element.getAttribute('aria-label')) || value || name || '操作',
+    action,
+    fields,
+    method: (element.getAttribute('formmethod') || form?.getAttribute('method') || 'POST').toUpperCase(),
+    href,
+  };
+}
+
+function scrapeForm(form: HTMLFormElement, doc: Document, index: number, used: Set<string>, fallbackAction: string): HydroAdminForm {
+  const fields = formControls(form).map((element, fieldIndex) => {
+    const auxiliary = element.name.startsWith('booleanKeys.') || Boolean(element.closest('.display-hidden'));
+    const type = auxiliary ? 'hidden' : element instanceof HTMLSelectElement ? 'select' : element instanceof HTMLTextAreaElement ? 'textarea' : element.type || 'text';
+    return {
+      id: uniqueAdminId(used, element.id, `field-${index + 1}-${fieldIndex + 1}`),
+      name: element.name,
+      type,
+      label: elementLabel(element, doc),
+      value: element instanceof HTMLInputElement && element.type === 'file' ? '' : element.value,
+      checked: element instanceof HTMLInputElement ? element.checked : false,
+      disabled: element.disabled,
+      required: element.required,
+      placeholder: element.getAttribute('placeholder') || undefined,
+      helpText: clean(element.closest('.form__item')?.querySelector('.help-text')?.textContent) || undefined,
+      accept: element instanceof HTMLInputElement ? element.accept || undefined : undefined,
+      multiple: element instanceof HTMLSelectElement || element instanceof HTMLInputElement ? element.multiple : undefined,
+      options: element instanceof HTMLSelectElement
+        ? Array.from(element.options).map((option) => ({ value: option.value, label: clean(option.textContent), selected: option.selected }))
+        : undefined,
+    } satisfies HydroAdminField;
+  });
+  const submits = Array.from(form.querySelectorAll<HTMLButtonElement | HTMLInputElement>(
+    'button, input[type="submit"], input[type="button"]',
+  )).map((element, submitIndex) => ({
+    id: uniqueAdminId(used, element.id, `submit-${index + 1}-${submitIndex + 1}`),
+    name: element.name || undefined,
+    value: element instanceof HTMLInputElement ? element.value || undefined : element.getAttribute('value') || undefined,
+    label: clean(element.textContent) || clean(element.getAttribute('aria-label')) || (element instanceof HTMLInputElement ? element.value : '') || '提交',
+    action: internalPath(element.getAttribute('formaction'), form.getAttribute('action') || ''),
+    method: element.getAttribute('formmethod') || form.getAttribute('method') || 'GET',
+    enctype: element.getAttribute('formenctype') || form.getAttribute('enctype') || 'application/x-www-form-urlencoded',
+  }));
+  const links = Array.from(form.querySelectorAll<HTMLAnchorElement>('a[href]')).map((link, linkIndex) => ({
+    id: uniqueAdminId(used, link.id, `form-${index + 1}-link-${linkIndex + 1}`),
+    label: clean(link.textContent) || link.getAttribute('aria-label') || link.getAttribute('href') || '',
+    href: link.getAttribute('href') || '',
+  }));
+  return {
+    id: uniqueAdminId(used, form.id, `form-${index + 1}`),
+    action: internalPath(form.getAttribute('action'), fallbackAction),
+    method: (form.getAttribute('method') || 'GET').toUpperCase(),
+    enctype: form.getAttribute('enctype') || 'application/x-www-form-urlencoded',
+    title: headingFor(form, '设置表单'),
+    fields,
+    submits,
+    links,
+  };
+}
+
+function scrapeTables(root: Element, used: Set<string>): HydroAdminTable[] {
+  return Array.from(root.querySelectorAll<HTMLTableElement>('table')).map((table, tableIndex) => ({
+    id: uniqueAdminId(used, table.id, `table-${tableIndex + 1}`),
+    title: headingFor(table.closest('.section') || table, '数据列表'),
+    headers: Array.from(table.querySelectorAll('thead th, thead td')).map((cell) => clean(cell.textContent)),
+    rows: Array.from(table.querySelectorAll<HTMLTableRowElement>('tbody tr')).map((row, rowIndex) => ({
+      id: uniqueAdminId(
+        used,
+        row.id,
+        row.dataset.uid || row.dataset.gid || row.dataset.role || `row-${tableIndex + 1}-${rowIndex + 1}`,
+      ),
+      cells: Array.from(row.cells).map((cell) => ({
+        text: clean(cell.textContent),
+        href: cell.querySelector<HTMLAnchorElement>('a[href]')?.getAttribute('href') || undefined,
+      })),
+      attributes: Object.fromEntries(Array.from(row.attributes).map((attribute) => [attribute.name, attribute.value])),
+    })),
+  }));
+}
+
+function linkList(root: Element, used: Set<string>, prefix: string): HydroAdminLink[] {
+  return Array.from(root.querySelectorAll<HTMLAnchorElement>('a[href]')).map((link, index) => ({
+    id: uniqueAdminId(used, link.id, `${prefix}-link-${index + 1}`),
+    label: clean(link.textContent) || link.getAttribute('aria-label') || link.getAttribute('href') || '',
+    href: link.getAttribute('href') || '',
+  }));
+}
+
+function virtualField(
+  used: Set<string>,
+  name: string,
+  value = '',
+  type = 'text',
+  label = name,
+  options?: HydroAdminField['options'],
+): HydroAdminField {
+  return {
+    id: uniqueAdminId(used, '', `virtual-field-${name}`),
+    name,
+    type,
+    label,
+    value,
+    checked: false,
+    disabled: false,
+    options,
+  };
+}
+
+function virtualForm(
+  used: Set<string>,
+  path: string,
+  title: string,
+  fields: HydroAdminField[],
+  submits: HydroAdminSubmit[] = [],
+): HydroAdminForm {
+  return {
+    id: uniqueAdminId(used, '', `virtual-form-${used.size + 1}`),
+    action: path,
+    method: 'POST',
+    enctype: 'application/x-www-form-urlencoded',
+    title,
+    fields,
+    submits,
+  };
+}
+
+function specialAdminForms(
+  path: string,
+  root: Element,
+  forms: HydroAdminForm[],
+  used: Set<string>,
+): HydroAdminForm[] {
+  const route = routePath(path);
+  if (route === '/manage/config') {
+    const textarea = root.querySelector<HTMLTextAreaElement>('[data-model="hydro://system/setting.yaml"], #config');
+    return [virtualForm(used, path, '系统配置', [
+      virtualField(used, 'value', textarea?.value || '', 'textarea', 'config'),
+    ], [{ label: '保存' }])];
+  }
+  if (route === '/manage/script') {
+    return Array.from(root.querySelectorAll<HTMLTableRowElement>('tbody tr')).flatMap((row, rowIndex) => {
+      const href = row.querySelector<HTMLAnchorElement>('a[href^="javascript:"]')?.getAttribute('href') || '';
+      const id = href.match(/runScript\(\s*['"]([^'"]+)['"]\s*\)/)?.[1];
+      if (!id) return [];
+      return [virtualForm(used, path, clean(row.cells[1]?.textContent) || '运行脚本', [
+        virtualField(used, 'id', id, 'hidden', 'ID'),
+        virtualField(used, 'args', '{}', 'text', '参数'),
+      ], [{ id: `script-submit-${rowIndex + 1}`, label: '运行' }])];
+    });
+  }
+  if (route === '/manage/userimport') {
+    const textarea = root.querySelector<HTMLTextAreaElement>('[name="users"]');
+    return [virtualForm(used, path, '导入用户', [
+      virtualField(used, 'users', textarea?.value || '', 'textarea', '用户'),
+    ], [
+      { id: 'user-import-preview', name: 'draft', value: 'true', label: '预览' },
+      { id: 'user-import-submit', name: 'draft', value: 'false', label: '导入' },
+    ])];
+  }
+  if (route === '/manage/userpriv') {
+    return Array.from(root.querySelectorAll<HTMLElement>('[data-uid][data-priv]')).map((item, index) => {
+      const isDefault = item.dataset.uid === 'default';
+      return virtualForm(used, path, isDefault ? '默认用户权限' : `用户权限 ${item.dataset.uid}`, [
+        virtualField(used, 'uid', isDefault ? '0' : item.dataset.uid || '', 'hidden', '用户 ID'),
+        virtualField(used, 'priv', item.dataset.priv || '0', 'number', '权限值'),
+        virtualField(used, 'system', String(isDefault), 'hidden', 'system'),
+      ], [{ id: `user-priv-submit-${index + 1}`, label: '保存' }]);
+    });
+  }
+  if (route === '/domain/user') {
+    const roleOptions = Array.from(root.querySelector<HTMLSelectElement>('tbody select[name="role"]')?.options || [])
+      .map((option) => ({ value: option.value, label: clean(option.textContent), selected: option.selected }));
+    const addRoleOptions = roleOptions.filter((option) => option.value !== 'default');
+    const result = Array.from(root.querySelectorAll<HTMLTableRowElement>('tbody tr[data-uid]')).flatMap((row) => {
+      const uid = row.dataset.uid || '';
+      const role = row.querySelector<HTMLSelectElement>('select[name="role"]');
+      if (!uid || !role || role.disabled) return [];
+      const options = Array.from(role.options).map((option) => ({
+        value: option.value,
+        label: clean(option.textContent),
+        selected: option.selected,
+      }));
+      return [
+        virtualForm(used, path, `用户 ${uid}`, [
+          virtualField(used, 'operation', 'set_user', 'hidden', 'operation'),
+          virtualField(used, 'uid', uid, 'hidden', '用户 ID'),
+          virtualField(used, 'role', role.value, 'select', '角色', options),
+        ], [{ label: '保存' }]),
+        virtualForm(used, path, `移除用户 ${uid}`, [
+          virtualField(used, 'operation', 'set_user', 'hidden', 'operation'),
+          virtualField(used, 'uid', uid, 'hidden', '用户 ID'),
+          virtualField(used, 'role', 'default', 'hidden', '角色'),
+        ], [{ label: '移除' }]),
+      ];
+    });
+    result.unshift(virtualForm(used, path, '添加用户', [
+      virtualField(used, 'operation', 'set_user', 'hidden', 'operation'),
+      virtualField(used, 'uid', '', 'text', '用户 ID'),
+      virtualField(used, 'role', addRoleOptions[0]?.value || '', 'select', '角色', addRoleOptions),
+    ], [{ label: '添加' }]));
+    return result;
+  }
+  if (route === '/domain/role') {
+    const result = Array.from(root.querySelectorAll<HTMLTableRowElement>('tbody tr[data-role]')).map((row) => virtualForm(used, path, `删除角色 ${row.dataset.role}`, [
+      virtualField(used, 'operation', 'delete', 'hidden', 'operation'),
+      virtualField(used, 'roles', row.dataset.role || '', 'hidden', '角色'),
+    ], [{ label: '删除' }]));
+    result.unshift(virtualForm(used, path, '创建角色', [
+      virtualField(used, 'operation', 'add', 'hidden', 'operation'),
+      virtualField(used, 'role', '', 'text', '角色名'),
+    ], [{ label: '创建' }]));
+    return result;
+  }
+  if (route === '/domain/group') {
+    const result = Array.from(root.querySelectorAll<HTMLTableRowElement>('tbody tr[data-gid]')).flatMap((row) => {
+      const name = row.dataset.gid || '';
+      return [
+        virtualForm(used, path, `用户组 ${name}`, [
+          virtualField(used, 'operation', 'update', 'hidden', 'operation'),
+          virtualField(used, 'name', name, 'hidden', '组名'),
+          virtualField(used, 'uids', row.querySelector<HTMLInputElement>('input[data-gid]')?.value || '', 'text', '用户 ID'),
+        ], [{ label: '保存' }]),
+        virtualForm(used, path, `删除用户组 ${name}`, [
+          virtualField(used, 'operation', 'del', 'hidden', 'operation'),
+          virtualField(used, 'name', name, 'hidden', '组名'),
+        ], [{ label: '删除' }]),
+      ];
+    });
+    result.unshift(virtualForm(used, path, '创建用户组', [
+      virtualField(used, 'operation', 'update', 'hidden', 'operation'),
+      virtualField(used, 'name', '', 'text', '组名'),
+      virtualField(used, 'uids', '', 'text', '用户 ID'),
+    ], [{ label: '创建' }]));
+    return result;
+  }
+  return forms;
+}
+
+function pageActions(root: Element, path: string, used: Set<string>): HydroAdminAction[] {
+  if ([
+    '/manage/config',
+    '/manage/script',
+    '/manage/userimport',
+    '/manage/userpriv',
+    '/domain/user',
+    '/domain/role',
+    '/domain/group',
+  ].includes(routePath(path))) return [];
+  return Array.from(root.querySelectorAll<HTMLButtonElement | HTMLInputElement | HTMLAnchorElement>(
+    'button, input[type="submit"], input[type="button"], a[data-operation], a[data-action]',
+  )).filter((element) => !element.closest('form')).map((element, index) => actionFromElement(element, used, index));
+}
+
+export async function scrapeAdminPage(path: string): Promise<HydroAdminPage> {
+  const doc = await readHydroPageResponse(path, false).then((result) => result.doc);
+  const root = doc.querySelector('main, .main, #content') || doc.body;
+  const used = new Set<string>();
+  const forms = Array.from(root.querySelectorAll<HTMLFormElement>('form')).map((form, index) => scrapeForm(form, doc, index, used, path));
+  const actions = pageActions(root, path, used);
+  const pageForms = specialAdminForms(path, root, forms, used);
+  return {
+    id: uniqueAdminId(used, '', `page-${routePath(path).replace(/[^a-z0-9]+/gi, '-') || 'admin'}`),
+    path,
+    title: headingFor(root, path),
+    forms: pageForms,
+    tables: scrapeTables(root, used),
+    actions,
+    links: linkList(root, used, 'page'),
+  };
 }
 
 export async function scrapeAdminForms(path: string): Promise<HydroAdminForm[]> {
-  const doc = await readHydroPageResponse(path, false).then((result) => result.doc);
-  return Array.from(doc.querySelectorAll<HTMLFormElement>('form')).flatMap((form) => {
-    const fields = Array.from(form.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('input[name], select[name], textarea[name]')).flatMap((element) => {
-      if (element.disabled || element.type === 'submit' || element.type === 'button' || element.type === 'file') return [];
-      const label = element.id ? doc.querySelector<HTMLLabelElement>(`label[for="${CSS.escape(element.id)}"]`)?.textContent : element.closest('label')?.textContent;
-      const common = { name: element.name, label: clean(label) || element.getAttribute('placeholder') || element.name, disabled: element.disabled };
-      if (element instanceof HTMLSelectElement) return [{ ...common, type: 'select', value: element.value, checked: false, options: Array.from(element.options).map((option) => ({ value: option.value, label: clean(option.textContent), selected: option.selected })) }];
-      if (element instanceof HTMLTextAreaElement) return [{ ...common, type: 'textarea', value: element.value, checked: false }];
-      if (element.type === 'checkbox' || element.type === 'radio') return [{ ...common, type: element.type, value: element.value || 'on', checked: element.checked }];
-      return [{ ...common, type: element.type || 'text', value: element.value, checked: false }];
-    });
-    if (!fields.length) return [];
-    const heading = form.querySelector<HTMLElement>('h1, h2, h3, h4, legend, .section__title')?.textContent;
-    return [{ action: form.getAttribute('action') || path, title: clean(heading) || '设置表单', fields }];
-  });
+  return (await scrapeAdminPage(path)).forms.map((form) => ({
+    ...form,
+    fields: form.fields.filter((field) => !field.disabled && field.type !== 'submit' && field.type !== 'button' && field.type !== 'file'),
+  }));
 }
 
-export async function scrapeProblemSolutions(pid: string, pageNumber = 1): Promise<ProblemSolutionsResult> {
-  const page = await readHydroPageResponse(`/p/${encodeURIComponent(pid)}/solution?page=${pageNumber}`);
+export async function submitHydroAdminForm(
+  path: string,
+  method: string,
+  fields: HydroFormInput,
+  enctype?: string,
+): Promise<HydroSubmitResult> {
+  return submitHydro(path, fields, { method, enctype });
+}
+
+export async function scrapeProblemSolutions(pid: string, pageNumber = 1, tid?: string): Promise<ProblemSolutionsResult> {
+  const query = `?page=${pageNumber}${tid ? `&tid=${encodeURIComponent(tid)}` : ''}`;
+  const page = await readHydroPageResponse(`/p/${encodeURIComponent(pid)}/solution${query}`);
   if (!page.payload || !Array.isArray(page.payload.psdocs)) return { items: [], pageCount: 1, total: 0 };
   const items = page.payload.psdocs.flatMap((item) => {
     if (!isRecord(item)) return [];
@@ -993,8 +1554,9 @@ export async function scrapeProblemSolutions(pid: string, pageNumber = 1): Promi
   };
 }
 
-export async function scrapeProblemStats(pid: string): Promise<ProblemStat[]> {
-  const page = await readHydroPageResponse(`/p/${encodeURIComponent(pid)}/stat`);
+export async function scrapeProblemStats(pid: string, tid?: string): Promise<ProblemStat[]> {
+  const query = tid ? `?tid=${encodeURIComponent(tid)}` : '';
+  const page = await readHydroPageResponse(`/p/${encodeURIComponent(pid)}/stat${query}`);
   if (!page.payload || !Array.isArray(page.payload.rsdocs)) return [];
   return page.payload.rsdocs.flatMap((item) => {
     if (!isRecord(item)) return [];
@@ -1005,8 +1567,9 @@ export async function scrapeProblemStats(pid: string): Promise<ProblemStat[]> {
   });
 }
 
-export async function scrapeProblemFiles(pid: string): Promise<ProblemFile[]> {
-  const page = await readHydroPageResponse(`/p/${encodeURIComponent(pid)}/files`);
+export async function scrapeProblemFiles(pid: string, tid?: string): Promise<ProblemFile[]> {
+  const query = tid ? `?tid=${encodeURIComponent(tid)}` : '';
+  const page = await readHydroPageResponse(`/p/${encodeURIComponent(pid)}/files${query}`);
   if (!page.payload || !Array.isArray(page.payload.fragments)) return [];
   return page.payload.fragments.flatMap((fragment) => {
     if (!isRecord(fragment) || typeof fragment.html !== 'string') return [];

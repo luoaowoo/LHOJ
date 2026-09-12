@@ -8,6 +8,19 @@ export type ResolvedEndpoint = 'primary' | 'fallback';
 const storageKey = 'luoa-oj.endpoint';
 let resolvedEndpoint: ResolvedEndpoint | null = null;
 let pendingProbe: Promise<ResolvedEndpoint> | null = null;
+let avatarRevision = '';
+let serverClockOffset = 0;
+
+function recordServerTime(response: Response): void {
+  const value = response.headers.get('date');
+  if (!value) return;
+  const serverTime = Date.parse(value);
+  if (Number.isFinite(serverTime)) serverClockOffset = serverTime - Date.now();
+}
+
+export function serverNow(): number {
+  return Date.now() + serverClockOffset;
+}
 
 export function requestSignal(timeout = REQUEST_TIMEOUT_MS): AbortSignal {
   return AbortSignal.timeout(timeout);
@@ -19,6 +32,7 @@ export async function fetchRead(input: RequestInfo | URL, init: RequestInit = {}
   for (let attempt = 0; attempt <= 2; attempt += 1) {
     try {
       response = await fetch(input, { ...init, signal });
+      recordServerTime(response);
       if (response.status < 500 || attempt === 2) return response;
       await response.body?.cancel();
     } catch (cause) {
@@ -112,7 +126,10 @@ export function hydroUrl(path: string): string {
 
 export function hydroNativeUrl(path: string): string {
   const normalized = path.startsWith('/') ? path : `/${path}`;
-  return `/hydro-native${normalized}`;
+  const nativePath = normalized.startsWith('/hydro-native/')
+    ? normalized.slice('/hydro-native'.length)
+    : normalized;
+  return `/hydro-native${nativePath}`;
 }
 
 export function hydroWebSocketUrl(path: string): string {
@@ -122,8 +139,11 @@ export function hydroWebSocketUrl(path: string): string {
 }
 
 export function hydroPublicUrl(path: string): string {
+  // Hydro HTML pages must stay same-origin so the session cookie and the
+  // server-side proxy are preserved. Going through the CDN hostname causes
+  // several native Hydro routes (notably /p/:pid/edit) to return 404.
   const url = new URL(path, `${PUBLIC_HYDRO_BASE}/`);
-  return `${PUBLIC_HYDRO_BASE}${url.pathname}${url.search}${url.hash}`;
+  return hydroNativeUrl(`${url.pathname}${url.search}${url.hash}`);
 }
 
 export function hydroContentUrl(value?: string): string | undefined {
@@ -155,15 +175,28 @@ export function hydroAssetUrl(value?: string): string | undefined {
 }
 
 export function hydroAvatarUrl(value: string | undefined, userId: number): string {
+  // Same-origin so the browser doesn't block it as mixed content on HTTPS.
+  // /hydro-native is proxied to Hydro in both the Vite dev server and Caddy.
+  const uploaded = hydroNativeUrl(`/file/${encodeURIComponent(String(userId))}/.avatar.jpg`);
   if (value) {
     try {
-      const url = new URL(value, PUBLIC_HYDRO_BASE);
-      if (url.hostname === new URL(PUBLIC_HYDRO_BASE).hostname) return url.toString();
+      const normalized = value.startsWith('url:') ? value.slice(4) : value;
+      const url = new URL(normalized, PUBLIC_HYDRO_BASE);
+      if (url.hostname === new URL(PUBLIC_HYDRO_BASE).hostname || url.host === new URL(FALLBACK_BASE).host) {
+        const proxied = hydroNativeUrl(`${url.pathname}${url.search}${url.hash}`);
+        return avatarRevision ? `${proxied}${proxied.includes('?') ? '&' : '?'}v=${avatarRevision}` : proxied;
+      }
+      if (url.hostname === 'cn.gravatar.com') url.hostname = 'www.gravatar.com';
+      if (url.protocol === 'http:' || url.protocol === 'https:') return url.toString();
     } catch {
       // Fall through to the canonical Hydro avatar URL.
     }
   }
-  return hydroPublicUrl(`/file/${encodeURIComponent(String(userId))}/.avatar.jpg`);
+  return avatarRevision ? `${uploaded}?v=${avatarRevision}` : uploaded;
+}
+
+export function invalidateAvatarCache(): void {
+  avatarRevision = String(Date.now());
 }
 
 function fallbackUrl(path: string): string {

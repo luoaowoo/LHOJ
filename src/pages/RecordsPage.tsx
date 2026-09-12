@@ -8,7 +8,7 @@ import { ListChecks, RefreshCw } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import StatusChip from '../components/StatusChip';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
-import { hydroPublicUrl } from '../lib/endpoint';
+import { hydroWorkspaceHref } from '../lib/hydro-workspace';
 import { scrapeRecordRows } from '../lib/scrape';
 import type { RecordRow } from '../types';
 
@@ -30,11 +30,23 @@ const statusOptions = [
   { value: '0', label: 'Waiting' },
 ];
 
-function problemLink(row: RecordRow): { label: string; to?: string; href?: string } {
+function hydroWorkspacePath(value: string): string {
+  if (/^https?:\/\//i.test(value)) {
+    try {
+      const url = new URL(value);
+      return `${url.pathname}${url.search}${url.hash}`;
+    } catch {
+      return value;
+    }
+  }
+  return value.startsWith('/') ? value : `/${value}`;
+}
+
+function problemLink(row: RecordRow): { label: string; to?: string } {
   const label = row.problem || row.problemHref || '*';
   const match = row.problemHref?.match(/(?:^|\/)p\/([^/?#]+)/i);
   if (match?.[1]) return { label, to: `/problem/${encodeURIComponent(decodeURIComponent(match[1]))}` };
-  if (row.problemHref) return { label, href: hydroPublicUrl(row.problemHref) };
+  if (row.problemHref) return { label, to: hydroWorkspaceHref(hydroWorkspacePath(row.problemHref), label) };
   return { label };
 }
 
@@ -232,10 +244,6 @@ export default function RecordsPage() {
                     <TableCell onClick={(event) => event.stopPropagation()}>
                       {problem.to ? (
                         <RouterLink to={problem.to}>{problem.label}</RouterLink>
-                      ) : problem.href ? (
-                        <Typography component="a" href={problem.href} target="_blank" rel="noreferrer">
-                          {problem.label}
-                        </Typography>
                       ) : (
                         <Typography>{problem.label}</Typography>
                       )}

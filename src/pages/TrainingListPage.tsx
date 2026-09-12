@@ -8,7 +8,7 @@ import { GraduationCap, Plus, RefreshCw, Search } from 'lucide-react';
 import { useAuth } from '../auth';
 import PageHeader from '../components/PageHeader';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
-import { hydroPublicUrl } from '../lib/endpoint';
+import HydroWorkspaceButton from '../components/HydroWorkspaceButton';
 import { scrapeTrainingRows } from '../lib/scrape';
 import type { TrainingRow } from '../types';
 
@@ -53,9 +53,9 @@ export default function TrainingListPage() {
         actions={(
           <>
             {user?.role === 'root' ? (
-              <Button component="a" href={hydroPublicUrl('/training/create')} target="_blank" rel="noreferrer" variant="contained" startIcon={<Plus size={16} />}>
+              <HydroWorkspaceButton path="/training/create" title="创建训练" variant="contained" startIcon={<Plus size={16} />}>
                 创建训练
-              </Button>
+              </HydroWorkspaceButton>
             ) : null}
             <Button variant="outlined" startIcon={<RefreshCw size={16} />} onClick={() => void load()}>
               刷新

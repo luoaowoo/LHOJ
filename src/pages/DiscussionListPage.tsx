@@ -4,10 +4,10 @@ import {
   Box, Button, Chip, InputAdornment, Pagination, Paper, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, TextField,
 } from '@mui/material';
-import { ExternalLink, MessageSquare, RefreshCw, Search } from 'lucide-react';
+import { MessageSquare, RefreshCw, Search } from 'lucide-react';
+import HydroWorkspaceButton from '../components/HydroWorkspaceButton';
 import PageHeader from '../components/PageHeader';
 import { EmptyBox, ErrorBox, FullPageLoader } from '../components/StateBox';
-import { hydroPublicUrl } from '../lib/endpoint';
 import { formatDate, scrapeDiscussionRows } from '../lib/scrape';
 import type { DiscussionRow } from '../types';
 
@@ -61,16 +61,13 @@ export default function DiscussionListPage() {
             <Button variant="outlined" startIcon={<RefreshCw size={16} />} onClick={() => void load()}>
               刷新
             </Button>
-            <Button
-              component="a"
-              href={hydroPublicUrl('/discuss/node/%E9%97%AE%E7%AD%94/create')}
-              target="_blank"
-              rel="noreferrer"
+            <HydroWorkspaceButton
+              path="/discuss/node/问答/create"
+              title="发布讨论"
               variant="contained"
-              endIcon={<ExternalLink size={15} />}
             >
               发布讨论
-            </Button>
+            </HydroWorkspaceButton>
           </>
         }
       />

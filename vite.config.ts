@@ -11,6 +11,17 @@ const proxyOptions = {
       proxyReq.setHeader('Origin', primaryHydro);
       proxyReq.setHeader('Referer', `${primaryHydro}/`);
     });
+    proxy.on('proxyRes', (proxyRes) => {
+      const location = proxyRes.headers.location;
+      if (typeof location !== 'string') return;
+      try {
+        const url = new URL(location, primaryHydro);
+        if (url.origin !== new URL(primaryHydro).origin) return;
+        proxyRes.headers.location = `/hydro-native${url.pathname}${url.search}${url.hash}`;
+      } catch {
+        // Leave malformed upstream redirects untouched.
+      }
+    });
   },
 };
 const nativeProxyOptions = {

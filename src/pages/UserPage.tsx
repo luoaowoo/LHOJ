@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Link as RouterLink, useParams } from 'react-router-dom';
-import { Accordion, AccordionDetails, AccordionSummary, Alert, Avatar, Box, Button, Chip, CircularProgress, Divider, LinearProgress, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Stack, Tab, Tabs, TextField, Typography } from '@mui/material';
-import { Bell, CheckCircle2, ChevronDown, CircleUserRound, ExternalLink, Globe2, Image, Search, Settings2, ShieldCheck, Trophy, Wrench } from 'lucide-react';
+import { Accordion, AccordionDetails, AccordionSummary, Alert, Box, Button, Chip, CircularProgress, Divider, LinearProgress, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Stack, Tab, Tabs, TextField, Typography } from '@mui/material';
+import { Bell, CheckCircle2, ChevronDown, CircleUserRound, Globe2, Image, Search, Settings2, ShieldCheck, Trophy, Wrench } from 'lucide-react';
 import { useAuth } from '../auth';
+import HydroWorkspaceButton from '../components/HydroWorkspaceButton';
 import PageHeader from '../components/PageHeader';
 import { ErrorBox, FullPageLoader } from '../components/StateBox';
 import { fetchUserByIdentifier } from '../lib/api';
-import { hydroAvatarUrl, hydroPublicUrl } from '../lib/endpoint';
+import { hydroAvatarUrl } from '../lib/endpoint';
+import HydroAvatar from '../components/HydroAvatar';
 import { difficultyColor } from '../lib/difficulty';
 import { parseRp, ratingColor } from '../lib/rating';
 import { formatDate, scrapeProblemRows } from '../lib/scrape';
@@ -100,7 +102,6 @@ export default function UserPage() {
     return <ErrorBox message={error || '请先登录后查看个人中心。'} />;
   }
 
-  const initials = profile.uname.trim().slice(0, 2).toUpperCase() || '?';
   const encodedUname = encodeURIComponent(profile.uname);
   const canOpenOriginal = typeof profile._id === 'number';
   const ownProfile = !uname || profile._id === sessionUser?._id;
@@ -150,13 +151,7 @@ export default function UserPage() {
           flexWrap: 'wrap',
         }}
       >
-        <Avatar
-          src={hydroAvatarUrl(profile.avatarUrl, profile._id)}
-          alt=""
-          sx={{ width: 72, height: 72, bgcolor: 'primary.main', fontSize: 26 }}
-        >
-          {initials}
-        </Avatar>
+        <HydroAvatar src={hydroAvatarUrl(profile.avatarUrl, profile._id)} name={profile.uname} userId={profile._id} size={72} />
         <Box sx={{ flex: 1, minWidth: 220 }}>
           <Typography variant="h6" sx={{ fontWeight: 700, color: nameColor ?? 'text.primary' }}>
             {profile.displayName || profile.uname}
@@ -182,15 +177,13 @@ export default function UserPage() {
             我的评测
           </Button>
           {canOpenOriginal && (
-            <Button
-              component="a"
-              href={hydroPublicUrl(`/user/${encodedUname}`)}
-              target="_blank"
-              rel="noreferrer"
+            <HydroWorkspaceButton
+              path={`/user/${encodedUname}`}
+              title={`${profile.displayName || profile.uname} · 用户工作区`}
               variant="outlined"
             >
-              Hydro 原始页面
-            </Button>
+              用户工作区
+            </HydroWorkspaceButton>
           )}
         </Box>
       </Paper>
@@ -274,30 +267,59 @@ export default function UserPage() {
           <List disablePadding aria-label="账户管理">
             {accountLinks.map((item, index) => (
               <ListItem key={item.path} disablePadding divider={index < accountLinks.length - 1}>
-                <ListItemButton
-                  component={item.internal ? RouterLink : 'a'}
-                  {...(item.internal ? { to: item.path } : { href: hydroPublicUrl(item.path), target: '_blank', rel: 'noreferrer' })}
-                  sx={{ minHeight: 58, px: { xs: 2, md: 2.5 } }}
-                >
-                  <ListItemIcon sx={{ minWidth: 42 }}><item.icon size={19} /></ListItemIcon>
-                  <ListItemText primary={item.label} secondary={item.description} />
-                  {!item.internal ? <ExternalLink size={16} aria-hidden="true" /> : null}
-                </ListItemButton>
+                {item.internal ? (
+                  <ListItemButton
+                    component={RouterLink}
+                    to={item.path}
+                    sx={{ minHeight: 58, px: { xs: 2, md: 2.5 } }}
+                  >
+                    <ListItemIcon sx={{ minWidth: 42 }}><item.icon size={19} /></ListItemIcon>
+                    <ListItemText primary={item.label} secondary={item.description} />
+                  </ListItemButton>
+                ) : (
+                  <HydroWorkspaceButton
+                    path={item.path}
+                    title={item.label}
+                    color="inherit"
+                    fullWidth
+                    startIcon={<item.icon size={19} />}
+                    sx={{
+                      minHeight: 58,
+                      px: { xs: 2, md: 2.5 },
+                      justifyContent: 'flex-start',
+                      textAlign: 'left',
+                      textTransform: 'none',
+                    }}
+                  >
+                    <Box>
+                      <Typography variant="body1" sx={{ fontWeight: 500 }}>{item.label}</Typography>
+                      <Typography variant="body2" color="text.secondary">{item.description}</Typography>
+                    </Box>
+                  </HydroWorkspaceButton>
+                )}
               </ListItem>
             ))}
             {profile.role === 'root' ? (
               <ListItem disablePadding>
-                <ListItemButton
-                  component="a"
-                  href={hydroPublicUrl('/manage')}
-                  target="_blank"
-                  rel="noreferrer"
-                  sx={{ minHeight: 58, px: { xs: 2, md: 2.5 } }}
+                <HydroWorkspaceButton
+                  path="/manage"
+                  title="系统管理"
+                  color="inherit"
+                  fullWidth
+                  startIcon={<Wrench size={19} />}
+                  sx={{
+                    minHeight: 58,
+                    px: { xs: 2, md: 2.5 },
+                    justifyContent: 'flex-start',
+                    textAlign: 'left',
+                    textTransform: 'none',
+                  }}
                 >
-                  <ListItemIcon sx={{ minWidth: 42 }}><Wrench size={19} /></ListItemIcon>
-                  <ListItemText primary="系统管理" secondary="Hydro 管理控制台" />
-                  <ExternalLink size={16} aria-hidden="true" />
-                </ListItemButton>
+                  <Box>
+                    <Typography variant="body1" sx={{ fontWeight: 500 }}>系统管理</Typography>
+                    <Typography variant="body2" color="text.secondary">Hydro 管理控制台</Typography>
+                  </Box>
+                </HydroWorkspaceButton>
               </ListItem>
             ) : null}
           </List>

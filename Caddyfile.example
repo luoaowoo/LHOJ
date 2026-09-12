@@ -9,6 +9,7 @@
 			header_up Host {http.reverse_proxy.upstream.hostport}
 			header_up Origin http://64.90.0.223:801
 			header_up Referer http://64.90.0.223:801/
+			header_down Location ^/(.*)$ /hydro-native/$1
 		}
 	}
 

@@ -2,20 +2,21 @@ import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Outlet, useLocation, Link as RouterLink } from 'react-router-dom';
 import {
-  AppBar, Avatar, BottomNavigation, BottomNavigationAction, Box, Divider, Drawer, IconButton, List, ListItem,
+  AppBar, BottomNavigation, BottomNavigationAction, Box, Divider, Drawer, IconButton, List, ListItem,
   ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem, Paper, Toolbar,
   Tooltip, Typography, useMediaQuery, useTheme,
 } from '@mui/material';
 import {
-  Activity, BarChart3, BookOpen, ChevronDown, CircleUserRound, ClipboardList, ExternalLink, GraduationCap,
+  Activity, BarChart3, BookOpen, ChevronDown, CircleUserRound, ClipboardList, GraduationCap,
   Home, ListChecks, LogOut, MessageSquare, MoreHorizontal, Palette, PanelLeftClose,
   PanelLeftOpen, Settings2, ShieldCheck, Trophy, Wrench,
 } from 'lucide-react';
 import { useAuth } from '../auth';
 import { usePreferences } from '../prefs';
-import { hydroAvatarUrl, hydroPublicUrl } from '../lib/endpoint';
+import { hydroAvatarUrl } from '../lib/endpoint';
 import { parseRp, ratingColor } from '../lib/rating';
 import { resolveChromeBg } from '../theme';
+import HydroAvatar from './HydroAvatar';
 
 const drawerWidth = 260;
 const railWidth = 72;
@@ -129,10 +130,9 @@ export default function AppLayout() {
 
   const drawerContent = (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <Box sx={{ px: compactRail ? 1 : 2.5, pt: 3.5, pb: 3, minHeight: 56, display: 'flex', justifyContent: compactRail ? 'center' : 'flex-start', alignItems: 'center' }}>
-        {!compactRail
-          ? <Typography sx={{ fontWeight: 600, fontSize: 15, letterSpacing: '-0.01em' }}>LH-oj</Typography>
-          : <Typography sx={{ fontWeight: 600, fontSize: 15 }}>OJ</Typography>}
+      <Box sx={{ px: compactRail ? 1 : 2.5, pt: 3.5, pb: 3, minHeight: 56, display: 'flex', gap: 1.25, justifyContent: compactRail ? 'center' : 'flex-start', alignItems: 'center' }}>
+        <Box component="img" src="/校徽.png" alt="学校校徽" sx={{ width: 32, height: 32, objectFit: 'contain', flexShrink: 0 }} />
+        {!compactRail && <Typography sx={{ fontWeight: 600, fontSize: 15 }}>LH-oj</Typography>}
       </Box>
       <List dense sx={{ px: 1.5, py: 0, flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
         {visibleNavItems.map((item) => (
@@ -151,21 +151,6 @@ export default function AppLayout() {
       <List dense sx={{ px: 1.5, py: 1 }}>
         <NavRow to="/status" label="系统状态" icon={Activity} activeItem={active('/status')} compact={compactRail} onClick={() => setDrawerOpen(false)} />
         <NavRow to="/user" label="个人中心" icon={CircleUserRound} activeItem={active('/user')} compact={compactRail} onClick={() => setDrawerOpen(false)} />
-        <ListItem disablePadding>
-          <ListItemButton
-            component="a"
-            href={hydroPublicUrl('/domain/dashboard')}
-            target="_blank"
-            rel="noreferrer"
-            onClick={() => setDrawerOpen(false)}
-            aria-label="Hydro 管理"
-            title={compactRail ? 'Hydro 管理' : undefined}
-            sx={{ minHeight: 38, px: 1.5, justifyContent: compactRail ? 'center' : 'flex-start', color: 'text.secondary' }}
-          >
-            <ListItemIcon sx={{ minWidth: compactRail ? 0 : 34, justifyContent: 'center', color: 'inherit' }}><ExternalLink size={18} strokeWidth={1.75} /></ListItemIcon>
-            {!compactRail && <ListItemText primaryTypographyProps={{ fontSize: 14 }}>Hydro 管理</ListItemText>}
-          </ListItemButton>
-        </ListItem>
       </List>
     </Box>
   );
@@ -221,7 +206,7 @@ export default function AppLayout() {
                   '&:hover': { bgcolor: 'action.hover' },
                 }}
               >
-                <Avatar src={hydroAvatarUrl(user.avatarUrl, user._id)} sx={{ width: 28, height: 28 }} alt="">{user.uname.slice(0, 2)}</Avatar>
+                <HydroAvatar src={hydroAvatarUrl(user.avatarUrl, user._id)} name={user.uname} userId={user._id} size={28} />
                 <Typography noWrap sx={{ fontSize: 13.5, fontWeight: 600, color: userColor ?? 'text.primary', maxWidth: 140 }}>
                   {user.uname}
                 </Typography>
