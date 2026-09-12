@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Link as RouterLink, useParams } from 'react-router-dom';
+import { Link as RouterLink, useParams, useSearchParams } from 'react-router-dom';
 import { Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import { ArrowLeft, BarChart3 } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
@@ -9,16 +9,18 @@ import type { ProblemStat } from '../types';
 
 export default function ProblemStatsPage() {
   const { id = '' } = useParams();
+  const [searchParams] = useSearchParams();
+  const tid = searchParams.get('tid') ?? '';
   const [rows, setRows] = useState<ProblemStat[] | null>(null);
   const [error, setError] = useState('');
-  const load = useCallback(async () => { setError(''); try { setRows(await scrapeProblemStats(id)); } catch (cause) { setError(cause instanceof Error ? cause.message : '统计加载失败。'); } }, [id]);
+  const load = useCallback(async () => { setError(''); try { setRows(await scrapeProblemStats(id, tid || undefined)); } catch (cause) { setError(cause instanceof Error ? cause.message : '统计加载失败。'); } }, [id, tid]);
   useEffect(() => { void load(); }, [load]);
   if (!rows && !error) return <FullPageLoader />;
   if (error) return <ErrorBox message={error} onRetry={() => void load()} />;
   return (
     <Box>
       <Box sx={{ mb: 1.5 }}>
-        <Button component={RouterLink} to={`/problem/${encodeURIComponent(id)}`} color="inherit" size="small" startIcon={<ArrowLeft size={16} />}>返回题目</Button>
+        <Button component={RouterLink} to={`/problem/${encodeURIComponent(id)}${tid ? `?tid=${encodeURIComponent(tid)}` : ''}`} color="inherit" size="small" startIcon={<ArrowLeft size={16} />}>返回题目</Button>
       </Box>
       <PageHeader icon={<BarChart3 size={22} />} title="最优提交" />
       {!rows?.length ? <EmptyBox message="暂无统计数据" /> : (

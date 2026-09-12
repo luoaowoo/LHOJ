@@ -82,7 +82,7 @@ export default function HydroAdminWorkspace({ path, title }: { path: string; tit
   const navigate = (href?: string) => {
     if (!href || href.startsWith('javascript:') || href.startsWith('#')) return;
     try {
-      const url = new URL(href, window.location.origin);
+      const url = new URL(href, new URL(currentPath, window.location.origin));
       if (url.origin !== window.location.origin) return;
       setHistory((old) => [...old, currentPath]);
       setCurrentPath(`${url.pathname}${url.search}`);
@@ -106,8 +106,9 @@ export default function HydroAdminWorkspace({ path, title }: { path: string; tit
         const action = submit?.action || form.action;
         navigate(`${action}${action.includes('?') ? '&' : '?'}${params}`);
       } else {
-        await submitForm(form, values, submit);
-        await load();
+        const result = await submitForm(form, values, submit);
+        if (result.redirectUrl) navigate(result.redirectUrl);
+        else await load();
         setNotice('操作已完成。');
       }
     }
@@ -133,14 +134,16 @@ export default function HydroAdminWorkspace({ path, title }: { path: string; tit
       try {
         const data = new FormData();
         action.fields.forEach((field) => data.append(field.name, field.value));
-        await submitHydroAdminForm(action.action || currentPath, action.method || 'POST', data);
-        await load();
+        const result = await submitHydroAdminForm(action.action || currentPath, action.method || 'POST', data);
+        if (result.redirectUrl) navigate(result.redirectUrl);
+        else await load();
         setNotice('操作已完成。');
       } catch (cause) { setError(cause instanceof Error ? cause.message : '操作失败。'); }
       finally { setSaving(false); }
     })()}>{action.label}</Button>)}</Stack> : null}
+    {page.links.length ? <Stack direction="row" flexWrap="wrap" gap={1} sx={{ mb: 2 }}>{page.links.map((link) => <Button key={link.id} size="small" variant="outlined" onClick={() => navigate(link.href)}>{link.label || "打开"}</Button>)}</Stack> : null}
     {page.tables?.map((table, tableIndex) => <Paper key={`table-${tableIndex}`} variant="outlined" sx={{ mb: 2, overflow: 'auto' }}><Typography fontWeight={650} sx={{ p: 2 }}>{table.title || '数据列表'}</Typography><Divider /><Table size="small"><TableHead><TableRow>{table.headers.map((header) => <TableCell key={header}>{header}</TableCell>)}</TableRow></TableHead><TableBody>{table.rows.map((row, rowIndex) => <TableRow key={rowIndex}>{row.cells.map((cell, cellIndex) => <TableCell key={cellIndex}>{cell.href ? <Link component="button" onClick={() => navigate(cell.href)} underline="hover">{cell.text || '打开'}</Link> : cell.text}</TableCell>)}</TableRow>)}</TableBody></Table></Paper>)}
-    {!page.forms.length && !page.tables?.length ? <Paper variant="outlined" sx={{ p: 3 }}><Typography color="text.secondary">该管理页暂无可操作内容。</Typography></Paper> : null}
+    {!page.forms.length && !page.tables?.length && !page.links.length ? <Paper variant="outlined" sx={{ p: 3 }}><Typography color="text.secondary">该管理页暂无可操作内容。</Typography></Paper> : null}
     <Stack spacing={2}>{page.forms.map((form, formIndex) => <Paper key={`${form.action}-${formIndex}`} variant="outlined" sx={{ p: { xs: 2, sm: 2.5 } }}>
       <Typography fontWeight={650} sx={{ mb: 1.5 }}>{form.title || '设置表单'}</Typography><Divider sx={{ mb: 2 }} />
       <Stack spacing={2}>{form.fields.map((field, index) => {

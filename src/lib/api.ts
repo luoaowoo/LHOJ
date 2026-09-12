@@ -1,9 +1,24 @@
 import type { HydroContest, HydroProblem, HydroUser } from '../types';
 import { ensureEndpoint, fetchRead, hydroLoginUrl, hydroLogoutUrl, hydroNativeUrl, hydroUrl, requestSignal } from './endpoint';
-import { scrapeProblemRows } from './scrape';
+import { scrapeContestProblems, scrapeProblemRows } from './scrape';
 import { ApiError, sessionExpiredError } from './errors';
 
 export { ApiError } from './errors';
+
+const contestContextDone = new Map<string, number>();
+const contestContextRequests = new Map<string, Promise<void>>();
+
+async function ensureContestProblemContext(tid: string): Promise<void> {
+  const recent = contestContextDone.get(tid);
+  if (recent && Date.now() - recent < 5 * 60_000) return;
+  const pending = contestContextRequests.get(tid);
+  if (pending) return pending;
+  const request = scrapeContestProblems(tid)
+    .then(() => { contestContextDone.set(tid, Date.now()); })
+    .finally(() => { contestContextRequests.delete(tid); });
+  contestContextRequests.set(tid, request);
+  return request;
+}
 
 export function localizedContent(value: unknown, language = 'zh'): string {
   if (typeof value !== 'string') return '';
@@ -161,6 +176,7 @@ interface ProblemData {
 
 export async function fetchProblem(value: string, tid?: string): Promise<HydroProblem | null> {
   if (tid) {
+    await ensureContestProblemContext(tid);
     await ensureEndpoint();
     const query = `?tid=${encodeURIComponent(tid)}`;
     let response: Response;
@@ -172,13 +188,20 @@ export async function fetchProblem(value: string, tid?: string): Promise<HydroPr
     } catch {
       throw new ApiError('无法读取比赛题目。');
     }
-    if (!response.ok) return null;
-    try {
-      const payload = await response.json() as { pdoc?: unknown };
-      return payload.pdoc && typeof payload.pdoc === 'object' ? payload.pdoc as HydroProblem : null;
-    } catch {
-      return null;
+    if (!response.ok) {
+      throw new ApiError(response.status === 401 || response.status === 403
+        ? '当前账号无权查看该比赛题目，请确认已报名。'
+        : `比赛题目加载失败（HTTP ${response.status}）。`);
     }
+    let payload: { pdoc?: unknown; url?: unknown };
+    try {
+      payload = await response.json() as { pdoc?: unknown; url?: unknown };
+    } catch {
+      throw new ApiError('Hydro 返回了无效的题目数据。');
+    }
+    if (typeof payload.url === 'string' && /^\/login(?:[/?#]|$)/.test(payload.url)) throw sessionExpiredError();
+    if (!payload.pdoc || typeof payload.pdoc !== 'object') throw new ApiError('题目不存在或无权访问。');
+    return payload.pdoc as HydroProblem;
   }
   const numeric = /^\d+$/.test(value);
   const query = `query Problem($id: Int, $pid: String) {
@@ -192,12 +215,8 @@ interface ProblemsData {
   problems: HydroProblem[] | null;
 }
 
-export async function fetchProblemsByIds(ids: number[], tid?: string): Promise<HydroProblem[]> {
+export async function fetchProblemsByIds(ids: number[]): Promise<HydroProblem[]> {
   if (!ids.length) return [];
-  if (tid) {
-    const problems = await Promise.all(ids.map((id) => fetchProblem(String(id), tid).catch(() => null)));
-    return problems.filter((problem): problem is HydroProblem => problem !== null);
-  }
   try {
     const data = await gql<ProblemsData>(
       `query Problems($ids: [Int]) { problems(ids: $ids) {
@@ -263,6 +282,7 @@ export interface SubmitConfig {
 }
 
 export async function fetchSubmitConfig(pid: string, tid?: string): Promise<SubmitConfig> {
+  if (tid) await ensureContestProblemContext(tid);
   await ensureEndpoint();
   const query = tid ? `?tid=${encodeURIComponent(tid)}` : '';
   let response: Response;
@@ -283,6 +303,7 @@ export async function fetchSubmitConfig(pid: string, tid?: string): Promise<Subm
   }
   if (!payload || typeof payload !== 'object') throw new ApiError('Hydro 返回了无效的提交配置。');
   const body = payload as Record<string, unknown>;
+  if (typeof body.url === 'string' && /^\/login(?:[/?#]|$)/.test(body.url)) throw sessionExpiredError();
   if (!body.pdoc || typeof body.pdoc !== 'object') throw new ApiError('题目不存在或当前账号无权提交。');
   const problem = body.pdoc as HydroProblem & { config?: { langs?: unknown } };
   const labels = body.langRange && typeof body.langRange === 'object'

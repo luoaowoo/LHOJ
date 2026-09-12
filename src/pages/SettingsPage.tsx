@@ -124,6 +124,7 @@ export default function SettingsPage() {
                   <MenuItem value="collapsed">默认收缩</MenuItem>
                 </Select>
               </FormControl>
+
             </Box>
 
             <Divider />

@@ -1,11 +1,12 @@
+import { contestProblems } from './contestRule';
 import type {
   ContestRow, DiscussionDetail, DiscussionReply, DiscussionRow, HomeworkDetail,
-  HomeworkProblem, HomeworkRow, ProblemFile, ProblemRow, ProblemStat,
+  HomeworkProblem, HomeworkRow, HydroProblem, ProblemFile, ProblemRow, ProblemStat,
   ProblemSolutionsResult, RankingRow, RecordDetail, RecordRow, ScoreboardRow,
   HydroSetting, TrainingDetail, TrainingNode, TrainingProblem, TrainingRow, UnsolvedProblem, UserMessage, UserSession,
 } from '../types';
 import { ApiError, sessionExpiredError } from './errors';
-import { ensureEndpoint, fetchRead, hydroNativeUrl, requestSignal } from './endpoint';
+import { ensureEndpoint, fetchRead, hydroNativeUrl, requestSignal, serverNow } from './endpoint';
 
 interface HydroPageResult {
   doc: Document;
@@ -750,6 +751,8 @@ export interface ContestParticipation {
   rule?: string;
   beginAt?: string;
   endAt?: string;
+  globalEndAt?: string;
+  allowPrint?: boolean;
 }
 
 export interface ContestParticipant {
@@ -762,14 +765,34 @@ export async function scrapeContestParticipation(id: string): Promise<ContestPar
   const page = await readHydroPageResponse(`/contest/${encodeURIComponent(id)}`);
   const status = isRecord(page.payload?.tsdoc) ? page.payload.tsdoc : null;
   const contest = isRecord(page.payload?.tdoc) ? page.payload.tdoc : null;
+  const endAt = rawString(status?.endAt) ?? rawString(contest?.endAt);
   return {
     attended: status?.attend === 1 || status?.attend === true,
     subscribed: status?.subscribe === 1 || status?.subscribe === true,
     requiresCode: Boolean(contest?._code),
-    ended: Boolean(status?.endAt),
+    ended: Boolean(endAt && Date.parse(endAt) <= serverNow()),
     rule: textValue(contest?.rule) || undefined,
     beginAt: rawString(contest?.beginAt),
-    endAt: rawString(contest?.endAt),
+    endAt,
+    globalEndAt: rawString(contest?.endAt),
+    allowPrint: contest?.allowPrint === true,
+  };
+}
+
+export interface ContestProblemList {
+  problems: HydroProblem[];
+  endAt?: string;
+}
+
+// Hydro initializes an attended user's personal start timer on this route.
+// Direct hidden-problem requests fail until this endpoint has been visited.
+export async function scrapeContestProblems(id: string, pids: number[] = []): Promise<ContestProblemList> {
+  const page = await readHydroPageResponse(`/contest/${encodeURIComponent(id)}/problems`);
+  const status = isRecord(page.payload?.tsdoc) ? page.payload.tsdoc : null;
+  const payload = isRecord(page.payload) ? page.payload : {};
+  return {
+    problems: contestProblems(payload, pids),
+    endAt: rawString(status?.endAt) ?? undefined,
   };
 }
 
@@ -1495,8 +1518,9 @@ export async function submitHydroAdminForm(
   return submitHydro(path, fields, { method, enctype });
 }
 
-export async function scrapeProblemSolutions(pid: string, pageNumber = 1): Promise<ProblemSolutionsResult> {
-  const page = await readHydroPageResponse(`/p/${encodeURIComponent(pid)}/solution?page=${pageNumber}`);
+export async function scrapeProblemSolutions(pid: string, pageNumber = 1, tid?: string): Promise<ProblemSolutionsResult> {
+  const query = `?page=${pageNumber}${tid ? `&tid=${encodeURIComponent(tid)}` : ''}`;
+  const page = await readHydroPageResponse(`/p/${encodeURIComponent(pid)}/solution${query}`);
   if (!page.payload || !Array.isArray(page.payload.psdocs)) return { items: [], pageCount: 1, total: 0 };
   const items = page.payload.psdocs.flatMap((item) => {
     if (!isRecord(item)) return [];
@@ -1530,8 +1554,9 @@ export async function scrapeProblemSolutions(pid: string, pageNumber = 1): Promi
   };
 }
 
-export async function scrapeProblemStats(pid: string): Promise<ProblemStat[]> {
-  const page = await readHydroPageResponse(`/p/${encodeURIComponent(pid)}/stat`);
+export async function scrapeProblemStats(pid: string, tid?: string): Promise<ProblemStat[]> {
+  const query = tid ? `?tid=${encodeURIComponent(tid)}` : '';
+  const page = await readHydroPageResponse(`/p/${encodeURIComponent(pid)}/stat${query}`);
   if (!page.payload || !Array.isArray(page.payload.rsdocs)) return [];
   return page.payload.rsdocs.flatMap((item) => {
     if (!isRecord(item)) return [];
@@ -1542,8 +1567,9 @@ export async function scrapeProblemStats(pid: string): Promise<ProblemStat[]> {
   });
 }
 
-export async function scrapeProblemFiles(pid: string): Promise<ProblemFile[]> {
-  const page = await readHydroPageResponse(`/p/${encodeURIComponent(pid)}/files`);
+export async function scrapeProblemFiles(pid: string, tid?: string): Promise<ProblemFile[]> {
+  const query = tid ? `?tid=${encodeURIComponent(tid)}` : '';
+  const page = await readHydroPageResponse(`/p/${encodeURIComponent(pid)}/files${query}`);
   if (!page.payload || !Array.isArray(page.payload.fragments)) return [];
   return page.payload.fragments.flatMap((fragment) => {
     if (!isRecord(fragment) || typeof fragment.html !== 'string') return [];

@@ -16,6 +16,7 @@ export default function ProblemSolutionsPage() {
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const page = Math.max(1, Number.parseInt(searchParams.get('page') ?? '1', 10) || 1);
+  const tid = searchParams.get('tid') ?? '';
   const [result, setResult] = useState<ProblemSolutionsResult | null>(null);
   const [error, setError] = useState('');
   const [content, setContent] = useState('');
@@ -33,11 +34,11 @@ export default function ProblemSolutionsPage() {
   const load = useCallback(async () => {
     setError('');
     try {
-      setResult(await scrapeProblemSolutions(id, page));
+      setResult(await scrapeProblemSolutions(id, page, tid || undefined));
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : '题解加载失败。');
     }
-  }, [id, page]);
+  }, [id, page, tid]);
 
   useEffect(() => { void load(); }, [load]);
   if (!result && !error) return <FullPageLoader />;
@@ -48,7 +49,7 @@ export default function ProblemSolutionsPage() {
     setActing(true);
     setActionError('');
     try {
-      await postHydroForm(`/p/${encodeURIComponent(id)}/solution`, {
+      await postHydroForm(`/p/${encodeURIComponent(id)}/solution${tid ? `?tid=${encodeURIComponent(tid)}` : ''}`, {
         operation,
         ...(psid ? { psid } : {}),
         ...(psrid ? { psrid } : {}),
@@ -83,13 +84,13 @@ export default function ProblemSolutionsPage() {
   return (
     <Box>
       <Box sx={{ mb: 1.5 }}>
-        <Button component={RouterLink} to={`/problem/${encodeURIComponent(id)}`} color="inherit" size="small" startIcon={<ArrowLeft size={16} />}>返回题目</Button>
+        <Button component={RouterLink} to={`/problem/${encodeURIComponent(id)}${tid ? `?tid=${encodeURIComponent(tid)}` : ''}`} color="inherit" size="small" startIcon={<ArrowLeft size={16} />}>返回题目</Button>
       </Box>
       <PageHeader
         icon={<Lightbulb size={22} />}
         title="题解"
         actions={(
-          <Button component={RouterLink} to={hydroWorkspaceHref(`/p/${encodeURIComponent(id)}/solution`, '发布或管理题解')} size="small">
+          <Button component={RouterLink} to={hydroWorkspaceHref(`/p/${encodeURIComponent(id)}/solution${tid ? `?tid=${encodeURIComponent(tid)}` : ''}`, '发布或管理题解')} size="small">
             发布或管理题解
           </Button>
         )}
